@@ -1,5 +1,6 @@
-import { useGetHealth } from "@/hooks/api/useGetHealth";
 import React from "react";
+
+import { useGetHealth } from "@/hooks/api/useGetHealth";
 
 export const HealthStatus: React.FC = () => {
   const { data, isLoading, error } = useGetHealth();
