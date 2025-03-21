@@ -11,4 +11,4 @@ function About() {
 const a = null;
 
 const b = { asdf: 123 };
-const {asdf} =b;
+const { asdf } = b;
