@@ -1,11 +1,2 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-echo "Running pre-commit hooks... 1"
-cd code
-echo "Running pre-commit hooks... 2"
 npx lint-staged
-echo "Running pre-commit hooks... 3"
-npm run lint:style:fix
-echo "Running pre-commit hooks... 4"
 npx tsc --noEmit
