@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 762.09 379.54">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        font-family: STHeiti, STHeiti;
+      }
+
+      .cls-3 {
+        font-size: 160.91px;
+      }
+
+      .cls-2 {
+        fill: #00b38a;
+        font-size: 332px;
+      }
+
+      .cls-4 {
+        font-size: 300px;
+      }
+    </style>
+  </defs>
+  <text class="cls-1" transform="translate(0 258)"><tspan class="cls-3" x="0" y="0">MANE</tspan><tspan class="cls-4" x="472.26" y="0" xml:space="preserve">  </tspan><tspan class="cls-3" x="622.26" y="0">O</tspan></text>
+  <text class="cls-2" transform="translate(452.52 333.06)"><tspan x="0" y="0">X</tspan></text>
+</svg>
