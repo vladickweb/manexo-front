@@ -3,7 +3,11 @@
 
 @theme {
 	--color-primary: #01b48a;
+	--color-primary-light: #3dd2b8;
+	--color-primary-dark: #008f68;
 	--color-secondary: #f0a202;
+	--color-secondary-light: #f7c949;
+	--color-secondary-dark: #c87e00;
 }
 
 :root {
