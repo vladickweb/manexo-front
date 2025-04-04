@@ -21,7 +21,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       onClose={() => setIsOpen(false)}
       containerClassName="w-11/12 max-w-2xl"
     >
-      {/* Tabs */}
       <div className="mb-6 flex border-b">
         <button
           className={`flex-1 py-2 text-center font-semibold ${
