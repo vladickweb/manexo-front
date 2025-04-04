@@ -43,7 +43,6 @@ export const ProfilePage = () => {
 
   return (
     <MainLayout>
-      {/* Profile Info */}
       <div className="flex flex-col items-center mb-8">
         <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4">
           <FaUser className="w-12 h-12 text-primary" />
@@ -53,7 +52,6 @@ export const ProfilePage = () => {
         </h2>
       </div>
 
-      {/* Menu Items */}
       <div className="space-y-2">
         {menuItems.map((item) => (
           <button

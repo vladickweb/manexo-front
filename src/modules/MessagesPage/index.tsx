@@ -5,7 +5,6 @@ import { MainLayout } from "@/layouts/MainLayout";
 export const MessagesPage = () => {
   return (
     <MainLayout>
-      {/* Main Content */}
       <div className="flex flex-col items-center justify-center h-[60vh]">
         <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
           <FaCommentDots className="w-10 h-10 text-primary" />

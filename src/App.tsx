@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { LandingPage } from "@/modules/LandingPage";
 import { useUser } from "@/stores/useUser";
 
-// Componente de ruta protegida
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useUser((s) => s.user);
 
@@ -14,7 +13,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Componente de Servicios
 const Services = () => {
   return (
     <div className="container mx-auto px-4 py-8">

@@ -51,7 +51,6 @@ const categories: Category[] = [
 export const ServicesPage = () => {
   return (
     <MainLayout>
-      {/* Categories */}
       <div className="grid grid-cols-4 gap-4 mb-8">
         {categories.map((category, index) => (
           <button

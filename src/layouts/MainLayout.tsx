@@ -82,13 +82,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Logo className="h-8 w-auto" />
-              {/* Address Selector for Desktop */}
               <div className="hidden md:block ml-8">
                 <AddressSelector value={address} onChange={setAddress} />
               </div>
@@ -102,17 +100,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </button>
             </div>
           </div>
-          {/* Address Selector for Mobile */}
           <div className="md:hidden mt-4">
             <AddressSelector value={address} onChange={setAddress} />
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-6">{children}</main>
 
-      {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-3">

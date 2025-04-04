@@ -1,4 +1,3 @@
-// api/axiosClient.ts
 import axios from "axios";
 
 import { useUser } from "@/stores/useUser";
@@ -10,7 +9,6 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(
   (config) => {
-    // Obtener el accessToken directamente del store
     const { accessToken } = useUser.getState();
 
     if (accessToken) {
