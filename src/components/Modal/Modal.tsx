@@ -8,13 +8,13 @@ interface ModalProps {
   containerClassName?: string;
 }
 
-export const Modal: React.FC<ModalProps> = ({
+export const Modal = ({
   isOpen,
   onClose,
   children,
   title,
   containerClassName = "w-11/12 max-w-lg",
-}) => {
+}: ModalProps) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -71,7 +71,7 @@ export const Modal: React.FC<ModalProps> = ({
               if (
                 React.isValidElement(child) &&
                 child.type === "div" &&
-                child.props.className?.includes("mb-6 flex border-b")
+                (child as any).props.className?.includes("mb-6 flex border-b")
               ) {
                 return child;
               }
@@ -85,7 +85,7 @@ export const Modal: React.FC<ModalProps> = ({
               !(
                 React.isValidElement(child) &&
                 child.type === "div" &&
-                child.props.className?.includes("mb-6 flex border-b")
+                (child as any).props.className?.includes("mb-6 flex border-b")
               )
             ) {
               return child;
