@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import Logo from "@/assets/manexo-logo.svg?react";
 import { Link } from "@/components/ActionButton/ActionButton";
 import { Button } from "@/components/Button/Button";
+import { LoginModal } from "@/components/Login/LoginModal";
 
 export const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
 
@@ -48,7 +50,14 @@ export const Header: React.FC = () => {
           <Link href="#features">Servicios</Link>
           <Link href="#about">Acerca</Link>
           <Link href="#contact">Contacto</Link>
-          <Button>Iniciar Sesión</Button>
+          <Button
+            onClick={() => {
+              setIsLoginModalOpen(true);
+              setMenuOpen(false);
+            }}
+          >
+            Iniciar Sesión
+          </Button>
         </nav>
       </div>
 
@@ -68,6 +77,7 @@ export const Header: React.FC = () => {
           </div>
         </nav>
       )}
+      <LoginModal isOpen={isLoginModalOpen} setIsOpen={setIsLoginModalOpen} />
     </header>
   );
 };
