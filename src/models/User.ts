@@ -1,3 +1,5 @@
+import { Service } from "@/models/Service";
+
 export type User = {
   id: string;
   email: string;
