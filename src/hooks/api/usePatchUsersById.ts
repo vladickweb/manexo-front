@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
+import axiosClient from "@/api/axiosClient";
 import { UpdateUserDto, User } from "@/models";
 
 export const usePatchUsersById = (
@@ -8,12 +9,8 @@ export const usePatchUsersById = (
   return useMutation({
     ...(options || {}),
     mutationFn: async (params: UpdateUserDto) => {
-      const res = await fetch("/users/{id}", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      });
-      return res.json();
+      const { data } = await axiosClient.patch<User>(`/users/{id}`, params);
+      return data;
     },
   });
 };

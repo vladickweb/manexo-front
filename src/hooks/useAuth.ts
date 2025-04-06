@@ -7,21 +7,24 @@ import { useUser } from "@/stores/useUser";
 
 export const useAuth = () => {
   const navigate = useNavigate();
-  const { user, accessToken, setUser } = useUser();
-  const { data: userData, isLoading, isError } = useGetUser();
+  const { accessToken, refreshToken, setUser } = useUser();
+  const { data: user, isLoading, isError } = useGetUser();
 
   useEffect(() => {
-    if (accessToken && !user && !isLoading && userData) {
-      const refreshToken = useUser.getState().refreshToken || "";
-      setUser(userData, accessToken, refreshToken);
+    if (isError && accessToken) {
+      navigate("/", { replace: true });
     }
-  }, [accessToken, user, isLoading, userData, setUser]);
+  }, [isError, accessToken, navigate]);
 
   useEffect(() => {
-    if (isError) {
-      navigate("/");
+    if (user && accessToken) {
+      setUser(user, accessToken, refreshToken || "");
     }
-  }, [isError, navigate]);
+  }, [user, accessToken, refreshToken, setUser]);
 
-  return { user, accessToken, isLoading };
+  return {
+    isLoading,
+    isAuthenticated: !!accessToken,
+    user,
+  };
 };

@@ -15,6 +15,8 @@ interface LoginResponse {
   user: {
     id: string;
     email: string;
+    firstName?: string;
+    lastName?: string;
   };
 }
 
@@ -32,7 +34,12 @@ export const useLogin = () => {
     },
     onSuccess: (data) => {
       setUser(data.user, data.accessToken, data.refreshToken);
-      navigate("/services", { replace: true });
+      setTimeout(() => {
+        navigate("/services", { replace: true });
+      }, 100);
+    },
+    onError: (error) => {
+      console.error("useLogin - Error en login:", error);
     },
   });
 };

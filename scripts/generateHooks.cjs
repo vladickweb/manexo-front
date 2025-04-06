@@ -71,26 +71,30 @@ const generateHookContent = ({
   const isGet = method === "get";
   const queryKey = toSnakeCase(hookName).toUpperCase();
 
-const nativeTypes = ["any", "void", "string", "number", "boolean", "unknown", "any[]"];
-const typesToImport = [responseType, requestType]
-  .filter((type) => !!type && !nativeTypes.includes(type))
-  .filter((v, i, arr) => arr.indexOf(v) === i);
+  const nativeTypes = ["any", "void", "string", "number", "boolean", "unknown", "any[]"];
+  const typesToImport = [responseType, requestType]
+    .filter((type) => !!type && !nativeTypes.includes(type))
+    .filter((v, i, arr) => arr.indexOf(v) === i);
 
-
-  const importLine = typesToImport.length
-    ? `import { ${typesToImport.join(", ")} } from '@/models';\n\n`
-    : "";
+  const importLine = [
+    typesToImport.length ? `import { ${typesToImport.join(", ")} } from '@/models';` : null,
+    `import axiosClient from '@/api/axiosClient';`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   if (isGet) {
     return `
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { QueryKeys } from '@/constants/queryKeys';
-${importLine}export const use${hookName} = (${hasParams ? `params: any, ` : ""}options?: Omit<UseQueryOptions<${responseType}>, "queryKey" | "queryFn">) => {
+${importLine}
+
+export const use${hookName} = (${hasParams ? `params: any, ` : ""}options?: Omit<UseQueryOptions<${responseType}>, "queryKey" | "queryFn">) => {
   return useQuery<${responseType}>({
     queryKey: [QueryKeys.${queryKey}${hasParams ? ", params" : ""}],
     queryFn: async () => {
-      const res = await fetch('${routePath}');
-      return res.json();
+      const { data } = await axiosClient.get<${responseType}>(\`${routePath}\`${hasParams ? ", { params }" : ""});
+      return data;
     },
     ...options,
   });
@@ -99,22 +103,21 @@ ${importLine}export const use${hookName} = (${hasParams ? `params: any, ` : ""}o
   } else {
     return `
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
-${importLine}export const use${hookName} = (options?: UseMutationOptions<${responseType}, unknown, ${requestType || "void"}>) => {
+${importLine}
+
+export const use${hookName} = (options?: UseMutationOptions<${responseType}, unknown, ${requestType || "void"}>) => {
   return useMutation({
     ...(options || {}),
     mutationFn: async (${requestType ? "params: " + requestType : ""}) => {
-      const res = await fetch('${routePath}', {
-        method: '${method.toUpperCase()}',
-        headers: { 'Content-Type': 'application/json' },
-        ${requestType ? "body: JSON.stringify(params)," : ""}
-      });
-      return res.json();
+      const { data } = await axiosClient.${method}<${responseType}>(\`${routePath}\`${requestType ? ", params" : ""});
+      return data;
     },
   });
 };
 `.trim();
   }
 };
+
 
 const generateQueryKeysFile = (queryKeys) => {
   const entries = queryKeys.map((k) => `  ${k}: '${k}'`).join(",\n");

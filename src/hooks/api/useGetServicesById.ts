@@ -1,5 +1,6 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
+import axiosClient from "@/api/axiosClient";
 import { QueryKeys } from "@/constants/queryKeys";
 import { Service } from "@/models";
 
@@ -10,8 +11,10 @@ export const useGetServicesById = (
   return useQuery<Service>({
     queryKey: [QueryKeys.GET_SERVICES_BY_ID, params],
     queryFn: async () => {
-      const res = await fetch("/services/{id}");
-      return res.json();
+      const { data } = await axiosClient.get<Service>(`/services/{id}`, {
+        params,
+      });
+      return data;
     },
     ...options,
   });

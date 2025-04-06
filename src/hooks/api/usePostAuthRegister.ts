@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
+import axiosClient from "@/api/axiosClient";
 import { RegisterDto } from "@/models";
 
 export const usePostAuthRegister = (
@@ -8,12 +9,8 @@ export const usePostAuthRegister = (
   return useMutation({
     ...(options || {}),
     mutationFn: async (params: RegisterDto) => {
-      const res = await fetch("/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      });
-      return res.json();
+      const { data } = await axiosClient.post<any>(`/auth/register`, params);
+      return data;
     },
   });
 };

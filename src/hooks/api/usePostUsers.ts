@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
+import axiosClient from "@/api/axiosClient";
 import { CreateUserDto, User } from "@/models";
 
 export const usePostUsers = (
@@ -8,12 +9,8 @@ export const usePostUsers = (
   return useMutation({
     ...(options || {}),
     mutationFn: async (params: CreateUserDto) => {
-      const res = await fetch("/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      });
-      return res.json();
+      const { data } = await axiosClient.post<User>(`/users`, params);
+      return data;
     },
   });
 };
