@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
+import axiosClient from "@/api/axiosClient";
 import { Category, CreateCategoryDto } from "@/models";
 
 export const usePostCategories = (
@@ -8,12 +9,8 @@ export const usePostCategories = (
   return useMutation({
     ...(options || {}),
     mutationFn: async (params: CreateCategoryDto) => {
-      const res = await fetch("/categories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      });
-      return res.json();
+      const { data } = await axiosClient.post<Category>(`/categories`, params);
+      return data;
     },
   });
 };

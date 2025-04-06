@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
+import axiosClient from "@/api/axiosClient";
 import { LoginDto } from "@/models";
 
 export const usePostAuthLogin = (
@@ -8,12 +9,8 @@ export const usePostAuthLogin = (
   return useMutation({
     ...(options || {}),
     mutationFn: async (params: LoginDto) => {
-      const res = await fetch("/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      });
-      return res.json();
+      const { data } = await axiosClient.post<any>(`/auth/login`, params);
+      return data;
     },
   });
 };

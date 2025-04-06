@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
+import axiosClient from "@/api/axiosClient";
 import { Category, UpdateCategoryDto } from "@/models";
 
 export const usePatchCategoriesById = (
@@ -8,12 +9,11 @@ export const usePatchCategoriesById = (
   return useMutation({
     ...(options || {}),
     mutationFn: async (params: UpdateCategoryDto) => {
-      const res = await fetch("/categories/{id}", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      });
-      return res.json();
+      const { data } = await axiosClient.patch<Category>(
+        `/categories/{id}`,
+        params,
+      );
+      return data;
     },
   });
 };

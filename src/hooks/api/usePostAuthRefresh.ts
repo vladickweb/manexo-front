@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
+import axiosClient from "@/api/axiosClient";
 import { RefreshTokenDto } from "@/models";
 
 export const usePostAuthRefresh = (
@@ -8,12 +9,8 @@ export const usePostAuthRefresh = (
   return useMutation({
     ...(options || {}),
     mutationFn: async (params: RefreshTokenDto) => {
-      const res = await fetch("/auth/refresh", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
-      });
-      return res.json();
+      const { data } = await axiosClient.post<any>(`/auth/refresh`, params);
+      return data;
     },
   });
 };
