@@ -118,7 +118,6 @@ export const use${hookName} = (options?: UseMutationOptions<${responseType}, unk
   }
 };
 
-
 const generateQueryKeysFile = (queryKeys) => {
   const entries = queryKeys.map((k) => `  ${k}: '${k}'`).join(",\n");
   return `export const QueryKeys = {\n${entries}\n};\n`;
