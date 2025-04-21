@@ -37,7 +37,7 @@ export const useSignup = () => {
     },
     onSuccess: (data) => {
       setUser(data.user, data.accessToken, data.refreshToken);
-      navigate("/services", { replace: true });
+      navigate("/search", { replace: true });
     },
   });
 };

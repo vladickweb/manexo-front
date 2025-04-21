@@ -5,6 +5,8 @@ import { IUser } from "@/stores/useUser";
 import { useUser } from "@/stores/useUser";
 
 export const useGetUser = () => {
+  const accessToken = useUser((state) => state.accessToken);
+
   return useQuery({
     queryKey: ["user"],
     queryFn: async () => {
@@ -12,6 +14,6 @@ export const useGetUser = () => {
       return data;
     },
     retry: false,
-    enabled: !!useUser.getState().accessToken,
+    enabled: !!accessToken,
   });
 };

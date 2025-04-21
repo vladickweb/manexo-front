@@ -5,8 +5,9 @@ import { PublicRoute } from "@/components/PublicRoute";
 import { FavoritesPage } from "@/modules/FavoritesPage";
 import { LandingPage } from "@/modules/LandingPage";
 import { MessagesPage } from "@/modules/MessagesPage";
+import { MyServicesPage } from "@/modules/MyServicesPage";
 import { ProfilePage } from "@/modules/ProfilePage";
-import { ServicesPage } from "@/modules/ServicesPage";
+import { SearchPage } from "@/modules/SearchPage";
 
 export const AppRoutes = () => {
   return (
@@ -20,10 +21,18 @@ export const AppRoutes = () => {
         }
       />
       <Route
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <SearchPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/services"
         element={
           <ProtectedRoute>
-            <ServicesPage />
+            <MyServicesPage />
           </ProtectedRoute>
         }
       />

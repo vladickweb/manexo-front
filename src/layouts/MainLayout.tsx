@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
     id: "search",
     name: "Buscar",
     icon: <FaSearch className="w-5 h-5" />,
-    path: "/services",
+    path: "/search",
   },
   {
     id: "favorites",
@@ -36,7 +36,7 @@ const navItems: NavItem[] = [
   },
   {
     id: "services",
-    name: "Servicios",
+    name: "Mis Servicios",
     icon: <FaCalendarAlt className="w-5 h-5" />,
     path: "/services",
   },
@@ -106,7 +106,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6">{children}</main>
+      <main
+        className={`${
+          location.pathname === "/services"
+            ? "p-0 max-w-none w-full"
+            : "container mx-auto px-4 py-6"
+        }`}
+      >
+        {children}
+      </main>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
         <div className="container mx-auto px-4">
