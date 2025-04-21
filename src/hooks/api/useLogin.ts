@@ -35,7 +35,7 @@ export const useLogin = () => {
     onSuccess: (data) => {
       setUser(data.user, data.accessToken, data.refreshToken);
       setTimeout(() => {
-        navigate("/services", { replace: true });
+        navigate("/search", { replace: true });
       }, 100);
     },
     onError: (error) => {

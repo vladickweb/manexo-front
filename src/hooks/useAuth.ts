@@ -7,20 +7,14 @@ import { useUser } from "@/stores/useUser";
 
 export const useAuth = () => {
   const navigate = useNavigate();
-  const { accessToken, refreshToken, setUser } = useUser();
+  const { accessToken } = useUser();
   const { data: user, isLoading, isError } = useGetUser();
 
   useEffect(() => {
-    if (isError && accessToken) {
+    if (isError) {
       navigate("/", { replace: true });
     }
-  }, [isError, accessToken, navigate]);
-
-  useEffect(() => {
-    if (user && accessToken) {
-      setUser(user, accessToken, refreshToken || "");
-    }
-  }, [user, accessToken, refreshToken, setUser]);
+  }, [isError, navigate]);
 
   return {
     isLoading,
