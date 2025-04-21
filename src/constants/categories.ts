@@ -25,7 +25,7 @@ import SchoolIcon from "@/assets/svg/subcategories/school.svg";
 import TennisIcon from "@/assets/svg/subcategories/tennis.svg";
 import YogaIcon from "@/assets/svg/subcategories/yoga.svg";
 
-export interface Subcategory {
+interface Subcategory {
   id: string;
   name: string;
   description: string;

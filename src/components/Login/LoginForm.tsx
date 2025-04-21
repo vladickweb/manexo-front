@@ -7,7 +7,7 @@ import { SocialAuthButtons } from "@/components/Login/SocialAuthButtons";
 import { Title } from "@/components/Login/Title";
 import { useLogin } from "@/hooks/api/useLogin";
 
-export const LoginSchema = Yup.object({
+const LoginSchema = Yup.object({
   email: Yup.string().email("Correo inválido").required("Correo requerido"),
   password: Yup.string().required("Contraseña requerida"),
 });

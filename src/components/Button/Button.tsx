@@ -2,7 +2,7 @@ import React from "react";
 
 import { Loader } from "@/components/Loader/Loader";
 
-export interface ButtonProps {
+interface ButtonProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
@@ -43,7 +43,7 @@ const getButtonClasses = (
   return classes + hover;
 };
 
-export const Button: React.FC<ButtonProps> = ({
+export const Button = ({
   children,
   className = "",
   onClick,
@@ -52,7 +52,7 @@ export const Button: React.FC<ButtonProps> = ({
   filled = false,
   disabled = false,
   loading = false,
-}) => {
+}: ButtonProps) => {
   const buttonClasses = getButtonClasses(variant, filled, disabled);
 
   return (
