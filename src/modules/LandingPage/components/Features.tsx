@@ -1,5 +1,3 @@
-import React from "react";
-
 import Lottie from "lottie-react";
 
 import cleanerData from "@/assets/lotties/cleaner.json";
