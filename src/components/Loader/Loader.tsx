@@ -1,6 +1,4 @@
-import React from "react";
-
-export const Loader: React.FC = () => (
+export const Loader = () => (
   <div className="flex items-center justify-center">
     <svg
       className="animate-spin h-5 w-5 mr-2 text-current"

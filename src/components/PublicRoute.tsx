@@ -6,7 +6,7 @@ interface PublicRouteProps {
   children: React.ReactNode;
 }
 
-export const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
+export const PublicRoute = ({ children }: PublicRouteProps) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 

@@ -1,5 +1,3 @@
-import React from "react";
-
 import Lottie from "lottie-react";
 
 import cleanerData from "@/assets/lotties/cleaner.json";
@@ -33,7 +31,7 @@ const features: Feature[] = [
   },
 ];
 
-const Features: React.FC = () => {
+const Features = () => {
   return (
     <section id="features" className="container mx-auto px-4 py-16">
       <h3 className="text-3xl font-bold text-center mb-16">

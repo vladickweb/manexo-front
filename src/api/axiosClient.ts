@@ -2,7 +2,6 @@ import axios, { AxiosError } from "axios";
 
 import { useUser } from "@/stores/useUser";
 
-// Extender la interfaz de configuración de Axios
 declare module "axios" {
   interface InternalAxiosRequestConfig {
     _retry?: boolean;
@@ -19,9 +18,17 @@ const axiosClient = axios.create({
   },
 });
 
-// Variable para controlar si estamos en proceso de refresh
+axiosClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      useUser.getState().logout();
+    }
+    return Promise.reject(error);
+  },
+);
+
 let isRefreshing = false;
-// Cola de callbacks pendientes
 let failedQueue: {
   resolve: (value?: unknown) => void;
   reject: (reason?: unknown) => void;
@@ -59,10 +66,8 @@ axiosClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Si el error es 401 y no estamos ya intentando refrescar
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        // Si ya estamos refrescando, añadir a la cola
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -84,7 +89,6 @@ axiosClient.interceptors.response.use(
       }
 
       try {
-        // Intentar refrescar el token
         const response = await axiosClient.post("/auth/refresh", {
           refreshToken,
         });
@@ -92,15 +96,12 @@ axiosClient.interceptors.response.use(
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
           response.data;
 
-        // Actualizar tokens en el store
         useUser
           .getState()
           .setUser(useUser.getState().user!, newAccessToken, newRefreshToken);
 
-        // Actualizar el header de la petición original
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-        // Procesar cola de peticiones pendientes
         processQueue(null, newAccessToken);
 
         return axiosClient(originalRequest);

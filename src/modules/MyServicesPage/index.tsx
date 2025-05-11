@@ -1,84 +1,113 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
 
-import { useGetServicesUserUserId } from "@/hooks/api/useGetServicesUserUserId";
-import { MainLayout } from "@/layouts/MainLayout";
-import { useUser } from "@/stores/useUser";
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import { Button } from "@/components/Button/Button";
+import { ServiceCard } from "@/components/services/ServiceCard";
+import { useDeleteServicesById } from "@/hooks/api/useDeleteServicesById";
+import { useGetServices } from "@/hooks/api/useGetServices";
 
 export const MyServicesPage = () => {
-  const { user } = useUser();
-  const { data: services, isLoading } = useGetServicesUserUserId(
-    { userId: user?.id },
-    { enabled: !!user?.id },
+  const [activeTab, setActiveTab] = useState<"offered" | "contracted">(
+    "offered",
   );
+  const { data: services, isLoading } = useGetServices();
+  const { mutate: deleteService } = useDeleteServicesById();
+  const navigate = useNavigate();
+
+  const handleDelete = (id: string) => {
+    deleteService(id);
+  };
+
+  const handleEdit = (id: string) => {
+    navigate(`/services/${id}/edit`);
+  };
+
+  const handleCreateService = () => {
+    navigate("/services/create");
+  };
 
   if (isLoading) {
     return (
-      <MainLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      </MainLayout>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
     );
   }
 
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Mis Servicios Contratados</h1>
-
-        {services?.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 mb-4">
-              No tienes servicios contratados
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-              onClick={() => (window.location.href = "/search")}
-            >
-              Buscar Servicios
-            </motion.button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services?.map((service, index) => (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <img
-                      src={service.category?.icon}
-                      alt={service.category?.name}
-                      className="w-6 h-6"
-                    />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold">{service.title}</h2>
-                    <p className="text-sm text-gray-500">
-                      {service.category?.name}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-gray-600 mb-4">{service.description}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-primary">
-                    ${service.price}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {new Date(service.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Mis Servicios</h1>
+        <Button
+          variant="primary"
+          filled
+          onClick={handleCreateService}
+          className="flex items-center"
+        >
+          <Plus className="mr-2 h-5 w-5" />
+          Crear Servicio
+        </Button>
       </div>
-    </MainLayout>
+
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="border-b border-gray-200">
+          <nav className="flex space-x-8 px-6" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab("offered")}
+              className={`${
+                activeTab === "offered"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Servicios Ofrecidos
+            </button>
+            <button
+              onClick={() => setActiveTab("contracted")}
+              className={`${
+                activeTab === "contracted"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Servicios Contratados
+            </button>
+          </nav>
+        </div>
+
+        <div className="p-6">
+          {activeTab === "offered" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {services?.map((service) => (
+                <ServiceCard
+                  key={service.id}
+                  title={service.title}
+                  description={service.description}
+                  price={service.price}
+                  category={service.category.name}
+                  onEdit={() => handleEdit(service.id)}
+                  onDelete={() => handleDelete(service.id)}
+                />
+              ))}
+              {services?.length === 0 && (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-gray-600">
+                    No tienes servicios ofrecidos. ¡Crea uno nuevo!
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "contracted" && (
+            <div className="text-center py-12">
+              <p className="text-gray-600">No tienes servicios contratados</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };

@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import Logo from "@/assets/manexo-logo.svg?react";
-import { Link } from "@/components/ActionButton/ActionButton";
+import { ActionButton } from "@/components/ActionButton/ActionButton";
 import { Button } from "@/components/Button/Button";
 import { LoginModal } from "@/components/Login/LoginModal";
 
-export const Header: React.FC = () => {
+export const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -47,9 +47,9 @@ export const Header: React.FC = () => {
         </div>
 
         <nav className="hidden md:flex items-center space-x-6">
-          <Link href="#features">Servicios</Link>
-          <Link href="#about">Acerca</Link>
-          <Link href="#contact">Contacto</Link>
+          <ActionButton href="#features">Servicios</ActionButton>
+          <ActionButton href="#about">Acerca</ActionButton>
+          <ActionButton href="#contact">Contacto</ActionButton>
           <Button
             onClick={() => {
               setIsLoginModalOpen(true);
@@ -64,15 +64,15 @@ export const Header: React.FC = () => {
       {menuOpen && (
         <nav className="md:hidden bg-white shadow">
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-            <Link href="#features" onClick={() => setMenuOpen(false)}>
+            <ActionButton href="#features" onClick={() => setMenuOpen(false)}>
               Servicios
-            </Link>
-            <Link href="#about" onClick={() => setMenuOpen(false)}>
+            </ActionButton>
+            <ActionButton href="#about" onClick={() => setMenuOpen(false)}>
               Acerca
-            </Link>
-            <Link href="#contact" onClick={() => setMenuOpen(false)}>
+            </ActionButton>
+            <ActionButton href="#contact" onClick={() => setMenuOpen(false)}>
               Contacto
-            </Link>
+            </ActionButton>
             <Button onClick={() => setMenuOpen(false)}>Iniciar Sesión</Button>
           </div>
         </nav>

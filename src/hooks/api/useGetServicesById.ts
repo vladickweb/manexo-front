@@ -1,21 +1,23 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 import axiosClient from "@/api/axiosClient";
-import { QueryKeys } from "@/constants/queryKeys";
-import { Service } from "@/models";
+import { Service } from "@/types/service";
 
-export const useGetServicesById = (
-  params: any,
-  options?: Omit<UseQueryOptions<Service>, "queryKey" | "queryFn">,
-) => {
+export const useGetServicesById = (id: string) => {
   return useQuery<Service>({
-    queryKey: [QueryKeys.GET_SERVICES_BY_ID, params],
+    queryKey: ["services", id],
     queryFn: async () => {
-      const { data } = await axiosClient.get<Service>(`/services/{id}`, {
-        params,
-      });
-      return data;
+      try {
+        const response = await axiosClient.get(`/services/${id}`);
+        return response.data;
+      } catch (error: any) {
+        toast.error(
+          error.response?.data?.message || "Error al cargar el servicio",
+        );
+        throw error;
+      }
     },
-    ...options,
+    enabled: !!id,
   });
 };

@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import axiosClient from "@/api/axiosClient";
 import { useUser } from "@/stores/useUser";
@@ -10,6 +11,13 @@ interface SignupData {
   email: string;
   password: string;
   confirmPassword: string;
+}
+
+interface SignupPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
 }
 
 interface SignupResponse {
@@ -29,15 +37,24 @@ export const useSignup = () => {
 
   return useMutation({
     mutationFn: async (data: SignupData) => {
+      const { confirmPassword: _confirmPassword, ...payload } = data;
       const response = await axiosClient.post<SignupResponse>(
         "/auth/register",
-        data,
+        payload as SignupPayload,
       );
       return response.data;
     },
     onSuccess: (data) => {
       setUser(data.user, data.accessToken, data.refreshToken);
       navigate("/search", { replace: true });
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.message;
+      if (Array.isArray(errorMessage)) {
+        errorMessage.forEach((msg) => toast.error(msg));
+      } else {
+        toast.error(errorMessage || "Error al registrarse");
+      }
     },
   });
 };

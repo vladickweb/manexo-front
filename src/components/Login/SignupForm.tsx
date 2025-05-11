@@ -20,7 +20,7 @@ const SignupSchema = Yup.object().shape({
     .required("Confirmación requerida"),
 });
 
-export const SignupForm: React.FC = () => {
+export const SignupForm = () => {
   const { mutate: signup } = useSignup();
 
   return (
@@ -52,24 +52,24 @@ export const SignupForm: React.FC = () => {
                   <Field
                     name="firstName"
                     placeholder="Nombre"
-                    className="input"
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   />
                   <ErrorMessage
                     name="firstName"
                     component="div"
-                    className="text-red-500 text-sm mt-1"
+                    className="text-sm text-red-600 mt-1"
                   />
                 </Col>
                 <Col w={12} m={6}>
                   <Field
                     name="lastName"
                     placeholder="Apellidos"
-                    className="input"
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   />
                   <ErrorMessage
                     name="lastName"
                     component="div"
-                    className="text-red-500 text-sm mt-1"
+                    className="text-sm text-red-600 mt-1"
                   />
                 </Col>
                 <Col w={12} m={6}>
@@ -77,12 +77,12 @@ export const SignupForm: React.FC = () => {
                     name="email"
                     type="email"
                     placeholder="Correo Electrónico"
-                    className="input"
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   />
                   <ErrorMessage
                     name="email"
                     component="div"
-                    className="text-red-500 text-sm mt-1"
+                    className="text-sm text-red-600 mt-1"
                   />
                 </Col>
                 <Col w={12} m={6}>
@@ -90,12 +90,12 @@ export const SignupForm: React.FC = () => {
                     name="password"
                     type="password"
                     placeholder="Contraseña"
-                    className="input"
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   />
                   <ErrorMessage
                     name="password"
                     component="div"
-                    className="text-red-500 text-sm mt-1"
+                    className="text-sm text-red-600 mt-1"
                   />
                 </Col>
                 <Col w={12}>
@@ -103,12 +103,12 @@ export const SignupForm: React.FC = () => {
                     name="confirmPassword"
                     type="password"
                     placeholder="Confirmar Contraseña"
-                    className="input"
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                   />
                   <ErrorMessage
                     name="confirmPassword"
                     component="div"
-                    className="text-red-500 text-sm mt-1"
+                    className="text-sm text-red-600 mt-1"
                   />
                 </Col>
               </Row>

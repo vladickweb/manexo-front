@@ -2,7 +2,7 @@ import React from "react";
 
 import { Loader } from "@/components/Loader/Loader";
 
-export interface ButtonProps {
+interface ButtonProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
@@ -35,15 +35,15 @@ const getButtonClasses = (
     case "default":
     default:
       classes += filled
-        ? `bg-gray-800 text-white ${disabled ? "" : "hover:bg-gray-900"}`
-        : `border border-gray-800 text-gray-800 ${disabled ? "" : "hover:bg-gray-800 hover:text-white"}`;
+        ? `bg-primary text-white ${disabled ? "" : "hover:bg-primary/90"}`
+        : `border border-primary text-primary ${disabled ? "" : "hover:bg-primary hover:text-white"}`;
       break;
   }
 
   return classes + hover;
 };
 
-export const Button: React.FC<ButtonProps> = ({
+export const Button = ({
   children,
   className = "",
   onClick,
@@ -52,7 +52,7 @@ export const Button: React.FC<ButtonProps> = ({
   filled = false,
   disabled = false,
   loading = false,
-}) => {
+}: ButtonProps) => {
   const buttonClasses = getButtonClasses(variant, filled, disabled);
 
   return (
