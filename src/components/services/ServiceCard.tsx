@@ -46,7 +46,6 @@ export const ServiceCard: FC<ServiceCardProps> = ({
 
   return (
     <div className="group relative bg-white rounded-2xl p-6 overflow-hidden border border-gray-100 shadow-sm transition-all duration-300">
-      {/* HEADER */}
       <div className="flex justify-between items-start">
         <div className="space-y-1">
           <h3 className="text-xl font-semibold text-gray-900 transition-colors">
@@ -102,7 +101,6 @@ export const ServiceCard: FC<ServiceCardProps> = ({
         </div>
       </div>
 
-      {/* LOCATION & RATING INFO */}
       <div className="mt-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="flex items-center text-sm text-gray-500">
@@ -122,12 +120,10 @@ export const ServiceCard: FC<ServiceCardProps> = ({
         </div>
       </div>
 
-      {/* DESCRIPTION */}
       <p className="mt-4 text-gray-600 text-sm leading-relaxed line-clamp-3">
         {description}
       </p>
 
-      {/* FOOTER */}
       <div className="mt-6 flex items-center justify-between">
         <div className="space-y-1">
           <span className="text-2xl font-bold text-gray-900">

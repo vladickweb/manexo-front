@@ -138,8 +138,6 @@ export const MapContainer = ({
         mapTypeControl: false,
         fullscreenControl: false,
       }}
-    >
-      {/* Aquí puedes agregar marcadores, círculos u otros componentes del mapa */}
-    </GoogleMap>
+    ></GoogleMap>
   );
 };

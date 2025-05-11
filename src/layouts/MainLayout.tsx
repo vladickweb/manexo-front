@@ -90,7 +90,6 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
                 <Logo className="h-12 w-auto" />
               </button>
             </div>
-            {/* Navegación para desktop */}
             <nav className="hidden md:block">
               <div className="flex items-center space-x-8">
                 {navItems.map((item) => (
@@ -117,7 +116,6 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         <div className="container mx-auto px-4 h-full">{children}</div>
       </main>
 
-      {/* Navegación para móvil */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-3">
