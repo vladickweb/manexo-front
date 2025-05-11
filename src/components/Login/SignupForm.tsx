@@ -20,7 +20,7 @@ const SignupSchema = Yup.object().shape({
     .required("Confirmación requerida"),
 });
 
-export const SignupForm: React.FC = () => {
+export const SignupForm = () => {
   const { mutate: signup } = useSignup();
 
   return (

@@ -26,14 +26,14 @@ import TennisIcon from "@/assets/svg/subcategories/tennis.svg";
 import YogaIcon from "@/assets/svg/subcategories/yoga.svg";
 
 interface Subcategory {
-  id: string;
+  id: number;
   name: string;
   description: string;
   icon: string;
 }
 
 export interface Category {
-  id: string;
+  id: number;
   name: string;
   description: string;
   icon: string;
@@ -42,31 +42,31 @@ export interface Category {
 
 export const CATEGORIES: Category[] = [
   {
-    id: "9ed7b42c-ffe4-41bc-8e05-f453ff3fcae6",
+    id: 1,
     name: "Hogar",
     description: "Servicios de hogar",
     icon: HomeIcon,
     subcategories: [
       {
-        id: "hogar-plancha",
+        id: 7,
         name: "Plancha",
         description: "Servicio de planchado a domicilio",
         icon: IroningIcon,
       },
       {
-        id: "hogar-limpieza",
+        id: 8,
         name: "Limpieza",
         description: "Servicio de limpieza del hogar",
         icon: CleaningIcon,
       },
       {
-        id: "hogar-manitas",
+        id: 9,
         name: "Manitas",
         description: "Reparaciones y mantenimiento del hogar",
         icon: HandymanIcon,
       },
       {
-        id: "hogar-jardineria",
+        id: 10,
         name: "Jardinería",
         description: "Mantenimiento de jardines",
         icon: GardeningIcon,
@@ -74,25 +74,25 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: "dca61642-aaa6-45ca-b76a-a8ae9517bbb5",
+    id: 2,
     name: "Clases",
     description: "Servicios de clases",
     icon: BookIcon,
     subcategories: [
       {
-        id: "clases-musica",
+        id: 11,
         name: "Música",
         description: "Clases de música",
         icon: MusicIcon,
       },
       {
-        id: "clases-idiomas",
+        id: 12,
         name: "Idiomas",
         description: "Clases de idiomas",
         icon: LanguagesIcon,
       },
       {
-        id: "clases-colegio",
+        id: 13,
         name: "Colegio",
         description: "Apoyo escolar",
         icon: SchoolIcon,
@@ -100,43 +100,43 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: "d8557cf4-f863-4834-a9cb-d493f86cc7f6",
+    id: 3,
     name: "Deporte",
     description: "Servicios de deporte",
     icon: SportIcon,
     subcategories: [
       {
-        id: "deporte-boxeo",
+        id: 14,
         name: "Boxeo",
         description: "Clases de boxeo",
         icon: BoxingIcon,
       },
       {
-        id: "deporte-personal",
+        id: 15,
         name: "Personal Training",
         description: "Entrenamiento personalizado",
         icon: TrainerIcon,
       },
       {
-        id: "deporte-yoga",
+        id: 16,
         name: "Yoga",
         description: "Clases de yoga",
         icon: YogaIcon,
       },
       {
-        id: "deporte-pilates",
+        id: 17,
         name: "Pilates",
         description: "Clases de pilates",
         icon: PilatesIcon,
       },
       {
-        id: "deporte-padel",
+        id: 18,
         name: "Pádel",
         description: "Clases de pádel",
         icon: PadelIcon,
       },
       {
-        id: "deporte-tenis",
+        id: 19,
         name: "Tenis",
         description: "Clases de tenis",
         icon: TennisIcon,
@@ -144,19 +144,19 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: "5fb3df80-b298-4014-83a3-dc5dc94035d8",
+    id: 4,
     name: "Cuidados",
     description: "Servicios de cuidados",
     icon: CareIcon,
     subcategories: [
       {
-        id: "cuidados-ninos",
+        id: 20,
         name: "Niños",
         description: "Cuidado de niños",
         icon: ChildCareIcon,
       },
       {
-        id: "cuidados-ancianos",
+        id: 21,
         name: "Ancianos",
         description: "Cuidado de ancianos",
         icon: ElderCareIcon,
@@ -164,19 +164,19 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: "3a17e363-5080-4ea9-ad03-ef70b4f95a43",
+    id: 5,
     name: "Mascotas",
     description: "Servicios de mascotas",
     icon: DogIcon,
     subcategories: [
       {
-        id: "mascotas-peluqueria",
+        id: 22,
         name: "Peluquería",
         description: "Peluquería para mascotas",
         icon: PetGroomingIcon,
       },
       {
-        id: "mascotas-paseador",
+        id: 23,
         name: "Paseador",
         description: "Servicio de paseo de perros",
         icon: DogWalkerIcon,
@@ -184,25 +184,25 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: "9e23ba51-e40b-4572-a295-0dc1ad6654d4",
+    id: 6,
     name: "Otros",
     description: "Otros servicios",
     icon: OtherIcon,
     subcategories: [
       {
-        id: "otros-fotografo",
+        id: 24,
         name: "Fotógrafo",
         description: "Servicios de fotografía",
         icon: PhotographerIcon,
       },
       {
-        id: "otros-masajista",
+        id: 25,
         name: "Masajista",
         description: "Servicios de masajes",
         icon: MassageIcon,
       },
       {
-        id: "otros-fisio",
+        id: 26,
         name: "Fisioterapeuta",
         description: "Servicios de fisioterapia",
         icon: PhysioIcon,

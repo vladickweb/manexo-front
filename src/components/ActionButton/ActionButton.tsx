@@ -1,6 +1,6 @@
 import React from "react";
 
-interface LinkProps {
+interface ActionButtonProps {
   href: string;
   children: React.ReactNode;
   className?: string;
@@ -8,12 +8,12 @@ interface LinkProps {
   onClick?: () => void;
 }
 
-export const Link: React.FC<LinkProps> = ({
+export const ActionButton = ({
   href,
   children,
   className = "",
   onClick,
-}) => {
+}: ActionButtonProps) => {
   return (
     <div onClick={onClick}>
       <a

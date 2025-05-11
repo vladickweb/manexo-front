@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import {
   FaCalendarAlt,
@@ -10,7 +10,6 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 
 import Logo from "@/assets/manexo-logo.svg?react";
-import { AddressSelector } from "@/components/AddressSelector";
 import { useAuth } from "@/hooks/useAuth";
 
 interface NavItem {
@@ -57,10 +56,9 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+export const MainLayout = ({ children }: MainLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [address, setAddress] = useState("");
   const { user, isLoading } = useAuth();
 
   const handleNavigation = (path: string) => {
@@ -80,15 +78,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center">
-              <Logo className="h-8 w-auto" />
-              <div className="hidden md:block ml-8">
-                <AddressSelector value={address} onChange={setAddress} />
-              </div>
+              <button
+                onClick={() => handleNavigation("/search")}
+                className="focus:outline-none"
+              >
+                <Logo className="h-12 w-auto" />
+              </button>
             </div>
             {/* Navegación para desktop */}
             <nav className="hidden md:block">
@@ -110,20 +110,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </div>
             </nav>
           </div>
-          <div className="md:hidden mt-4">
-            <AddressSelector value={address} onChange={setAddress} />
-          </div>
         </div>
       </header>
 
-      <main
-        className={`${
-          location.pathname === "/services"
-            ? "p-0 max-w-none w-full"
-            : "container mx-auto px-4 py-6"
-        }`}
-      >
-        {children}
+      <main className="flex-1 pt-24 pb-16 md:pb-0">
+        <div className="container mx-auto px-4 h-full">{children}</div>
       </main>
 
       {/* Navegación para móvil */}

@@ -63,8 +63,8 @@ export const SearchPage = () => {
                   <button
                     onClick={() =>
                       handleSelectSubcategory(
-                        selectedCategory.id,
-                        subcategory.id,
+                        selectedCategory.id.toString(),
+                        subcategory.id.toString(),
                       )
                     }
                     className="w-full aspect-square bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-[1.02] border border-gray-100"

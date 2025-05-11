@@ -9,10 +9,7 @@ interface LoginModalProps {
   setIsOpen: (open: boolean) => void;
 }
 
-export const LoginModal: React.FC<LoginModalProps> = ({
-  isOpen,
-  setIsOpen,
-}) => {
+export const LoginModal = ({ isOpen, setIsOpen }: LoginModalProps) => {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
 
   return (

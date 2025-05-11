@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PublicRoute } from "@/components/PublicRoute";
 import { ServicesTabs } from "@/components/services/ServicesTabs";
 import { MainLayout } from "@/layouts/MainLayout";
+import { CreateServicePage } from "@/modules/CreateServicePage";
 import { FavoritesPage } from "@/modules/FavoritesPage";
 import { LandingPage } from "@/modules/LandingPage";
 import { MessagesPage } from "@/modules/MessagesPage";
@@ -18,18 +18,6 @@ import "react-toastify/dist/ReactToastify.css";
 export const AppRoutes = () => {
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       <Routes>
         <Route
           path="/"
@@ -57,6 +45,16 @@ export const AppRoutes = () => {
                 <div className="container mx-auto px-4 py-8">
                   <ServicesTabs />
                 </div>
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/services/create"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <CreateServicePage />
               </MainLayout>
             </ProtectedRoute>
           }

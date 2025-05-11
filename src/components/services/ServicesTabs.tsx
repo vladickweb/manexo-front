@@ -5,17 +5,15 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
 import { useDeleteServicesById } from "@/hooks/api/useDeleteServicesById";
-import { useGetServices } from "@/hooks/api/useGetServices";
+import { useGetServicesMePublished } from "@/hooks/api/useGetServicesMePublished";
 
-import { CreateServiceModal } from "./CreateServiceModal";
 import { ServiceCard } from "./ServiceCard";
 
 export const ServicesTabs = () => {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"offered" | "contracted">(
     "offered",
   );
-  const { data: services, isLoading } = useGetServices();
+  const { data: servicesMePublished, isLoading } = useGetServicesMePublished();
   const { mutate: deleteService } = useDeleteServicesById();
   const navigate = useNavigate();
 
@@ -38,7 +36,8 @@ export const ServicesTabs = () => {
         <Button
           variant="primary"
           filled
-          onClick={() => setIsCreateModalOpen(true)}
+          onClick={() => navigate("/services/create")}
+          className="flex items-center"
         >
           <Plus className="mr-2 h-4 w-4" />
           Crear Servicio
@@ -72,13 +71,13 @@ export const ServicesTabs = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {activeTab === "offered" &&
-          services?.map((service) => (
+          servicesMePublished?.map((service) => (
             <ServiceCard
               key={service.id}
-              title={service.title}
+              title={service.subcategory.description}
               description={service.description}
               price={service.price}
-              category={service.category.name}
+              category={service.subcategory.category.name}
               onEdit={() => handleEdit(service.id)}
               onDelete={() => handleDelete(service.id)}
             />
@@ -89,11 +88,6 @@ export const ServicesTabs = () => {
           </div>
         )}
       </div>
-
-      <CreateServiceModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
     </div>
   );
 };

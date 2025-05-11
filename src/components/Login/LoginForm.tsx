@@ -12,7 +12,7 @@ const LoginSchema = Yup.object({
   password: Yup.string().required("Contraseña requerida"),
 });
 
-export const LoginForm: React.FC = () => {
+export const LoginForm = () => {
   const loginMutation = useLogin();
 
   return (
