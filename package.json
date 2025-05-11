@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "prepare": "husky",
     "generate:hooks": "node scripts/generateHooks.cjs && eslint --fix 'src/**/*.{ts,tsx,js,jsx}'",
-    "find-deadcode": "ts-prune | grep -v '(used in module)'"
+    "find-deadcode": "ts-prune | grep -v '(used in module)'",
+    "knip": "knip"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -69,7 +70,7 @@
     "stylelint-config-standard": "^37.0.0",
     "stylelint-config-tailwindcss": "^1.0.0",
     "ts-prune": "^0.10.3",
-    "typescript": "~5.7.2",
+    "typescript": "~5.7.3",
     "vite": "^6.2.0",
     "vite-plugin-svgr": "^4.3.0"
   }
