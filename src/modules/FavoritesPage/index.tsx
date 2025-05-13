@@ -1,4 +1,4 @@
-import { ServiceCard } from "@/components/services/ServiceCard";
+import { ServiceCard } from "@/components/Services/ServiceCard";
 
 export const FavoritesPage = () => {
   const favorites = [] as any[];

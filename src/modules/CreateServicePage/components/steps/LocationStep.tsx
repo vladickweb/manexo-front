@@ -1,19 +1,66 @@
+import { useEffect } from "react";
+
 import { useFormikContext } from "formik";
 
 import { Map } from "@/components/Map/Map";
 import { SliderMarkup } from "@/modules/CreateServicePage/components/SliderMarkup";
 import { RADIO_OPTIONS } from "@/modules/CreateServicePage/constants";
 
-interface LocationStepProps {
-  showRadius: boolean;
-  onLocationSelect: (lat: number, lng: number, addr: string) => void;
+interface AddressComponents {
+  streetName: string;
+  streetNumber: string;
+  city: string;
+  province: string;
+  postalCode: string;
+  country: string;
 }
 
-const LocationStep = ({ showRadius, onLocationSelect }: LocationStepProps) => {
+interface LocationStepProps {
+  showRadius: boolean;
+  setShowRadius: (show: boolean) => void;
+  onLocationSelect: (
+    lat: number,
+    lng: number,
+    address: AddressComponents,
+  ) => void;
+}
+
+const LocationStep = ({
+  showRadius,
+  setShowRadius,
+  onLocationSelect,
+}: LocationStepProps) => {
   const { values, errors, touched, setFieldValue } = useFormikContext<any>();
+
+  useEffect(() => {
+    if (values.location.latitude !== 0 && values.location.longitude !== 0) {
+      setShowRadius(true);
+    }
+  }, [values.location.latitude, values.location.longitude, setShowRadius]);
 
   const handleRadiusChange = (radius: number) => {
     setFieldValue("radius", radius);
+  };
+
+  const handleLocationSelect = (
+    lat: number,
+    lng: number,
+    address: AddressComponents,
+  ) => {
+    setFieldValue("location", {
+      latitude: lat,
+      longitude: lng,
+      address: `${address.streetName} ${address.streetNumber}, ${address.city}, ${address.province} ${address.postalCode}`,
+      addressComponents: address,
+    });
+    setShowRadius(true);
+    onLocationSelect(lat, lng, address);
+  };
+
+  // Determinar la ubicación inicial del mapa
+  const initialLocation = {
+    lat: values.location.latitude,
+    lng: values.location.longitude,
   };
 
   return (
@@ -23,27 +70,18 @@ const LocationStep = ({ showRadius, onLocationSelect }: LocationStepProps) => {
       </p>
       <div className="h-[400px] rounded-lg overflow-hidden">
         <Map
-          initialLocation={{
-            lat: values.location.latitude,
-            lng: values.location.longitude,
-          }}
-          center={{
-            lat: values.location.latitude,
-            lng: values.location.longitude,
-          }}
+          location={initialLocation}
           radius={values.radius || RADIO_OPTIONS[2].value}
-          isInteractive={false}
-          onLocationSelect={onLocationSelect}
+          onLocationSelect={handleLocationSelect}
+          initialAddress={values.location.addressComponents}
         />
       </div>
-
       {showRadius && (
         <SliderMarkup
           selectedRadius={values.radius || RADIO_OPTIONS[2].value}
           setSelectedRadius={handleRadiusChange}
         />
       )}
-
       {(errors as any).location?.address &&
         (touched as any).location?.address && (
           <p className="text-red-500">

@@ -1,30 +1,102 @@
 import { useState } from "react";
 
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 
-import { CATEGORIES, Category } from "@/constants/categories";
+import { ServiceCard } from "@/components/Services/ServiceCard";
+import { useGetServices } from "@/hooks/api/useGetServices";
+import { reverseGeocode } from "@/lib/reverseGeocode";
+
+interface Location {
+  latitude: number;
+  longitude: number;
+  address: string;
+}
 
 export const SearchPage = () => {
-  const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
-  );
+  const [_location, setLocation] = useState<Location | null>(null);
+  const [isRequestingLocation, setIsRequestingLocation] = useState(true);
 
-  const handleSelectCategory = (category: Category) => {
-    setSelectedCategory(category);
+  const { data: services, isLoading: isServicesLoading } = useGetServices({
+    select: (data) => {
+      return data.map(async (service) => {
+        const location = await reverseGeocode(
+          service.location.latitude,
+          service.location.longitude,
+        );
+        return {
+          ...service,
+          location,
+        };
+      });
+    },
+  });
+
+  const requestLocation = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const locationData = {
+              latitude,
+              longitude,
+              address: "Tu ubicación actual",
+            };
+            setLocation(locationData);
+            localStorage.setItem("userLocation", JSON.stringify(locationData));
+            setIsRequestingLocation(false);
+          } catch (error) {
+            console.error("Error al obtener la dirección:", error);
+            setIsRequestingLocation(false);
+          }
+        },
+        (error) => {
+          console.error("Error al obtener la ubicación:", error);
+          setIsRequestingLocation(false);
+        },
+      );
+    } else {
+      console.error("Geolocalización no está disponible en este navegador");
+      setIsRequestingLocation(false);
+    }
   };
 
-  const handleCloseSubcategories = () => {
-    setSelectedCategory(null);
-  };
+  if (isRequestingLocation) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center p-8"
+        >
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Necesitamos tu ubicación
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Para mostrarte los servicios disponibles cerca de ti, necesitamos
+            acceder a tu ubicación.
+          </p>
+          <button
+            onClick={requestLocation}
+            className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            Permitir ubicación
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
 
-  const handleSelectSubcategory = (
-    categoryId: string,
-    subcategoryId: string,
-  ) => {
-    navigate(`/services/${categoryId}/${subcategoryId}`);
-  };
+  if (isServicesLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando servicios...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col bg-gray-50 min-h-screen">
@@ -35,7 +107,7 @@ export const SearchPage = () => {
           className="relative"
         >
           <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-dark mb-2">
-            Explora el mundo de servicios
+            Servicios cerca de ti
           </h1>
           <motion.p
             initial={{ opacity: 0, y: -20 }}
@@ -43,94 +115,30 @@ export const SearchPage = () => {
             transition={{ delay: 0.1 }}
             className="text-lg md:text-xl text-gray-600"
           >
-            Encuentra profesionales verificados para cada necesidad
+            Encuentra los mejores servicios en tu zona
           </motion.p>
         </motion.div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {selectedCategory ? (
-            <>
-              {selectedCategory.subcategories.map((subcategory, index) => (
-                <motion.div
-                  key={subcategory.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="relative group"
-                >
-                  <button
-                    onClick={() =>
-                      handleSelectSubcategory(
-                        selectedCategory.id.toString(),
-                        subcategory.id.toString(),
-                      )
-                    }
-                    className="w-full aspect-square bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-[1.02] border border-gray-100"
-                  >
-                    <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
-                      <img
-                        src={subcategory.icon}
-                        alt={subcategory.name}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-sm md:text-base font-medium text-gray-700 text-center">
-                      {subcategory.name}
-                    </span>
-                  </button>
-                </motion.div>
-              ))}
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                onClick={handleCloseSubcategories}
-                className="aspect-square bg-white rounded-2xl p-4 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
-              >
-                <span className="text-sm md:text-base font-medium text-gray-700">
-                  Volver
-                </span>
-              </motion.button>
-            </>
-          ) : (
-            CATEGORIES.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="relative group"
-              >
-                <button
-                  onClick={() => handleSelectCategory(category)}
-                  className="w-full aspect-square bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-[1.02] border border-gray-100"
-                >
-                  <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
-                    <img
-                      src={category.icon}
-                      alt={category.name}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <span className="text-sm md:text-base font-medium text-gray-700 text-center">
-                    {category.name}
-                  </span>
-                </button>
-              </motion.div>
-            ))
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services?.map((service) => {
+            return (
+              <ServiceCard
+                key={service.id}
+                title={service.subcategory.description}
+                description={service.description}
+                price={service.price}
+                category={service.subcategory.category.name}
+                location={service.location}
+                rating={service.rating}
+                serviceRadius={service.radius}
+                onDelete={() => {}}
+                onEdit={() => {}}
+              />
+            );
+          })}
         </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="space-y-6"
-        ></motion.div>
       </div>
     </div>
   );

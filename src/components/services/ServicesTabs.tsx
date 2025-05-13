@@ -4,10 +4,9 @@ import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
+import { ServiceCard } from "@/components/Services/ServiceCard";
 import { useDeleteServicesById } from "@/hooks/api/useDeleteServicesById";
 import { useGetServicesMePublished } from "@/hooks/api/useGetServicesMePublished";
-
-import { ServiceCard } from "./ServiceCard";
 
 export const ServicesTabs = () => {
   const [activeTab, setActiveTab] = useState<"offered" | "contracted">(

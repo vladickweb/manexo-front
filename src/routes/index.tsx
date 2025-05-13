@@ -2,13 +2,12 @@ import { Route, Routes } from "react-router-dom";
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PublicRoute } from "@/components/PublicRoute";
-import { ServicesTabs } from "@/components/services/ServicesTabs";
+import { ServicesTabs } from "@/components/Services/ServicesTabs";
 import { MainLayout } from "@/layouts/MainLayout";
 import { CreateServicePage } from "@/modules/CreateServicePage";
 import { FavoritesPage } from "@/modules/FavoritesPage";
 import { LandingPage } from "@/modules/LandingPage";
 import { MessagesPage } from "@/modules/MessagesPage";
-import { MyServicesPage } from "@/modules/MyServicesPage";
 import { ProfilePage } from "@/modules/ProfilePage";
 import { SearchPage } from "@/modules/SearchPage";
 import { ServiceDetailPage } from "@/modules/ServiceDetailPage";
@@ -65,16 +64,6 @@ export const AppRoutes = () => {
             <ProtectedRoute>
               <MainLayout>
                 <ServiceDetailPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/my-services"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <MyServicesPage />
               </MainLayout>
             </ProtectedRoute>
           }
