@@ -73,10 +73,10 @@ export const ServicesTabs = () => {
           servicesMePublished?.map((service) => (
             <ServiceCard
               key={service.id}
-              title={service.subcategory.description}
-              description={service.description}
+              title={service.subcategory?.description}
+              tag={service.description}
               price={service.price}
-              category={service.subcategory.category.name}
+              category={service.subcategory?.category?.name}
               onEdit={() => handleEdit(service.id)}
               onDelete={() => handleDelete(service.id)}
             />

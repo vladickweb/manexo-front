@@ -5,12 +5,14 @@ import { IUser } from "@/stores/useUser";
 import { useUser } from "@/stores/useUser";
 
 export const useGetUser = () => {
-  const accessToken = useUser((state) => state.accessToken);
+  const { accessToken, setUser } = useUser();
 
   return useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       const { data } = await axiosClient.get<IUser>("/auth/me");
+      // Actualizamos el store con los datos del usuario
+      setUser(data, accessToken!, accessToken!);
       return data;
     },
     retry: false,
