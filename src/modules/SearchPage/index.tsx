@@ -64,8 +64,12 @@ export const SearchPage: React.FC = () => {
 
   const handleFilterChange = useCallback(
     (newFilters: Omit<typeof filters, "limit">) => {
-      console.warn("Actualizando filtros:", newFilters);
-      setFilters((prev) => ({ ...prev, ...newFilters }));
+      setFilters((prev) => ({
+        ...prev,
+        ...newFilters,
+        minPrice: newFilters.minPrice ?? undefined,
+        maxPrice: newFilters.maxPrice ?? undefined,
+      }));
     },
     [],
   );
@@ -190,7 +194,7 @@ export const SearchPage: React.FC = () => {
 
       <ServiceFilters
         categories={categories || []}
-        onFilterChange={handleFilterChange}
+        onFilterChange={handleFilterChange as any}
       />
 
       <main className="container mx-auto px-4 py-8">
@@ -219,7 +223,6 @@ export const SearchPage: React.FC = () => {
               })}
             </div>
 
-            {/* Trigger para infinite scroll - invisible */}
             <div ref={ref} className="h-1" />
           </>
         )}
