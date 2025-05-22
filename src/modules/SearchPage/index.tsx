@@ -1,137 +1,237 @@
-import { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
+import { useLoadScript } from "@react-google-maps/api";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useInView } from "react-intersection-observer";
+import { toast } from "react-toastify";
 
-import { CATEGORIES, Category } from "@/constants/categories";
+import { ServiceFilters } from "@/components/Filters/ServiceFilters";
+import { ServiceCard } from "@/components/services/ServiceCard";
+import { useGetCategories } from "@/hooks/api/useGetCategories";
+import { useGetServicesInfinite } from "@/hooks/api/useGetServicesInfinite";
+import { useUpdateLocation } from "@/hooks/api/useUpdateLocation";
+import { getFormattedDistance } from "@/lib/calculateDistance";
+import { useUser } from "@/stores/useUser";
+import { Location } from "@/types/location";
 
-export const SearchPage = () => {
-  const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
+export const SearchPage: React.FC = () => {
+  const { user } = useUser();
+  const { data: categories } = useGetCategories();
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    rootMargin: "200px",
+    delay: 100,
+  });
+
+  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [filters, setFilters] = useState({
+    categoryIds: [] as string[],
+    minPrice: undefined as number | undefined,
+    maxPrice: undefined as number | undefined,
+    radius: 5000,
+    isActive: true,
+    limit: 10,
+  });
+
+  const { mutateAsync: updateLocation } = useUpdateLocation();
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: ["places"],
+  });
+
+  const {
+    data: pages,
+    isLoading: loadingServices,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetServicesInfinite(
+    {
+      ...filters,
+      latitude: user?.location?.latitude,
+      longitude: user?.location?.longitude,
+    },
+    { enabled: !!user?.location },
   );
 
-  const handleSelectCategory = (category: Category) => {
-    setSelectedCategory(category);
-  };
+  const services = pages?.pages.flatMap((p) => p.data) || [];
 
-  const handleCloseSubcategories = () => {
-    setSelectedCategory(null);
-  };
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleSelectSubcategory = (
-    categoryId: string,
-    subcategoryId: string,
-  ) => {
-    navigate(`/services/${categoryId}/${subcategoryId}`);
-  };
+  const handleFilterChange = useCallback(
+    (newFilters: Omit<typeof filters, "limit">) => {
+      setFilters((prev) => ({
+        ...prev,
+        ...newFilters,
+        minPrice: newFilters.minPrice ?? undefined,
+        maxPrice: newFilters.maxPrice ?? undefined,
+      }));
+    },
+    [],
+  );
 
-  return (
-    <div className="flex flex-col bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative"
-        >
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-dark mb-2">
-            Explora el mundo de servicios
-          </h1>
-          <motion.p
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-lg md:text-xl text-gray-600"
+  const requestLocation = useCallback(async () => {
+    if (!isLoaded) {
+      toast.error("Google Maps aún no cargado.");
+      return;
+    }
+    if (!navigator.geolocation) {
+      toast.error("Geolocalización no soportada.");
+      return;
+    }
+
+    setLoadingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const geocoder = new google.maps.Geocoder();
+          const results = await geocoder.geocode({
+            location: { lat: coords.latitude, lng: coords.longitude },
+          });
+          if (!results.results.length) throw new Error("Sin resultados");
+
+          const first = results.results[0];
+          const address = first.formatted_address;
+          const addressComponents = first.address_components;
+
+          const payload: Location = addressComponents.reduce(
+            (acc, comp) => {
+              const t = comp.types[0];
+              switch (t) {
+                case "route":
+                  acc.streetName = comp.long_name;
+                  break;
+                case "street_number":
+                  acc.streetNumber = comp.long_name;
+                  break;
+                case "locality":
+                  acc.city = comp.long_name;
+                  break;
+                case "administrative_area_level_2":
+                  acc.province = comp.long_name;
+                  break;
+                case "postal_code":
+                  acc.postalCode = comp.long_name;
+                  break;
+                case "country":
+                  acc.country = comp.long_name;
+                  break;
+              }
+              return acc;
+            },
+            {
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+              address,
+              streetName: "",
+              streetNumber: "",
+              city: "",
+              province: "",
+              postalCode: "",
+              country: "",
+            } as Location,
+          );
+
+          await updateLocation({ location: payload });
+          toast.success("Ubicación actualizada correctamente");
+        } catch (err) {
+          console.error(err);
+          toast.error("No se pudo obtener la ubicación");
+        } finally {
+          setLoadingLocation(false);
+        }
+      },
+      (error) => {
+        console.error(error);
+        toast.error("Permiso de ubicación denegado");
+        setLoadingLocation(false);
+      },
+    );
+  }, [isLoaded, updateLocation]);
+
+  // Si no hay ubicación, mostramos botón de permiso
+  if (!user?.location) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <h2 className="text-2xl font-bold mb-4">Permite tu ubicación</h2>
+          <button
+            onClick={requestLocation}
+            disabled={loadingLocation}
+            className="btn-primary"
           >
-            Encuentra profesionales verificados para cada necesidad
-          </motion.p>
+            {loadingLocation ? "Obteniendo..." : "Permitir ubicación"}
+          </button>
         </motion.div>
       </div>
+    );
+  }
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {selectedCategory ? (
-            <>
-              {selectedCategory.subcategories.map((subcategory, index) => (
-                <motion.div
-                  key={subcategory.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="relative group"
-                >
-                  <button
-                    onClick={() =>
-                      handleSelectSubcategory(
-                        selectedCategory.id.toString(),
-                        subcategory.id.toString(),
-                      )
-                    }
-                    className="w-full aspect-square bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-[1.02] border border-gray-100"
-                  >
-                    <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
-                      <img
-                        src={subcategory.icon}
-                        alt={subcategory.name}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-sm md:text-base font-medium text-gray-700 text-center">
-                      {subcategory.name}
-                    </span>
-                  </button>
-                </motion.div>
-              ))}
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                onClick={handleCloseSubcategories}
-                className="aspect-square bg-white rounded-2xl p-4 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
-              >
-                <span className="text-sm md:text-base font-medium text-gray-700">
-                  Volver
-                </span>
-              </motion.button>
-            </>
-          ) : (
-            CATEGORIES.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="relative group"
-              >
-                <button
-                  onClick={() => handleSelectCategory(category)}
-                  className="w-full aspect-square bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-[1.02] border border-gray-100"
-                >
-                  <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
-                    <img
-                      src={category.icon}
-                      alt={category.name}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <span className="text-sm md:text-base font-medium text-gray-700 text-center">
-                    {category.name}
-                  </span>
-                </button>
-              </motion.div>
-            ))
-          )}
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+  // UI principal con listado y paginación infinita
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="container mx-auto px-4 py-8">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="space-y-6"
-        ></motion.div>
-      </div>
+          className="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-dark"
+        >
+          Servicios cerca de ti
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mt-2 text-lg text-gray-600"
+        >
+          Encuentra los mejores servicios en tu zona
+        </motion.p>
+      </header>
+
+      <ServiceFilters
+        categories={categories || []}
+        onFilterChange={handleFilterChange as any}
+      />
+
+      <main className="container mx-auto px-4 py-8">
+        {loadingServices && !pages ? (
+          <div className="text-center py-20">
+            <div className="spinner" />
+            <p>Cargando servicios...</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              {services.map((svc) => {
+                const dist = user.location
+                  ? getFormattedDistance(user.location, svc.location)
+                  : null;
+                return (
+                  <ServiceCard
+                    provider={{
+                      name: svc.user?.firstName || "",
+                      avatar: svc.user?.avatar || undefined,
+                    }}
+                    id={svc.id.toString()}
+                    key={svc.id}
+                    title={svc.subcategory?.description}
+                    description={svc.description}
+                    price={+svc.price}
+                    tag={svc.subcategory?.category?.name || ""}
+                    location={dist ? `A ${dist} de ti` : undefined}
+                  />
+                );
+              })}
+            </div>
+
+            <div ref={ref} className="h-1" />
+          </>
+        )}
+      </main>
     </div>
   );
 };

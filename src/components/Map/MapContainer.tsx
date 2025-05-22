@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { GoogleMap, useLoadScript } from "@react-google-maps/api";
 
+import { toLatLng } from "@/lib/map";
 import { Location } from "@/types/location";
 
 interface MapContainerProps {
@@ -45,14 +46,14 @@ export const MapContainer = ({
     async (location?: Location) => {
       if (!location) return;
       if (!isOnline) {
-        const formattedCoords = `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
+        const formattedCoords = `${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`;
         onAddressChange?.(formattedCoords);
         return;
       }
 
       try {
         const response = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.lat},${location.lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`,
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.latitude},${location.longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`,
         );
 
         if (!response.ok) throw new Error("Error en la geocodificación");
@@ -61,12 +62,12 @@ export const MapContainer = ({
         if (data.results && data.results.length > 0) {
           onAddressChange?.(data.results[0].formatted_address);
         } else {
-          const formattedCoords = `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
+          const formattedCoords = `${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`;
           onAddressChange?.(formattedCoords);
         }
       } catch (error) {
         console.error("Error al obtener la dirección:", error);
-        const formattedCoords = `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
+        const formattedCoords = `${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`;
         onAddressChange?.(formattedCoords);
       }
     },
@@ -82,9 +83,9 @@ export const MapContainer = ({
           navigator.geolocation.getCurrentPosition(
             (position) => {
               const newLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              };
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              } as Location;
               setPosition(newLocation);
               onLocationChange?.(newLocation);
               fetchAddress(newLocation);
@@ -113,9 +114,9 @@ export const MapContainer = ({
     (e: google.maps.MapMouseEvent) => {
       if (e.latLng) {
         const newLocation = {
-          lat: e.latLng.lat(),
-          lng: e.latLng.lng(),
-        };
+          latitude: e.latLng.lat(),
+          longitude: e.latLng.lng(),
+        } as Location;
         setPosition(newLocation);
         onLocationChange?.(newLocation);
         fetchAddress(newLocation);
@@ -129,7 +130,7 @@ export const MapContainer = ({
   return (
     <GoogleMap
       zoom={15}
-      center={position}
+      center={toLatLng(position)}
       mapContainerClassName="w-full h-[400px] rounded-lg"
       onClick={handleMapClick}
       options={{

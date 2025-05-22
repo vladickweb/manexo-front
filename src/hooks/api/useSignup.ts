@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 
 import axiosClient from "@/api/axiosClient";
 import { useUser } from "@/stores/useUser";
+import { IUser } from "@/types/user";
 
 interface SignupData {
   firstName: string;
@@ -45,7 +46,11 @@ export const useSignup = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      setUser(data.user, data.accessToken, data.refreshToken);
+      setUser(
+        data.user as unknown as IUser,
+        data.accessToken,
+        data.refreshToken,
+      );
       navigate("/search", { replace: true });
     },
     onError: (error: any) => {

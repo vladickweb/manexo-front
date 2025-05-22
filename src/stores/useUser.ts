@@ -1,12 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface IUser {
-  id: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-}
+import { IUser } from "@/types/user";
 
 interface UserState {
   user: IUser | null;
@@ -22,12 +17,9 @@ export const useUser = create<UserState>()(
       user: null,
       accessToken: null,
       refreshToken: null,
-      setUser: (user, accessToken, refreshToken) => {
-        set({ user, accessToken, refreshToken });
-      },
-      logout: () => {
-        set({ user: null, accessToken: null, refreshToken: null });
-      },
+      setUser: (user, accessToken, refreshToken) =>
+        set({ user, accessToken, refreshToken }),
+      logout: () => set({ user: null, accessToken: null, refreshToken: null }),
     }),
     {
       name: "user-storage",
