@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PublicRoute } from "@/components/PublicRoute";
-import { ServicesTabs } from "@/components/services/ServicesTabs";
+import { ServicesTabs } from "@/components/Services/ServicesTabs";
 import { MainLayout } from "@/layouts/MainLayout";
 import { CreateServicePage } from "@/modules/CreateServicePage";
 import { FavoritesPage } from "@/modules/FavoritesPage";

@@ -6,7 +6,7 @@ import { useInView } from "react-intersection-observer";
 import { toast } from "react-toastify";
 
 import { ServiceFilters } from "@/components/Filters/ServiceFilters";
-import { ServiceCard } from "@/components/services/ServiceCard";
+import { ServiceCard } from "@/components/Services/ServiceCard";
 import { useGetCategories } from "@/hooks/api/useGetCategories";
 import { useGetServicesInfinite } from "@/hooks/api/useGetServicesInfinite";
 import { useUpdateLocation } from "@/hooks/api/useUpdateLocation";
