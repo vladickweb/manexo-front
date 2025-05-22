@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Plus } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
@@ -38,7 +38,7 @@ export const ServicesTabs = () => {
           onClick={() => navigate("/services/create")}
           className="flex items-center"
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Calendar className="mr-2 h-4 w-4" />
           Crear Servicio
         </Button>
       </div>
@@ -68,25 +68,49 @@ export const ServicesTabs = () => {
         </nav>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {activeTab === "offered" &&
-          servicesMePublished?.map((service) => (
-            <ServiceCard
-              key={service.id}
-              title={service.subcategory?.description}
-              tag={service.description}
-              price={service.price}
-              category={service.subcategory?.category?.name}
-              onEdit={() => handleEdit(service.id)}
-              onDelete={() => handleDelete(service.id)}
-            />
-          ))}
-        {activeTab === "contracted" && (
-          <div className="col-span-full text-center py-12">
-            <p className="text-gray-600">No tienes servicios contratados</p>
+      {activeTab === "offered" &&
+        (servicesMePublished && servicesMePublished.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {servicesMePublished.map((service) => (
+              <ServiceCard
+                key={service.id}
+                id={service.id}
+                title={service.subcategory?.description}
+                description={service.description}
+                price={service.price}
+                tag={service.subcategory?.category?.name}
+                provider={service.provider}
+                onEdit={() => handleEdit(service.id)}
+                onDelete={() => handleDelete(service.id)}
+              />
+            ))}
           </div>
-        )}
-      </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-[48vh] w-full">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <Calendar className="w-10 h-10 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              No tienes servicios publicados
+            </h2>
+            <p className="text-gray-600 text-center max-w-md">
+              Crea tu primer servicio usando el botón "Crear Servicio".
+            </p>
+          </div>
+        ))}
+      {activeTab === "contracted" && (
+        <div className="flex flex-col items-center justify-center h-[48vh] w-full">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Calendar className="w-10 h-10 text-primary" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            No tienes servicios contratados
+          </h2>
+          <p className="text-gray-600 text-center max-w-md">
+            Cuando tengas servicios contratados, aparecerán aquí
+          </p>
+        </div>
+      )}
     </div>
   );
 };

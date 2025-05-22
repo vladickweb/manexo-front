@@ -5,9 +5,11 @@ import { Formik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
+import { AvailabilityManager } from "@/components/profile/AvailabilityManager";
 import { Button } from "@/components/ui/button";
 import { Category } from "@/constants/categories";
 import { QueryKeys } from "@/constants/queryKeys";
+import { useGetAvailabilities } from "@/hooks/api/useAvailabilities";
 import { usePostServices } from "@/hooks/api/usePostServices";
 import StepperHeader from "@/modules/CreateServicePage/components/StepperHeader";
 import CategoryStep from "@/modules/CreateServicePage/components/steps/CategoryStep";
@@ -80,6 +82,9 @@ export const CreateServicePage = () => {
   );
   const navigate = useNavigate();
   const { mutate: createService, isPending } = usePostServices();
+  const { data: availabilities, isLoading } = useGetAvailabilities();
+
+  const hasActiveAvailability = availabilities?.some((a) => a.isActive);
 
   const handleSubmit = useCallback(
     (values: FormValues) => {
@@ -164,6 +169,22 @@ export const CreateServicePage = () => {
     },
     [currentStep],
   );
+
+  if (isLoading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (!hasActiveAvailability) {
+    return (
+      <div className="max-w-2xl mx-auto mt-10">
+        <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded">
+          <b>¡Atención!</b> Para poder crear un servicio, primero debes
+          configurar tu disponibilidad.
+        </div>
+        <AvailabilityManager />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-[calc(100vh-100px)] flex flex-col items-center overflow-hidden">

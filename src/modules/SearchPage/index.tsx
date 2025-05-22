@@ -212,6 +212,11 @@ export const SearchPage: React.FC = () => {
                   : null;
                 return (
                   <ServiceCard
+                    provider={{
+                      name: svc.user?.firstName || "",
+                      avatar: svc.user?.avatar || undefined,
+                    }}
+                    id={svc.id.toString()}
                     key={svc.id}
                     title={svc.subcategory?.description}
                     description={svc.description}

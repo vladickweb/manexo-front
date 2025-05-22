@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
 import axiosClient from "@/api/axiosClient";
-import { IUser } from "@/stores/useUser";
 import { UpdateLocationDto } from "@/types/location";
+import { IUser } from "@/types/user";
 
 export const useUpdateLocation = (
   options?: UseMutationOptions<IUser, unknown, UpdateLocationDto>,

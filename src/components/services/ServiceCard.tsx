@@ -1,7 +1,14 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { MapPin, MoreVertical, Navigation, Star } from "lucide-react";
+import { Heart, MapPin, MoreVertical, Navigation, Star } from "lucide-react";
+
+import {
+  useCreateFavorite,
+  useDeleteFavorite,
+  useGetFavorites,
+} from "@/hooks/api/useFavorites";
+import { useUser } from "@/stores/useUser";
 
 import { ServiceDetailsModal } from "./ServiceDetailsModal";
 
@@ -35,9 +42,27 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   serviceRadius,
   provider,
 }) => {
+  const { user } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const userId = useMemo(() => user?.id ?? 0, [user]);
+
+  const { data: favorites, isLoading: favLoading } = useGetFavorites(userId);
+  const createFavorite = useCreateFavorite();
+  const deleteFavorite = useDeleteFavorite();
+
+  const fav = favorites?.find((f) => f.service.id === Number(id));
+  const isFavorite = !!fav;
+
+  const handleToggleFavorite = () => {
+    if (isFavorite && fav) {
+      deleteFavorite.mutate(fav.id);
+    } else {
+      createFavorite.mutate({ userId, serviceId: Number(id) });
+    }
+  };
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -57,6 +82,23 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   return (
     <>
       <div className="group relative bg-white rounded-2xl p-6 overflow-hidden border border-gray-100 shadow-sm transition-all duration-300">
+        <button
+          className="absolute top-4 right-4 z-20 p-1 rounded-full hover:bg-gray-100 transition-colors"
+          onClick={handleToggleFavorite}
+          aria-label={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+          disabled={
+            favLoading || createFavorite.isPending || deleteFavorite.isPending
+          }
+        >
+          <Heart
+            className={
+              isFavorite
+                ? "h-6 w-6 text-red-500 fill-red-500"
+                : "h-6 w-6 text-gray-400 hover:text-red-500"
+            }
+            fill={isFavorite ? "#ef4444" : "none"}
+          />
+        </button>
         <div className="flex justify-between items-start">
           <div className="space-y-1">
             <h3 className="text-xl font-semibold text-gray-900 transition-colors">

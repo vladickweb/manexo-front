@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import axiosClient from "@/api/axiosClient";
 import { useUser } from "@/stores/useUser";
+import { IUser } from "@/types/user";
 
 interface LoginPayload {
   email: string;
@@ -33,7 +34,11 @@ export const useLogin = () => {
       return data;
     },
     onSuccess: (data) => {
-      setUser(data.user, data.accessToken, data.refreshToken);
+      setUser(
+        data.user as unknown as IUser,
+        data.accessToken,
+        data.refreshToken,
+      );
       setTimeout(() => {
         navigate("/search", { replace: true });
       }, 100);

@@ -6,6 +6,7 @@ import {
   Marker,
 } from "@react-google-maps/api";
 
+import { toLatLng } from "@/lib/map";
 import { Location } from "@/types/location";
 
 interface GoogleMapProps {
@@ -36,7 +37,7 @@ export const GoogleMapView = ({
     <GoogleMapComponent
       mapContainerStyle={mapContainerStyle}
       zoom={13}
-      center={position || center}
+      center={toLatLng(position) || toLatLng(center)}
       onClick={onClick}
       onLoad={onLoad}
       options={{
@@ -54,10 +55,10 @@ export const GoogleMapView = ({
         ],
       }}
     >
-      {position && (
+      {toLatLng(position) && (
         <>
           <Marker
-            position={position}
+            position={toLatLng(position)!}
             icon={{
               url: "/map-marker.svg",
               scaledSize: new google.maps.Size(40, 40),
@@ -66,7 +67,7 @@ export const GoogleMapView = ({
           />
           {radius && (
             <Circle
-              center={position}
+              center={toLatLng(position)!}
               radius={radius}
               options={{
                 fillColor: "#3b82f6",
