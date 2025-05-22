@@ -1,6 +1,6 @@
 import { FaHeart } from "react-icons/fa";
 
-import { ServiceCard } from "@/components/Services/ServiceCard";
+import { ServiceCard } from "@/components/services/ServiceCard";
 import { useGetFavorites } from "@/hooks/api/useFavorites";
 import { useGetUser } from "@/hooks/api/useGetUser";
 
