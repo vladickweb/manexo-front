@@ -17,20 +17,14 @@ const ALLOWED_FILE_TYPES = [
 ];
 
 export const ProfilePage = () => {
-  const {
-    user: profile,
-    logout,
-    setUser,
-    accessToken,
-    refreshToken,
-  } = useUser();
+  const { user: profile, logout, setUser } = useUser();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isHovering, setIsHovering] = useState(false);
 
   const { mutateAsync: uploadImage, isPending: isUploading } =
     useUploadProfileImage({
       onSuccess: (data) => {
-        setUser(data, accessToken as string, refreshToken as string);
+        setUser(data);
         toast.success("Imagen de perfil actualizada correctamente");
       },
       onError: (error: unknown) => {
@@ -119,7 +113,10 @@ export const ProfilePage = () => {
                 ) : (
                   <>
                     <span className="text-3xl font-bold text-primary">
-                      {getInitials(profile.firstName, profile.lastName)}
+                      {getInitials(
+                        profile.firstName || "",
+                        profile.lastName || "",
+                      )}
                     </span>
                     <div
                       className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center transition-opacity duration-300 ${
@@ -288,7 +285,9 @@ export const ProfilePage = () => {
                     key={favorite.id}
                     className="p-4 border rounded-lg hover:border-primary transition-colors"
                   >
-                    <h3 className="font-medium">{favorite.service.title}</h3>
+                    <h3 className="font-medium">
+                      {favorite.service.description}
+                    </h3>
                     <p className="text-sm text-gray-600">
                       {favorite.service.description}
                     </p>

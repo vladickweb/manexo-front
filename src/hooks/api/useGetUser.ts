@@ -11,7 +11,7 @@ export const useGetUser = () => {
     queryKey: ["user"],
     queryFn: async () => {
       const { data } = await axiosClient.get<IUser>("/auth/me");
-      setUser(data, accessToken!, accessToken!);
+      setUser(data);
       return data;
     },
     retry: false,

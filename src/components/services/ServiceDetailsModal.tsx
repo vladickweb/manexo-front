@@ -8,6 +8,9 @@ import {
   LuX,
 } from "react-icons/lu";
 
+import { useCreateChat } from "@/hooks/api/useChats";
+import { IUser } from "@/types/user";
+
 interface TimeSlot {
   day: number;
   hour: number;
@@ -18,14 +21,11 @@ interface ServiceDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   service: {
-    id: string;
+    id: number;
     title: string;
     description: string;
     price: number;
-    provider: {
-      name: string;
-      avatar?: string;
-    };
+    provider: IUser;
   };
 }
 
@@ -58,6 +58,8 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
     hour: 9,
     minute: 0,
   });
+
+  const createChat = useCreateChat();
 
   const handleDayToggle = (day: number) => {
     setSelectedDays((prev) =>
@@ -113,6 +115,10 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
     }
   };
 
+  const handleSendMessage = () => {
+    createChat.mutate({ serviceId: service.id });
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case "details":
@@ -122,13 +128,13 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
               {service.provider?.avatar && (
                 <img
                   src={service.provider.avatar}
-                  alt={service.provider.name}
+                  alt={service.provider.firstName}
                   className="w-16 h-16 rounded-full"
                 />
               )}
               <div>
                 <h3 className="text-xl font-semibold">
-                  {service.provider?.name}
+                  {service.provider?.firstName} {service.provider?.lastName}
                 </h3>
                 <p className="text-gray-600">Proveedor verificado</p>
               </div>
@@ -159,7 +165,10 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
               >
                 Contratar servicio
               </button>
-              <button className="flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-colors">
+              <button
+                onClick={handleSendMessage}
+                className="flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-colors"
+              >
                 <LuMessageSquare className="w-5 h-5 mr-2" />
                 Enviar mensaje
               </button>
@@ -353,7 +362,9 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2 className="text-2xl font-bold">{service.title}</h2>
-                  <p className="text-gray-600 mt-1">{service.provider?.name}</p>
+                  <p className="text-gray-600 mt-1">
+                    {service.provider?.firstName} {service.provider?.lastName}
+                  </p>
                 </div>
                 <button
                   onClick={onClose}

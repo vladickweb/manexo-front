@@ -140,7 +140,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         </div>
       </header>
 
-      <main className="flex-1 pt-24 pb-16 md:pb-0">
+      <main className="flex-1 pt-16 pb-16 md:pb-0">
         <div className="container mx-auto px-4 h-full">{children}</div>
       </main>
 

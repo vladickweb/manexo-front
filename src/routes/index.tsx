@@ -89,6 +89,16 @@ export const AppRoutes = () => {
           }
         />
         <Route
+          path="/messages/:chatId"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <MessagesPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/profile"
           element={
             <ProtectedRoute>

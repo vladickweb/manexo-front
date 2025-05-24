@@ -3,17 +3,17 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Heart, MapPin, MoreVertical, Navigation, Star } from "lucide-react";
 
+import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal";
 import {
   useCreateFavorite,
   useDeleteFavorite,
   useGetFavorites,
 } from "@/hooks/api/useFavorites";
 import { useUser } from "@/stores/useUser";
-
-import { ServiceDetailsModal } from "./ServiceDetailsModal";
+import { IUser } from "@/types/user";
 
 interface ServiceCardProps {
-  id: string;
+  id: number;
   title: string;
   description: string;
   price: number;
@@ -23,10 +23,7 @@ interface ServiceCardProps {
   rating?: number;
   location?: string;
   serviceRadius?: string;
-  provider: {
-    name: string;
-    avatar?: string;
-  };
+  provider: IUser;
 }
 
 export const ServiceCard: FC<ServiceCardProps> = ({
@@ -107,6 +104,18 @@ export const ServiceCard: FC<ServiceCardProps> = ({
             <div className="flex items-center gap-2">
               <span className="inline-block bg-gradient-to-r from-primary/20 to-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full">
                 {tag}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              {provider.profileImageUrl && (
+                <img
+                  src={provider.profileImageUrl}
+                  alt={provider.firstName}
+                  className="w-8 h-8 rounded-full object-cover border"
+                />
+              )}
+              <span className="font-medium text-gray-800 text-sm">
+                {provider.firstName} {provider.lastName}
               </span>
             </div>
           </div>

@@ -23,6 +23,7 @@ interface LoginResponse {
 
 export const useLogin = () => {
   const setUser = useUser((s) => s.setUser);
+  const setTokens = useUser((s) => s.setTokens);
   const navigate = useNavigate();
 
   return useMutation({
@@ -34,11 +35,8 @@ export const useLogin = () => {
       return data;
     },
     onSuccess: (data) => {
-      setUser(
-        data.user as unknown as IUser,
-        data.accessToken,
-        data.refreshToken,
-      );
+      setUser(data.user as unknown as IUser);
+      setTokens(data.accessToken, data.refreshToken);
       setTimeout(() => {
         navigate("/search", { replace: true });
       }, 100);

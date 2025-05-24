@@ -13,6 +13,7 @@ import { useUpdateLocation } from "@/hooks/api/useUpdateLocation";
 import { getFormattedDistance } from "@/lib/calculateDistance";
 import { useUser } from "@/stores/useUser";
 import { Location } from "@/types/location";
+import { IUser } from "@/types/user";
 
 export const SearchPage: React.FC = () => {
   const { user } = useUser();
@@ -212,11 +213,8 @@ export const SearchPage: React.FC = () => {
                   : null;
                 return (
                   <ServiceCard
-                    provider={{
-                      name: svc.user?.firstName || "",
-                      avatar: svc.user?.avatar || undefined,
-                    }}
-                    id={svc.id.toString()}
+                    provider={svc.user as unknown as IUser}
+                    id={svc.id}
                     key={svc.id}
                     title={svc.subcategory?.description}
                     description={svc.description}

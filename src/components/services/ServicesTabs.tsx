@@ -79,7 +79,7 @@ export const ServicesTabs = () => {
                 description={service.description}
                 price={service.price}
                 tag={service.subcategory?.category?.name}
-                provider={service.provider}
+                provider={service.user}
                 onEdit={() => handleEdit(service.id)}
                 onDelete={() => handleDelete(service.id)}
               />

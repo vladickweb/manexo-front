@@ -1,3 +1,5 @@
+import { IUser } from "@/types/user";
+
 export interface Service {
   id: number;
   description: string;
@@ -8,7 +10,7 @@ export interface Service {
   requiresAcceptance: boolean;
   createdAt: Date;
   updatedAt: Date;
-  user: User;
+  user: IUser;
   subcategory: Category;
   distance: number;
 }
@@ -33,17 +35,4 @@ export interface Category {
   createdAt: Date;
   updatedAt: Date;
   category?: Category;
-}
-
-export interface User {
-  id: number;
-  firstName: null;
-  lastName: null;
-  email: string;
-  password: string;
-  avatar: null;
-  location: Location;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }

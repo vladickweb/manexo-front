@@ -34,6 +34,7 @@ interface SignupResponse {
 
 export const useSignup = () => {
   const setUser = useUser((state) => state.setUser);
+  const setTokens = useUser((state) => state.setTokens);
   const navigate = useNavigate();
 
   return useMutation({
@@ -46,11 +47,8 @@ export const useSignup = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      setUser(
-        data.user as unknown as IUser,
-        data.accessToken,
-        data.refreshToken,
-      );
+      setUser(data.user as unknown as IUser);
+      setTokens(data.accessToken, data.refreshToken);
       navigate("/search", { replace: true });
     },
     onError: (error: any) => {

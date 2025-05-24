@@ -1,3 +1,5 @@
+import { IFavorite } from "@/types/favorite";
+
 export interface Location {
   latitude: number;
   longitude: number;
@@ -46,17 +48,5 @@ export interface IUser {
     comment: string;
     createdAt: string;
   }>;
-  favorites?: Array<{
-    id: string;
-    service: {
-      id: string;
-      title: string;
-      description: string;
-      price: number;
-      user: {
-        firstName: string;
-        lastName: string;
-      };
-    };
-  }>;
+  favorites?: IFavorite[];
 }
