@@ -26,7 +26,6 @@ export const useUser = create<UserState>()(
         if (user) {
           const token = localStorage.getItem("accessToken");
           if (token && !websocketService.isConnected()) {
-            console.warn("🔄 Conectando WebSocket desde setUser...");
             websocketService.connect(token);
           }
         }
@@ -34,7 +33,6 @@ export const useUser = create<UserState>()(
       setTokens: (accessToken, refreshToken) => {
         set({ accessToken, refreshToken });
         if (accessToken && !websocketService.isConnected()) {
-          console.warn("🔄 Conectando WebSocket desde setTokens...");
           websocketService.connect(accessToken);
         }
       },

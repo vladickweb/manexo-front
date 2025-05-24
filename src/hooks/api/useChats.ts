@@ -148,8 +148,6 @@ export const useWebSocket = (chatId: string) => {
           (old = []) => [...old, message],
         );
         queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CHATS] });
-      } else {
-        console.warn("❌ Mensaje no pertenece al chat actual, ignorando");
       }
     },
     [chatId, queryClient],
@@ -157,12 +155,10 @@ export const useWebSocket = (chatId: string) => {
 
   const joinChat = useCallback(() => {
     if (!chatId) {
-      console.error("❌ No se puede unir al chat: ID no proporcionado");
       return;
     }
 
     if (!isConnected) {
-      console.error("❌ No se puede unir al chat: WebSocket no conectado");
       return;
     }
 
@@ -171,27 +167,22 @@ export const useWebSocket = (chatId: string) => {
 
   const leaveChat = useCallback(() => {
     if (!chatId) {
-      console.error("❌ No se puede salir del chat: ID no proporcionado");
       return;
     }
 
     if (!isConnected) {
-      console.error("❌ No se puede salir del chat: WebSocket no conectado");
       return;
     }
 
-    console.warn(`👋 useWebSocket: Saliendo del chat ${chatId}`);
     websocketService.leaveChat(chatId);
   }, [chatId, isConnected]);
 
   const subscribeToMessages = useCallback(
     (_handler: (message: IMessage) => void) => {
       if (!isConnected) {
-        console.error("❌ No se puede suscribir: WebSocket no conectado");
         return () => {};
       }
 
-      console.warn("🔔 useWebSocket: Suscribiéndose a mensajes");
       return websocketService.subscribeToMessages(handleNewMessage);
     },
     [isConnected, handleNewMessage],
@@ -200,7 +191,6 @@ export const useWebSocket = (chatId: string) => {
   const sendMessage = useCallback(
     (content: string) => {
       if (!isConnected) {
-        console.error("❌ No se puede enviar mensaje: WebSocket no conectado");
         return;
       }
 
