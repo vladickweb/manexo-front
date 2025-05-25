@@ -3,7 +3,7 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Heart, MapPin, MoreVertical, Navigation, Star } from "lucide-react";
 
-import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal";
+import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal/index";
 import {
   useCreateFavorite,
   useDeleteFavorite,
@@ -209,17 +209,13 @@ export const ServiceCard: FC<ServiceCardProps> = ({
         </div>
       </div>
 
-      <ServiceDetailsModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        service={{
-          id,
-          title,
-          description,
-          price,
-          provider,
-        }}
-      />
+      {isModalOpen && (
+        <ServiceDetailsModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          serviceId={id}
+        />
+      )}
     </>
   );
 };

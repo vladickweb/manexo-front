@@ -4,7 +4,7 @@ import { useGetServicesById } from "@/hooks/api/useGetServicesById";
 
 export const ServiceDetailPage = () => {
   const { id } = useParams();
-  const { data: service, isLoading } = useGetServicesById(id as string);
+  const { data: service, isLoading } = useGetServicesById(Number(id));
 
   if (isLoading) {
     return (
