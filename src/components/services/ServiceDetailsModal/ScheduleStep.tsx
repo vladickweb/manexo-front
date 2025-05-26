@@ -1,5 +1,6 @@
 import React from "react";
 
+import { addDays, isBefore, startOfDay } from "date-fns";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 import { ServiceAvailabilityResponse } from "@/hooks/api/useGetServiceAvailability";
@@ -13,7 +14,6 @@ interface TimeSlot {
 interface ScheduleStepProps {
   availability: ServiceAvailabilityResponse | undefined;
   isLoading: boolean;
-  selectedWeekStart: string;
   selectedSlots: TimeSlot[];
   onWeekChange: (direction: "prev" | "next") => void;
   onSlotSelect: (day: number, start: string, end: string) => void;
@@ -21,22 +21,47 @@ interface ScheduleStepProps {
 }
 
 const formatFullDate = (date: string): string => {
-  return new Date(date).toLocaleDateString("es-ES", {
+  const dateObj = new Date(date);
+  const formattedDate = dateObj.toLocaleDateString("es-ES", {
     weekday: "long",
     day: "numeric",
     month: "long",
   });
+
+  return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
 };
 
 export const ScheduleStep: React.FC<ScheduleStepProps> = ({
   availability,
   isLoading,
-  selectedWeekStart,
   selectedSlots,
   onWeekChange,
   onSlotSelect,
   onSlotRemove,
 }) => {
+  const today = startOfDay(new Date());
+
+  const weekDays = availability?.weekStart
+    ? Array.from({ length: 7 }, (_, i) => {
+        const date = addDays(new Date(availability.weekStart), i);
+        const isPastDate = isBefore(date, today);
+        return {
+          date: date.toISOString(),
+          dayOfWeek: i + 1,
+          isActive: false,
+          isPastDate,
+          availableSlots: [],
+        };
+      })
+    : [];
+
+  const allWeekDays = weekDays.map((day) => {
+    const backendDay = availability?.weekAvailability.find(
+      (d) => d.dayOfWeek === day.dayOfWeek,
+    );
+    return backendDay ? { ...backendDay, isPastDate: day.isPastDate } : day;
+  });
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -57,9 +82,7 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
         </button>
         <div className="text-center">
           <p className="font-semibold">
-            Semana del {formatFullDate(selectedWeekStart)}
-          </p>
-          <p className="text-sm text-gray-600">
+            Semana del {formatFullDate(availability?.weekStart || "")} al{" "}
             {formatFullDate(availability?.weekEnd || "")}
           </p>
         </div>
@@ -79,40 +102,44 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
         </div>
       ) : (
         <div className="space-y-6">
-          {availability?.weekAvailability.map((day) => (
+          {allWeekDays.map((day) => (
             <div key={day.date} className="space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold text-lg">
                   {formatFullDate(day.date)}
                 </h4>
-                {!day.isActive && (
-                  <span className="text-sm text-gray-500">No disponible</span>
+                {(!day.isActive || day.isPastDate) && (
+                  <span className="text-sm text-gray-500">
+                    {day.isPastDate ? "Fecha pasada" : "No disponible"}
+                  </span>
                 )}
               </div>
-              {day.isActive && day.availableSlots.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {day.availableSlots.map((slot, index) => (
-                    <button
-                      key={index}
-                      onClick={() =>
-                        onSlotSelect(day.dayOfWeek, slot.start, slot.end)
-                      }
-                      className={`p-3 rounded-lg text-center ${
-                        selectedSlots.some(
-                          (s) =>
-                            s.day === day.dayOfWeek &&
-                            s.start === slot.start &&
-                            s.end === slot.end,
-                        )
-                          ? "bg-primary text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                    >
-                      {slot.start} - {slot.end}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {day.isActive &&
+                !day.isPastDate &&
+                day.availableSlots.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {day.availableSlots.map((slot, index) => (
+                      <button
+                        key={index}
+                        onClick={() =>
+                          onSlotSelect(day.dayOfWeek, slot.start, slot.end)
+                        }
+                        className={`p-3 rounded-lg text-center ${
+                          selectedSlots.some(
+                            (s) =>
+                              s.day === day.dayOfWeek &&
+                              s.start === slot.start &&
+                              s.end === slot.end,
+                          )
+                            ? "bg-primary text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {slot.start} - {slot.end}
+                      </button>
+                    ))}
+                  </div>
+                )}
             </div>
           ))}
         </div>
@@ -121,25 +148,26 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
       {selectedSlots.length > 0 && (
         <div className="space-y-2 mt-6">
           <h3 className="font-semibold">Horarios seleccionados:</h3>
-          {selectedSlots.map((slot, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-            >
-              <span>
-                {formatFullDate(
-                  availability?.weekAvailability[slot.day].date || "",
-                )}{" "}
-                de {slot.start} a {slot.end}
-              </span>
-              <button
-                onClick={() => onSlotRemove(index)}
-                className="text-red-500 hover:text-red-700"
+          {selectedSlots.map((slot, index) => {
+            const day = allWeekDays.find((d) => d.dayOfWeek === slot.day);
+            return (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
               >
-                Eliminar
-              </button>
-            </div>
-          ))}
+                <span>
+                  {day ? formatFullDate(day.date) : ""} de {slot.start} a{" "}
+                  {slot.end}
+                </span>
+                <button
+                  onClick={() => onSlotRemove(index)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Eliminar
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

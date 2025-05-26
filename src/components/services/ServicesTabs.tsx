@@ -4,16 +4,23 @@ import { Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
+import { ContractCard } from "@/components/services/ContractCard";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { useDeleteServicesById } from "@/hooks/api/useDeleteServicesById";
+import { useGetMyContracts } from "@/hooks/api/useGetMyContracts";
 import { useGetServicesMePublished } from "@/hooks/api/useGetServicesMePublished";
+import { useUser } from "@/stores/useUser";
 
 export const ServicesTabs = () => {
   const [activeTab, setActiveTab] = useState<"offered" | "contracted">(
     "offered",
   );
-  const { data: servicesMePublished, isLoading } = useGetServicesMePublished();
+  const { data: servicesMePublished, isLoading: isLoadingOffered } =
+    useGetServicesMePublished();
+  const { data: myContracts, isLoading: isLoadingContracted } =
+    useGetMyContracts();
   const { mutate: deleteService } = useDeleteServicesById();
+  const { user } = useUser();
   const navigate = useNavigate();
 
   const handleDelete = (id: string) => {
@@ -23,6 +30,9 @@ export const ServicesTabs = () => {
   const handleEdit = (id: string) => {
     navigate(`/services/${id}/edit`);
   };
+
+  const isLoading =
+    activeTab === "offered" ? isLoadingOffered : isLoadingContracted;
 
   if (isLoading) {
     return <div>Cargando...</div>;
@@ -98,19 +108,38 @@ export const ServicesTabs = () => {
             </p>
           </div>
         ))}
-      {activeTab === "contracted" && (
-        <div className="flex flex-col items-center justify-center h-[48vh] w-full">
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <Calendar className="w-10 h-10 text-primary" />
+
+      {activeTab === "contracted" &&
+        (myContracts && myContracts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {myContracts
+              .filter((contract) => contract.client.id === user?.id)
+              .map((contract) => (
+                <ContractCard
+                  key={contract.id}
+                  title={contract.service.subcategory?.description || ""}
+                  description={contract.service.description}
+                  price={contract.service.price}
+                  tag={contract.service.subcategory?.category?.name || ""}
+                  provider={contract.provider}
+                  status={contract.status}
+                  contractId={contract.id}
+                />
+              ))}
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            No tienes servicios contratados
-          </h2>
-          <p className="text-gray-600 text-center max-w-md">
-            Cuando tengas servicios contratados, aparecerán aquí
-          </p>
-        </div>
-      )}
+        ) : (
+          <div className="flex flex-col items-center justify-center h-[48vh] w-full">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <Calendar className="w-10 h-10 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              No tienes servicios contratados
+            </h2>
+            <p className="text-gray-600 text-center max-w-md">
+              Cuando tengas servicios contratados, aparecerán aquí
+            </p>
+          </div>
+        ))}
     </div>
   );
 };

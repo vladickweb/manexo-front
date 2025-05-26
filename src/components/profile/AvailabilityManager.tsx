@@ -13,13 +13,13 @@ import {
 import { CreateAvailabilityDto, IAvailability } from "@/types/availability";
 
 const DAYS_OF_WEEK = [
-  "Domingo",
   "Lunes",
   "Martes",
   "Miércoles",
   "Jueves",
   "Viernes",
   "Sábado",
+  "Domingo",
 ];
 
 const HOURS = Array.from(
@@ -66,12 +66,14 @@ export const AvailabilityManager: FC = () => {
   // Crear array inicial con los 7 días
   const initialValues = {
     availabilities: DAYS_OF_WEEK.map((_, index) => {
+      // Ajustamos el índice para que coincida con el día de la semana (1-7)
+      const dayOfWeek = index === 6 ? 0 : index + 1;
       const existingAvailability = availabilities?.find(
-        (a) => a.dayOfWeek === index,
+        (a) => a.dayOfWeek === dayOfWeek,
       );
       return (
         existingAvailability || {
-          dayOfWeek: index,
+          dayOfWeek: dayOfWeek,
           startTime: "09:00",
           endTime: "17:00",
           isActive: false,
@@ -113,7 +115,7 @@ export const AvailabilityManager: FC = () => {
                                 : "text-gray-900"
                             }`}
                           >
-                            {DAYS_OF_WEEK[availability.dayOfWeek]}
+                            {DAYS_OF_WEEK[availability.dayOfWeek - 1]}
                           </h3>
                           <button
                             type="button"

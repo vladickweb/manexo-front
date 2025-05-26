@@ -29,16 +29,16 @@ export interface ServiceAvailabilityResponse {
 
 export const useGetServiceAvailability = (
   serviceId: number,
-  weekStart: string,
+  date: string,
   options?: {
     enabled?: boolean;
   },
 ) => {
   return useQuery<ServiceAvailabilityResponse>({
-    queryKey: ["service-availability", serviceId, weekStart],
+    queryKey: ["service-availability", serviceId, date],
     queryFn: async () => {
       const { data } = await axiosClient.get<ServiceAvailabilityResponse>(
-        `/services/${serviceId}/availability?weekStart=${weekStart}`,
+        `/services/${serviceId}/availability?date=${date}`,
       );
       return data;
     },

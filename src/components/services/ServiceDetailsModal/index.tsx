@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 
+import { addWeeks, startOfWeek } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { LuArrowLeft, LuArrowRight, LuX } from "react-icons/lu";
 
@@ -25,13 +26,6 @@ interface ServiceDetailsModalProps {
 
 type Step = "details" | "schedule" | "review";
 
-const getWeekStartDate = (date: Date): string => {
-  const day = date.getDay();
-  const diff = date.getDate() - day;
-  const weekStart = new Date(date.setDate(diff));
-  return weekStart.toISOString().split("T")[0];
-};
-
 export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
   isOpen,
   onClose,
@@ -39,17 +33,24 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
 }) => {
   const { data: service, isLoading: isLoadingService } = useGetServicesById(
     serviceId,
-    {
-      enabled: Boolean(!!serviceId && isOpen),
+    { enabled: Boolean(serviceId && isOpen) },
+  );
+
+  const [selectedWeekStartDate, setSelectedWeekStartDate] = useState<Date>(
+    () => {
+      const today = new Date();
+      // Si es domingo (0), usamos el lunes de la semana actual
+      if (today.getDay() === 0) {
+        return startOfWeek(today, { weekStartsOn: 1 });
+      }
+      return startOfWeek(today, { weekStartsOn: 1 });
     },
   );
 
-  const [selectedWeekStart, setSelectedWeekStart] = useState<string>(
-    getWeekStartDate(new Date()),
-  );
+  const selectedWeekStartIso = selectedWeekStartDate.toISOString();
 
   const { data: availability, isLoading: isLoadingAvailability } =
-    useGetServiceAvailability(serviceId, selectedWeekStart, {
+    useGetServiceAvailability(serviceId, selectedWeekStartIso, {
       enabled: Boolean(!!serviceId && isOpen),
     });
 
@@ -58,22 +59,14 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
 
   const createChat = useCreateChat();
 
-  const handleWeekChange = useCallback(
-    (direction: "prev" | "next") => {
-      const currentDate = new Date(selectedWeekStart);
-      const newDate = new Date(currentDate);
-
-      if (direction === "prev") {
-        newDate.setDate(currentDate.getDate() - 7);
-      } else {
-        newDate.setDate(currentDate.getDate() + 7);
-      }
-
-      setSelectedWeekStart(getWeekStartDate(newDate));
-      setSelectedSlots([]);
-    },
-    [selectedWeekStart],
-  );
+  const handleWeekChange = useCallback((direction: "prev" | "next") => {
+    setSelectedWeekStartDate((current) =>
+      direction === "prev"
+        ? startOfWeek(addWeeks(current, -1), { weekStartsOn: 1 })
+        : startOfWeek(addWeeks(current, 1), { weekStartsOn: 1 }),
+    );
+    setSelectedSlots([]);
+  }, []);
 
   const handleSlotSelect = useCallback(
     (day: number, start: string, end: string) => {
@@ -136,7 +129,6 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
           <ScheduleStep
             availability={availability}
             isLoading={isLoadingAvailability}
-            selectedWeekStart={selectedWeekStart}
             selectedSlots={selectedSlots}
             onWeekChange={handleWeekChange}
             onSlotSelect={handleSlotSelect}
@@ -159,7 +151,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
     currentStep,
     service,
     selectedSlots,
-    selectedWeekStart,
+    selectedWeekStartDate,
     availability,
     isLoadingAvailability,
   ]);

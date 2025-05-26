@@ -161,7 +161,7 @@ export const ProfilePage = () => {
                   <div className="flex items-center">
                     <LuCalendar className="w-4 h-4 mr-2" />
                     Miembro desde{" "}
-                    {new Date(profile.createdAt).toLocaleDateString()}
+                    {new Date(profile.createdAt).toLocaleDateString("es-ES")}
                   </div>
                   <div className="flex items-center">
                     <LuStar className="w-4 h-4 mr-2" />
