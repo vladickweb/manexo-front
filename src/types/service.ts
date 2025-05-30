@@ -28,7 +28,6 @@ export interface Service {
   id: number;
   description: string;
   radius: number;
-  location: Location;
   price: string;
   isActive: boolean;
   requiresAcceptance: boolean;

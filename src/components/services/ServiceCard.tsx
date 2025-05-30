@@ -68,15 +68,24 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   }).format(Number(service.price));
 
   const formattedDistance = service.distance
-    ? `${service.distance}m de ti`
-    : `${(service.distance / 1000).toFixed(1)} km de ti`;
+    ? service.distance < 1000
+      ? `${service.distance}m de ti`
+      : `${(service.distance / 1000).toFixed(1)} km de ti`
+    : null;
 
   return (
     <>
       <div
-        className="group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
-        onClick={() => setIsModalOpen(true)}
+        className={`group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer ${!service.isActive ? "opacity-60 grayscale pointer-events-none" : ""}`}
+        onClick={() => service.isActive && setIsModalOpen(true)}
       >
+        {!service.isActive && (
+          <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-30">
+            <span className="text-lg font-bold text-gray-500">
+              No disponible
+            </span>
+          </div>
+        )}
         {/* Header Section */}
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
@@ -108,6 +117,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                   isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"
                 }
                 disabled={
+                  !service.isActive ||
                   favLoading ||
                   createFavorite.isPending ||
                   deleteFavorite.isPending
@@ -131,6 +141,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                     setMenuOpen((o) => !o);
                   }}
                   className="p-2 rounded-full hover:bg-gray-50 transition-colors"
+                  disabled={!service.isActive}
                 >
                   <MoreVertical className="h-5 w-5 text-gray-500" />
                 </button>
@@ -151,6 +162,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                             onEdit();
                           }}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          disabled={!service.isActive}
                         >
                           Editar
                         </button>
@@ -163,6 +175,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                             onDelete();
                           }}
                           className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors"
+                          disabled={!service.isActive}
                         >
                           Eliminar
                         </button>
@@ -197,7 +210,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
               ) : (
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 mr-1" />
-                  {service.location.address}
+                  {service.user.location?.address}
                 </div>
               )}
             </div>

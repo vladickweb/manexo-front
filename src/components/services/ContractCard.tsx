@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useMemo, useState } from "react";
 
 import {
   LuCalendar,
@@ -31,21 +31,30 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
     });
   };
 
+  const { service, provider, bookings, amount } = useMemo(
+    () => contract,
+    [contract],
+  );
+
+  const sortedBookings = useMemo(
+    () =>
+      [...bookings].sort((a, b) => {
+        const dateA = new Date(`${a.date}T${a.startTime}`);
+        const dateB = new Date(`${b.date}T${b.startTime}`);
+        return dateA.getTime() - dateB.getTime();
+      }),
+    [bookings],
+  );
+
+  const firstBooking = useMemo(() => sortedBookings[0], [sortedBookings]);
+  const lastBooking = useMemo(
+    () => sortedBookings[sortedBookings.length - 1],
+    [sortedBookings],
+  );
+
   if (!contract?.service || !contract?.bookings?.length) {
     return null;
   }
-
-  const { service, provider, bookings, amount } = contract;
-
-  const sortedBookings = [...bookings].sort((a, b) => {
-    const dateA = new Date(`${a.date}T${a.startTime}`);
-    const dateB = new Date(`${b.date}T${b.startTime}`);
-    return dateA.getTime() - dateB.getTime();
-  });
-
-  const firstBooking = sortedBookings[0];
-  const lastBooking = sortedBookings[sortedBookings.length - 1];
-
   return (
     <>
       <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
@@ -70,10 +79,10 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
         <div className="space-y-2">
           <p className="text-gray-600">{service.description}</p>
 
-          {service.location && (
+          {service.user.location && (
             <div className="flex items-center text-sm text-gray-500">
               <LuMapPin className="mr-1 h-4 w-4" />
-              <span>{service.location.address}</span>
+              <span>{service.user.location.address}</span>
               {/* TODO: ver como va esto */}
             </div>
           )}

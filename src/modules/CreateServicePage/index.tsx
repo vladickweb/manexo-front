@@ -18,6 +18,7 @@ import { LocationStep } from "@/modules/CreateServicePage/components/steps/Locat
 import { PriceStep } from "@/modules/CreateServicePage/components/steps/PriceStep";
 import { steps } from "@/modules/CreateServicePage/constants/steps";
 import type { FormValues } from "@/modules/CreateServicePage/types";
+import { useUser } from "@/stores/useUser";
 
 interface AddressComponents {
   streetName: string;
@@ -52,29 +53,46 @@ const validationSchema = Yup.object<FormValues>({
   radius: Yup.number().required("El radio es requerido"),
 });
 
-const initialValues: FormValues = {
-  description: "",
-  price: 15,
-  categoryId: 0,
-  location: {
-    latitude: 0,
-    longitude: 0,
-    address: "",
-    addressComponents: {
-      streetName: "",
-      streetNumber: "",
-      city: "",
-      province: "",
-      postalCode: "",
-      country: "",
-    },
-  },
-  requiresAcceptance: false,
-  radius: 15000,
-};
+function getInitialValues(user: any): FormValues {
+  return {
+    description: "",
+    price: 15,
+    categoryId: 0,
+    location: user?.location
+      ? {
+          latitude: user.location.latitude,
+          longitude: user.location.longitude,
+          address: user.location.address,
+          addressComponents: {
+            streetName: user.location.streetName,
+            streetNumber: user.location.streetNumber,
+            city: user.location.city,
+            province: user.location.province,
+            postalCode: user.location.postalCode,
+            country: user.location.country,
+          },
+        }
+      : {
+          latitude: 0,
+          longitude: 0,
+          address: "",
+          addressComponents: {
+            streetName: "",
+            streetNumber: "",
+            city: "",
+            province: "",
+            postalCode: "",
+            country: "",
+          },
+        },
+    requiresAcceptance: false,
+    radius: 15000,
+  };
+}
 
 export const CreateServicePage = () => {
   const queryClient = useQueryClient();
+  const { user } = useUser();
   const [currentStep, setCurrentStep] = useState(0);
   const [showRadiusSlider, setShowRadiusSlider] = useState(false);
   const [_selectedCategory, setSelectedCategory] = useState<Category | null>(
@@ -192,7 +210,7 @@ export const CreateServicePage = () => {
         <StepperHeader currentStep={currentStep} />
         <div className="w-full px-6 pt-10">
           <Formik
-            initialValues={initialValues}
+            initialValues={getInitialValues(user)}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >

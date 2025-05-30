@@ -1,80 +1,126 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 
-import {
-  Box,
-  Group,
-  MultiSelect,
-  Select,
-  Switch,
-  TextInput,
-} from "@mantine/core";
+import { Box, Group, Switch, TextInput } from "@mantine/core";
 import { useFormik } from "formik";
 
-interface CategoryOption {
-  id: string;
-  name: string;
+import { CATEGORIES } from "@/constants/categories";
+
+interface FilterValues {
+  categoryId?: string;
+  subcategoryIds: string[];
+  minPrice: string;
+  maxPrice: string;
+  onlyActives: boolean;
 }
+
 interface Props {
-  categories: CategoryOption[];
   onFilterChange: (filters: {
-    categoryIds: string[];
+    categoryId?: string;
     minPrice?: number;
     maxPrice?: number;
-    radius: number;
-    isActive: boolean;
+    onlyActives: boolean;
+    subcategoryIds?: string[];
   }) => void;
+  resetKey?: number;
+  initialValues?: FilterValues;
 }
 
+const DEFAULT_VALUES: FilterValues = {
+  categoryId: undefined,
+  subcategoryIds: [],
+  minPrice: "",
+  maxPrice: "",
+  onlyActives: true,
+};
+
 export const ServiceFilters: React.FC<Props> = ({
-  categories,
   onFilterChange,
+  resetKey,
+  initialValues,
 }) => {
   const formik = useFormik({
-    initialValues: {
-      categoryIds: [] as string[],
-      minPrice: "",
-      maxPrice: "",
-      radius: "5000",
-      isActive: true,
-    },
+    initialValues: initialValues || DEFAULT_VALUES,
     onSubmit: () => {},
+    enableReinitialize: true,
   });
 
-  const categoryOptions = categories.map((c) => ({
-    label: c.name,
-    value: c.id.toString(),
-  }));
-  const radiusOptions = [
-    { value: "1000", label: "1 km" },
-    { value: "5000", label: "5 km" },
-    { value: "10000", label: "10 km" },
-    { value: "20000", label: "20 km" },
-    { value: "50000", label: "50 km" },
-  ];
+  const selectedCategory = useMemo(
+    () =>
+      CATEGORIES.find((cat) => cat.id.toString() === formik.values.categoryId),
+    [formik.values.categoryId],
+  );
 
   useEffect(() => {
     onFilterChange({
-      categoryIds: formik.values.categoryIds,
+      categoryId: formik.values.categoryId,
+      subcategoryIds: formik.values.subcategoryIds,
       minPrice: formik.values.minPrice ? +formik.values.minPrice : undefined,
       maxPrice: formik.values.maxPrice ? +formik.values.maxPrice : undefined,
-      radius: +formik.values.radius,
-      isActive: formik.values.isActive,
+      onlyActives: formik.values.onlyActives,
     });
   }, [formik.values, onFilterChange]);
 
   return (
     <Box maw={1200} mx="auto" px="md" py="4">
-      <form onSubmit={formik.handleSubmit}>
+      <form onSubmit={formik.handleSubmit} key={resetKey}>
         <Group align="flex-end" gap="md" wrap="wrap">
-          <MultiSelect
-            data={categoryOptions}
-            label="Categorías"
-            placeholder="Selecciona"
-            clearable
-            searchable
-            maxDropdownHeight={300}
-            {...formik.getFieldProps("categoryIds")}
-          />
+          <div className="flex flex-wrap gap-2 mb-2">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors text-sm font-medium shadow-sm ${
+                  formik.values.categoryId === cat.id.toString()
+                    ? "bg-primary text-white border-primary"
+                    : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                }`}
+                onClick={() => {
+                  formik.setFieldValue("categoryId", cat.id.toString());
+                  formik.setFieldValue("subcategoryIds", []);
+                }}
+              >
+                <img src={cat.icon} alt={cat.name} className="w-5 h-5" />
+                {cat.name}
+              </button>
+            ))}
+          </div>
+
+          {selectedCategory && (
+            <div className="flex flex-wrap gap-2 mb-2 w-full">
+              {selectedCategory.subcategories.map((sub) => (
+                <button
+                  key={sub.id}
+                  type="button"
+                  className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-colors text-xs font-medium shadow-sm ${
+                    formik.values.subcategoryIds.includes(sub.id.toString())
+                      ? "bg-primary text-white border-primary"
+                      : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                  }`}
+                  onClick={() => {
+                    const exists = formik.values.subcategoryIds.includes(
+                      sub.id.toString(),
+                    );
+                    if (exists) {
+                      formik.setFieldValue(
+                        "subcategoryIds",
+                        formik.values.subcategoryIds.filter(
+                          (id) => id !== sub.id.toString(),
+                        ),
+                      );
+                    } else {
+                      formik.setFieldValue("subcategoryIds", [
+                        ...formik.values.subcategoryIds,
+                        sub.id.toString(),
+                      ]);
+                    }
+                  }}
+                >
+                  <img src={sub.icon} alt={sub.name} className="w-4 h-4" />
+                  {sub.name}
+                </button>
+              ))}
+            </div>
+          )}
 
           <TextInput
             label="Precio mínimo"
@@ -90,14 +136,13 @@ export const ServiceFilters: React.FC<Props> = ({
             {...formik.getFieldProps("maxPrice")}
           />
 
-          <Select
-            label="Radio"
-            data={radiusOptions}
-            clearable={false}
-            {...formik.getFieldProps("radius")}
+          <Switch
+            label="Solo activos"
+            checked={formik.values.onlyActives}
+            onChange={(e) =>
+              formik.setFieldValue("onlyActives", e.currentTarget.checked)
+            }
           />
-
-          <Switch label="Solo activos" {...formik.getFieldProps("isActive")} />
         </Group>
       </form>
     </Box>

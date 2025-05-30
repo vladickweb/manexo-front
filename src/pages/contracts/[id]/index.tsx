@@ -124,7 +124,7 @@ export const ContractDetailsPage: FC = () => {
               <div>
                 <p className="text-sm text-gray-500">Ubicación</p>
                 <p className="font-medium">
-                  {contract.service.location.address}
+                  {contract.service.user.location?.address}
                 </p>
               </div>
             </div>
