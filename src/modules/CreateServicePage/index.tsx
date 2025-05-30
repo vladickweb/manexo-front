@@ -11,11 +11,11 @@ import { Category } from "@/constants/categories";
 import { QueryKeys } from "@/constants/queryKeys";
 import { useGetAvailabilities } from "@/hooks/api/useAvailabilities";
 import { usePostServices } from "@/hooks/api/usePostServices";
-import StepperHeader from "@/modules/CreateServicePage/components/StepperHeader";
-import CategoryStep from "@/modules/CreateServicePage/components/steps/CategoryStep";
-import InputStep from "@/modules/CreateServicePage/components/steps/InputStep";
-import LocationStep from "@/modules/CreateServicePage/components/steps/LocationStep";
-import PriceStep from "@/modules/CreateServicePage/components/steps/PriceStep";
+import { StepperHeader } from "@/modules/CreateServicePage/components/StepperHeader";
+import { CategoryStep } from "@/modules/CreateServicePage/components/steps/CategoryStep";
+import { InputStep } from "@/modules/CreateServicePage/components/steps/InputStep";
+import { LocationStep } from "@/modules/CreateServicePage/components/steps/LocationStep";
+import { PriceStep } from "@/modules/CreateServicePage/components/steps/PriceStep";
 import { steps } from "@/modules/CreateServicePage/constants/steps";
 import type { FormValues } from "@/modules/CreateServicePage/types";
 
@@ -91,7 +91,7 @@ export const CreateServicePage = () => {
       const mappedValues = {
         description: values.description,
         price: values.price,
-        categoryId: values.categoryId,
+        subcategory: values.categoryId,
         location: {
           latitude: values.location.latitude,
           longitude: values.location.longitude,

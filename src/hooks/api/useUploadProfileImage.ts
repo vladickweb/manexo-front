@@ -17,14 +17,12 @@ export const useUploadProfileImage = (
   return useMutation({
     ...(options || {}),
     mutationFn: async ({ id, file }: { id: number; file: File }) => {
-      // Validar tipo de archivo
       if (!ALLOWED_FILE_TYPES.includes(file.type)) {
         throw new Error(
           "Tipo de archivo no válido. Solo se permiten imágenes (JPG, PNG, GIF, WEBP)",
         );
       }
 
-      // Validar tamaño
       if (file.size > MAX_FILE_SIZE) {
         throw new Error(
           "El archivo es demasiado grande. El tamaño máximo es 5MB",

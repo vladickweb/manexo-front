@@ -11,8 +11,8 @@ import { MessagesPage } from "@/modules/MessagesPage";
 import { ProfilePage } from "@/modules/ProfilePage";
 import { SearchPage } from "@/modules/SearchPage";
 import { ServiceDetailPage } from "@/modules/ServiceDetailPage";
-import ContractDetailsPage from "@/pages/contracts/[id]";
-import ContractSuccessPage from "@/pages/contracts/[id]/success";
+import { ContractDetailsPage } from "@/pages/contracts/[id]";
+import { ContractSuccessPage } from "@/pages/contracts/[id]/success";
 
 import "react-toastify/dist/ReactToastify.css";
 

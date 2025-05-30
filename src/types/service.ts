@@ -1,5 +1,29 @@
 import { IUser } from "@/types/user";
 
+export interface Location {
+  address: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface Subcategory {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  category: {
+    id: number;
+    name: string;
+    description: string;
+    icon: string;
+  };
+}
+
+export interface ReviewStats {
+  totalReviews: number;
+  averageRating: number;
+}
+
 export interface Service {
   id: number;
   description: string;
@@ -8,23 +32,13 @@ export interface Service {
   price: string;
   isActive: boolean;
   requiresAcceptance: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   user: IUser;
-  subcategory: Category;
+  subcategory: Subcategory;
+  reviews: any[]; // TODO: Definir tipo de Review
   distance: number;
-}
-
-export interface Location {
-  latitude: number;
-  longitude: number;
-  address: string;
-  streetName?: string;
-  streetNumber?: string;
-  city?: string;
-  province?: string;
-  postalCode?: string;
-  country?: string;
+  reviewStats: ReviewStats;
 }
 
 export interface Category {

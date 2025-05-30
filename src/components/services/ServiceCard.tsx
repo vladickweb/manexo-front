@@ -1,8 +1,10 @@
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 
+import { Rating } from "@mantine/core";
 import { AnimatePresence, motion } from "framer-motion";
-import { Heart, MapPin, MoreVertical, Navigation, Star } from "lucide-react";
+import { MapPin, MoreVertical, Navigation, Star } from "lucide-react";
 
+import { ReviewsModal } from "@/components/reviews/ReviewsModal";
 import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal/index";
 import {
   useCreateFavorite,
@@ -10,39 +12,28 @@ import {
   useGetFavorites,
 } from "@/hooks/api/useFavorites";
 import { useUser } from "@/stores/useUser";
-import { IUser } from "@/types/user";
+import { Service } from "@/types/service";
 
 interface ServiceCardProps {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  tag: string;
+  service: Service;
   onEdit?: () => void;
   onDelete?: () => void;
-  rating?: number;
-  location?: string;
-  serviceRadius?: string;
-  provider: IUser;
+  showDistance?: boolean;
+  showFavoriteButton?: boolean;
 }
 
 export const ServiceCard: FC<ServiceCardProps> = ({
-  id,
-  title,
-  description,
-  price,
-  tag,
+  service,
   onEdit,
   onDelete,
-  rating,
-  location,
-  serviceRadius,
-  provider,
+  showDistance,
+  showFavoriteButton,
 }) => {
   const { user } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
 
   const userId = useMemo(() => user?.id ?? 0, [user]);
 
@@ -50,14 +41,14 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   const createFavorite = useCreateFavorite();
   const deleteFavorite = useDeleteFavorite();
 
-  const fav = favorites?.find((f) => f.service.id === Number(id));
+  const fav = favorites?.find((f) => f.service.id === service.id);
   const isFavorite = !!fav;
 
   const handleToggleFavorite = () => {
     if (isFavorite && fav) {
       deleteFavorite.mutate(fav.id);
     } else {
-      createFavorite.mutate({ userId, serviceId: Number(id) });
+      createFavorite.mutate({ userId, serviceId: service.id });
     }
   };
 
@@ -74,138 +65,189 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   const formattedPrice = new Intl.NumberFormat("es-ES", {
     style: "currency",
     currency: "EUR",
-  }).format(price);
+  }).format(Number(service.price));
+
+  const formattedDistance = service.distance
+    ? `${service.distance}m de ti`
+    : `${(service.distance / 1000).toFixed(1)} km de ti`;
 
   return (
     <>
-      <div className="group relative bg-white rounded-2xl p-6 overflow-hidden border border-gray-100 shadow-sm transition-all duration-300">
-        <button
-          className="absolute top-4 right-4 z-20 p-1 rounded-full hover:bg-gray-100 transition-colors"
-          onClick={handleToggleFavorite}
-          aria-label={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
-          disabled={
-            favLoading || createFavorite.isPending || deleteFavorite.isPending
-          }
-        >
-          <Heart
-            className={
-              isFavorite
-                ? "h-6 w-6 text-red-500 fill-red-500"
-                : "h-6 w-6 text-gray-400 hover:text-red-500"
-            }
-            fill={isFavorite ? "#ef4444" : "none"}
-          />
-        </button>
-        <div className="flex justify-between items-start">
-          <div className="space-y-1">
-            <h3 className="text-xl font-semibold text-gray-900 transition-colors">
-              {title}
-            </h3>
-            <div className="flex items-center gap-2">
-              <span className="inline-block bg-gradient-to-r from-primary/20 to-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full">
-                {tag}
+      <div
+        className="group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+        onClick={() => setIsModalOpen(true)}
+      >
+        {/* Header Section */}
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
+                {service.subcategory?.category?.name}
               </span>
-            </div>
-            <div className="flex items-center gap-2 mt-2">
-              {provider.profileImageUrl && (
-                <img
-                  src={provider.profileImageUrl}
-                  alt={provider.firstName}
-                  className="w-8 h-8 rounded-full object-cover border"
-                />
+              {service.subcategory?.name !==
+                service.subcategory?.description && (
+                <span className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
+                  {service.subcategory?.name}
+                </span>
               )}
-              <span className="font-medium text-gray-800 text-sm">
-                {provider.firstName} {provider.lastName}
-              </span>
             </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {service.subcategory?.description}
+            </h3>
           </div>
 
-          {(onEdit || onDelete) && (
-            <div ref={menuRef} className="relative">
+          <div className="flex items-center gap-2">
+            {showFavoriteButton && (
               <button
-                onClick={() => setMenuOpen((o) => !o)}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-full hover:bg-gray-50 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleFavorite();
+                }}
+                aria-label={
+                  isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"
+                }
+                disabled={
+                  favLoading ||
+                  createFavorite.isPending ||
+                  deleteFavorite.isPending
+                }
               >
-                <MoreVertical className="h-5 w-5 text-gray-600" />
+                <Star
+                  className={`h-5 w-5 transition-colors ${
+                    isFavorite
+                      ? "text-red-500 fill-red-500"
+                      : "text-gray-300 hover:text-red-500"
+                  }`}
+                />
               </button>
-              <AnimatePresence>
-                {menuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-10"
-                  >
-                    {onEdit && (
-                      <button
-                        onClick={() => {
-                          setMenuOpen(false);
-                          onEdit();
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        Editar
-                      </button>
-                    )}
-                    {onDelete && (
-                      <button
-                        onClick={() => {
-                          setMenuOpen(false);
-                          onDelete();
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors"
-                      >
-                        Eliminar
-                      </button>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
+            )}
 
-        <div className="mt-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center text-sm text-gray-500">
-              <MapPin className="h-4 w-4 mr-1" />
-              {location}
-            </div>
-            {serviceRadius && (
-              <div className="flex items-center text-sm text-gray-500">
-                <Navigation className="h-4 w-4 mr-1" />
-                {serviceRadius} km
+            {(onEdit || onDelete) && (
+              <div ref={menuRef} className="relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuOpen((o) => !o);
+                  }}
+                  className="p-2 rounded-full hover:bg-gray-50 transition-colors"
+                >
+                  <MoreVertical className="h-5 w-5 text-gray-500" />
+                </button>
+                <AnimatePresence>
+                  {menuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-10"
+                    >
+                      {onEdit && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuOpen(false);
+                            onEdit();
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          Editar
+                        </button>
+                      )}
+                      {onDelete && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuOpen(false);
+                            onDelete();
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors"
+                        >
+                          Eliminar
+                        </button>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
           </div>
-          {rating && (
-            <div className="flex items-center bg-gray-50 px-3 py-1 rounded-full">
-              <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-              <span className="ml-1 text-sm font-medium text-gray-600">
-                {rating}
-              </span>
-            </div>
-          )}
         </div>
 
-        <p className="mt-4 text-gray-600 text-sm leading-relaxed line-clamp-3">
-          {description}
+        {/* User Info Section */}
+        <div className="flex items-center gap-3 mb-4">
+          {service.user.profileImageUrl && (
+            <img
+              src={service.user.profileImageUrl}
+              alt={service.user.firstName}
+              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+            />
+          )}
+          <div>
+            <p className="font-medium text-gray-900">
+              {service.user.firstName} {service.user.lastName}
+            </p>
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              {showDistance ? (
+                <div className="flex items-center">
+                  <Navigation className="h-4 w-4 mr-1" />
+                  {formattedDistance}
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  {service.location.address}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Description */}
+        <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-4">
+          {service.description}
         </p>
 
-        <div className="mt-6 flex items-center justify-between">
-          <div className="space-y-1">
+        {/* Footer Section */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div
+            className="flex items-center gap-4 cursor-pointer group/reviews hover:bg-gray-50 p-2 rounded-lg transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsReviewsModalOpen(true);
+            }}
+          >
+            {service.reviewStats.totalReviews > 0 ? (
+              <div className="flex items-center gap-2">
+                <Rating
+                  value={service.reviewStats.averageRating}
+                  fractions={2}
+                  readOnly
+                  color="orange"
+                  size="sm"
+                  className="group-hover/reviews:scale-105 transition-transform"
+                />
+                <span className="text-sm font-medium text-gray-700 group-hover/reviews:text-primary transition-colors">
+                  {Number(service.reviewStats.averageRating).toFixed(1)}
+                </span>
+                <span className="text-xs text-gray-500 group-hover/reviews:text-gray-700 transition-colors">
+                  ({service.reviewStats.totalReviews})
+                </span>
+              </div>
+            ) : (
+              <span className="text-xs text-gray-400 group-hover/reviews:text-gray-600 transition-colors">
+                Sin valoraciones
+              </span>
+            )}
+          </div>
+
+          <div className="text-right">
             <span className="text-2xl font-bold text-gray-900">
               {formattedPrice}
             </span>
             <p className="text-xs text-gray-500">por hora</p>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-6 py-2.5 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors shadow-sm hover:shadow-md"
-          >
-            Ver detalles
-          </button>
         </div>
       </div>
 
@@ -213,7 +255,15 @@ export const ServiceCard: FC<ServiceCardProps> = ({
         <ServiceDetailsModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          serviceId={id}
+          serviceId={service.id}
+        />
+      )}
+
+      {isReviewsModalOpen && (
+        <ReviewsModal
+          isOpen={isReviewsModalOpen}
+          onClose={() => setIsReviewsModalOpen(false)}
+          serviceId={service.id}
         />
       )}
     </>

@@ -3,7 +3,6 @@ import { FaHeart } from "react-icons/fa";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { useGetFavorites } from "@/hooks/api/useFavorites";
 import { useGetUser } from "@/hooks/api/useGetUser";
-import { IUser } from "@/types/user";
 
 export const FavoritesPage = () => {
   const { data: user, isLoading: userLoading } = useGetUser();
@@ -26,17 +25,7 @@ export const FavoritesPage = () => {
       {favorites && favorites.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((fav) => {
-            return (
-              <ServiceCard
-                key={fav.service.id}
-                id={fav.service.id}
-                title={(fav.service as any).title}
-                description={fav.service.description}
-                price={Number(fav.service.price)}
-                tag={fav.service.subcategory?.name || ""}
-                provider={fav.service.user as unknown as IUser}
-              />
-            );
+            return <ServiceCard key={fav.service.id} service={fav.service} />;
           })}
         </div>
       ) : (

@@ -6,22 +6,35 @@ import { IUser } from "@/types/user";
 
 export interface Contract {
   id: string;
-  serviceId: number;
-  clientId: number;
-  providerId: number;
-  amount: number;
-  status: "PENDING" | "PAID" | "CANCELLED";
-  agreedPrice: number;
+  amount: string;
+  status: "paid" | "pending" | "cancelled";
+  notes: string | null;
+  agreedPrice: string;
+  stripePaymentIntentId: string;
   createdAt: string;
   updatedAt: string;
+  completedAt: string | null;
   service: Service;
   client: IUser;
   provider: IUser;
+  bookings: Array<{
+    id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    status: string;
+    totalPrice: string;
+    notes: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }>;
   timeSlots: Array<{
     date: string;
     startTime: string;
     endTime: string;
+    status: string;
   }>;
+  canReview: boolean;
 }
 
 interface CreateContractPayload {

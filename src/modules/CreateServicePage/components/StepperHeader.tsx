@@ -4,7 +4,7 @@ interface StepperHeaderProps {
   currentStep: number;
 }
 
-const StepperHeader = ({ currentStep }: StepperHeaderProps) => (
+export const StepperHeader = ({ currentStep }: StepperHeaderProps) => (
   <div className="w-full">
     <div className="max-w-4xl mx-auto px-4">
       <div className="py-4">
@@ -46,5 +46,3 @@ const StepperHeader = ({ currentStep }: StepperHeaderProps) => (
     </div>
   </div>
 );
-
-export default StepperHeader;

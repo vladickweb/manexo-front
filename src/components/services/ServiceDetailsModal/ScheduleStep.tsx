@@ -108,7 +108,9 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
                 <h4 className="font-semibold text-lg">
                   {formatFullDate(day.date)}
                 </h4>
-                {(!day.isActive || day.isPastDate) && (
+                {(!day.isActive ||
+                  day.isPastDate ||
+                  !day.availableSlots.length) && (
                   <span className="text-sm text-gray-500">
                     {day.isPastDate ? "Fecha pasada" : "No disponible"}
                   </span>

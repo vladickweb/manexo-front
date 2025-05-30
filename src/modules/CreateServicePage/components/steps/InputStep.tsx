@@ -9,7 +9,7 @@ interface InputStepProps {
   onKeyPress: (e: React.KeyboardEvent) => void;
 }
 
-const InputStep = ({ step, onKeyPress }: InputStepProps) => {
+export const InputStep = ({ step, onKeyPress }: InputStepProps) => {
   const { values, errors, touched, handleChange, handleBlur } =
     useFormikContext<any>();
   const Component = step.id === "description" ? Textarea : Input;
@@ -33,5 +33,3 @@ const InputStep = ({ step, onKeyPress }: InputStepProps) => {
     </div>
   );
 };
-
-export default InputStep;

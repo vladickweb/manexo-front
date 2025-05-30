@@ -1,4 +1,3 @@
-// src/components/Filters/ServiceFilters.tsx
 import React, { useEffect } from "react";
 
 import {

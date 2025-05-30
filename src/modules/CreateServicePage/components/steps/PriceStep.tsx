@@ -6,7 +6,7 @@ import { useFormikContext } from "formik";
 import { steps } from "@/modules/CreateServicePage/constants/steps";
 import type { Step } from "@/modules/CreateServicePage/types";
 
-const PriceStep = () => {
+export const PriceStep = () => {
   const {
     values: { price },
     setFieldValue,
@@ -105,5 +105,3 @@ const PriceStep = () => {
     </div>
   );
 };
-
-export default PriceStep;

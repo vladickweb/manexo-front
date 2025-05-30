@@ -39,7 +39,6 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
   const [selectedWeekStartDate, setSelectedWeekStartDate] = useState<Date>(
     () => {
       const today = new Date();
-      // Si es domingo (0), usamos el lunes de la semana actual
       if (today.getDay() === 0) {
         return startOfWeek(today, { weekStartsOn: 1 });
       }

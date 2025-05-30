@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { useGetContract } from "@/hooks/api/useGetContract";
 import { formatFullDate } from "@/utils/date";
 
-const ContractDetailsPage: FC = () => {
+export const ContractDetailsPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: contract, isLoading } = useGetContract(id || "");
 
@@ -180,5 +180,3 @@ const ContractDetailsPage: FC = () => {
     </div>
   );
 };
-
-export default ContractDetailsPage;

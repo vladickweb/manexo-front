@@ -117,20 +117,16 @@ export const useWebSocket = (chatId: string) => {
       setIsConnected(false);
     };
 
-    // Suscribirse a eventos de conexión
     websocketService.on("connect", handleConnect);
     websocketService.on("disconnect", handleDisconnect);
 
-    // Verificar si ya está conectado
     const checkConnection = () => {
       const connected = websocketService.isConnected();
       setIsConnected(connected);
     };
 
-    // Verificar conexión inicial
     checkConnection();
 
-    // Verificar conexión periódicamente
     const interval = setInterval(checkConnection, 5000);
 
     return () => {

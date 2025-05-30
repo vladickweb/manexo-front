@@ -1,9 +1,10 @@
 import { LuLoader } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { Loader } from "@/components/Loader/Loader";
 import { useGetContract } from "@/hooks/api/useGetContract";
 
-export default function ContractSuccessPage() {
+export const ContractSuccessPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: contract, isLoading } = useGetContract(id || "");
@@ -11,7 +12,7 @@ export default function ContractSuccessPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <Loader />
       </div>
     );
   }
@@ -66,4 +67,4 @@ export default function ContractSuccessPage() {
       </div>
     </div>
   );
-}
+};

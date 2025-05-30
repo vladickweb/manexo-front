@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { LuLoader } from "react-icons/lu";
 
@@ -40,7 +40,19 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   const createContract = useCreateContract();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const totalAmount = selectedSlots.length * Number(service?.price || 0);
+  const totalAmount = useMemo(
+    () => selectedSlots.length * Number(service?.price || 0),
+    [selectedSlots, service?.price],
+  );
+
+  const formattedTotal = useMemo(
+    () =>
+      new Intl.NumberFormat("es-ES", {
+        style: "currency",
+        currency: "EUR",
+      }).format(totalAmount),
+    [totalAmount],
+  );
 
   const handleConfirmAndPay = async () => {
     if (!user) return;
@@ -69,11 +81,9 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         timeSlots,
       });
 
-      // Redirigir a la página de pago de Stripe
       window.location.href = response.paymentUrl;
     } catch (error) {
       console.error("Error al crear el contrato:", error);
-      // Aquí podrías mostrar un mensaje de error al usuario
     } finally {
       setIsProcessing(false);
     }
@@ -115,7 +125,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         <div className="border-t pt-4">
           <div className="flex justify-between font-semibold">
             <span>Total</span>
-            <span>{totalAmount}€</span>
+            <span>{formattedTotal}</span>
           </div>
         </div>
       </div>

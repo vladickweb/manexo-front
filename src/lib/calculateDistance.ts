@@ -13,7 +13,7 @@ const calculateDistanceInMeters = (
   point1: Coordinates,
   point2: Coordinates,
 ): number => {
-  const R = 6371e3; // Radio de la Tierra en metros
+  const R = 6371e3;
   const φ1 = (point1.latitude * Math.PI) / 180;
   const φ2 = (point2.latitude * Math.PI) / 180;
   const Δφ = ((point2.latitude - point1.latitude) * Math.PI) / 180;

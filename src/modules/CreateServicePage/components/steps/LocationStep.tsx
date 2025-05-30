@@ -25,7 +25,7 @@ interface LocationStepProps {
   ) => void;
 }
 
-const LocationStep = ({
+export const LocationStep = ({
   showRadius,
   setShowRadius,
   onLocationSelect,
@@ -57,7 +57,6 @@ const LocationStep = ({
     onLocationSelect(lat, lng, address);
   };
 
-  // Determinar la ubicación inicial del mapa
   const initialLocation = {
     lat: values.location.latitude,
     lng: values.location.longitude,
@@ -91,5 +90,3 @@ const LocationStep = ({
     </div>
   );
 };
-
-export default LocationStep;

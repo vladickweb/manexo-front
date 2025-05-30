@@ -1,6 +1,6 @@
 import { Button } from "@/components/Button/Button";
 
-const Hero = () => {
+export const Hero = () => {
   return (
     <section className="relative h-[calc(100vh-500px)] w-full overflow-hidden">
       <div className="absolute inset-0">
@@ -27,5 +27,3 @@ const Hero = () => {
     </section>
   );
 };
-
-export default Hero;

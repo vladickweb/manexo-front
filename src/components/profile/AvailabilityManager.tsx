@@ -63,10 +63,8 @@ export const AvailabilityManager: FC = () => {
     return <div>Cargando disponibilidad...</div>;
   }
 
-  // Crear array inicial con los 7 días
   const initialValues = {
     availabilities: DAYS_OF_WEEK.map((_, index) => {
-      // Ajustamos el índice para que coincida con el día de la semana (1-7)
       const dayOfWeek = index === 6 ? 0 : index + 1;
       const existingAvailability = availabilities?.find(
         (a) => a.dayOfWeek === dayOfWeek,
