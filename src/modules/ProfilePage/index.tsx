@@ -186,7 +186,6 @@ export const ProfilePage = () => {
             <AvailabilityManager />
           </div>
 
-          {/* Servicios */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">Mis Servicios</h2>
             {profile.services && profile.services.length > 0 ? (

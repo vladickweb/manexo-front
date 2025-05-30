@@ -1,11 +1,12 @@
 import { FC } from "react";
 
-import { Avatar, Divider, Group, Rating, Stack, Text } from "@mantine/core";
+import { Divider, Group, Rating, Stack, Text } from "@mantine/core";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { AnimatePresence, motion } from "framer-motion";
 import { LuX } from "react-icons/lu";
 
+import { UserAvatar } from "@/components/UserAvatar";
 import { useGetServiceReviews } from "@/hooks/api/useReviews";
 
 interface ReviewsModalProps {
@@ -74,10 +75,7 @@ export const ReviewsModal: FC<ReviewsModalProps> = ({
                   {reviewsData?.reviews.map((review) => (
                     <div key={review.id} className="space-y-2">
                       <Group>
-                        <Avatar size="md" radius="xl" color="blue">
-                          {review.user.firstName[0]}
-                          {review.user.lastName[0]}
-                        </Avatar>
+                        <UserAvatar user={review.user} />
                         <div>
                           <Text fw={500}>
                             {review.user.firstName} {review.user.lastName}

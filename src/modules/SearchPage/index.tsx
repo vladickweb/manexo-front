@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Button, Drawer } from "@mantine/core";
 import { motion } from "framer-motion";
 import { SlidersHorizontal } from "lucide-react";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import { useInView } from "react-intersection-observer";
 
 import { ServiceFilters } from "@/components/Filters/ServiceFilters";
@@ -136,13 +137,6 @@ export const SearchPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 relative">
       <header className="container mx-auto px-4 py-8">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-dark"
-        >
-          Servicios cerca de ti
-        </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -209,16 +203,33 @@ export const SearchPage: React.FC = () => {
             <Loader />
             <p>Cargando servicios...</p>
           </div>
+        ) : services.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <FaMapMarkerAlt className="w-10 h-10 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              No se encontraron servicios
+            </h2>
+            <p className="text-gray-600 text-center max-w-md">
+              Prueba cambiando los filtros o ajustando tu ubicación para ver más
+              resultados cerca de ti.
+            </p>
+          </div>
         ) : (
           <>
             <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {services.map((svc) => {
                 return (
-                  <ServiceCard key={svc.id} service={svc} showDistance={true} />
+                  <ServiceCard
+                    key={svc.id}
+                    service={svc}
+                    showDistance={true}
+                    showFavoriteButton={true}
+                  />
                 );
               })}
             </div>
-
             <div ref={ref} className="h-1" />
           </>
         )}

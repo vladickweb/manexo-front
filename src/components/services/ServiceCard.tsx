@@ -6,6 +6,7 @@ import { MapPin, MoreVertical, Navigation, Star } from "lucide-react";
 
 import { ReviewsModal } from "@/components/reviews/ReviewsModal";
 import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal/index";
+import { UserAvatar } from "@/components/UserAvatar";
 import {
   useCreateFavorite,
   useDeleteFavorite,
@@ -126,8 +127,8 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                 <Star
                   className={`h-5 w-5 transition-colors ${
                     isFavorite
-                      ? "text-red-500 fill-red-500"
-                      : "text-gray-300 hover:text-red-500"
+                      ? "text-primary fill-primary"
+                      : "text-gray-300 hover:text-primary"
                   }`}
                 />
               </button>
@@ -190,13 +191,8 @@ export const ServiceCard: FC<ServiceCardProps> = ({
 
         {/* User Info Section */}
         <div className="flex items-center gap-3 mb-4">
-          {service.user.profileImageUrl && (
-            <img
-              src={service.user.profileImageUrl}
-              alt={service.user.firstName}
-              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
-            />
-          )}
+          <UserAvatar user={service.user} size="md" />
+
           <div>
             <p className="font-medium text-gray-900">
               {service.user.firstName} {service.user.lastName}

@@ -37,7 +37,6 @@ export const ServicesTabs = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Servicios</h2>
         <Button
           variant="primary"
           filled

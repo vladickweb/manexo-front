@@ -1,16 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 
 import axiosClient from "@/api/axiosClient";
+import { IUser } from "@/types/user";
 
 interface Review {
   id: string;
   rating: number;
   comment: string;
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-  };
+  user: IUser;
   createdAt: string;
 }
 
