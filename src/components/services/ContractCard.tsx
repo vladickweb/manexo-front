@@ -37,7 +37,6 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
 
   const { service, provider, bookings, amount } = contract;
 
-  // Ordenar las reservas por fecha y hora
   const sortedBookings = [...bookings].sort((a, b) => {
     const dateA = new Date(`${a.date}T${a.startTime}`);
     const dateB = new Date(`${b.date}T${b.startTime}`);
@@ -74,9 +73,8 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
           {service.location && (
             <div className="flex items-center text-sm text-gray-500">
               <LuMapPin className="mr-1 h-4 w-4" />
-              <span>
-                {service.location.address}, {service.location.city}
-              </span>
+              <span>{service.location.address}</span>
+              {/* TODO: ver como va esto */}
             </div>
           )}
 

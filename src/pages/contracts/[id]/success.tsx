@@ -50,7 +50,7 @@ export const ContractSuccessPage = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Estado:</span>
                   <span className="font-medium text-green-600">
-                    {contract.status === "PAID" ? "Pagado" : "Pendiente"}
+                    {contract.status === "paid" ? "Pagado" : "Pendiente"}
                   </span>
                 </div>
               </div>
