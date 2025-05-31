@@ -1,18 +1,25 @@
+import { useEffect } from "react";
+
 import { FaCommentDots } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 
 import { ChatList } from "@/components/chat/ChatList";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { useGetChat, useGetChats } from "@/hooks/api/useChats";
+import { useChatSocket } from "@/hooks/useChatSocket";
 import { MainLayout } from "@/layouts/MainLayout";
-import { useUserWebSocketAutoConnect } from "@/stores/useUser";
 
 export const MessagesPage = () => {
   const { chatId } = useParams();
   const { data: chats, isLoading: isLoadingChats } = useGetChats();
   const { data: chat } = useGetChat(chatId || "");
+  const { initializeLastMessages } = useChatSocket();
 
-  useUserWebSocketAutoConnect();
+  useEffect(() => {
+    if (chats) {
+      initializeLastMessages(chats);
+    }
+  }, [chats, initializeLastMessages]);
 
   if (isLoadingChats) {
     return (

@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Avatar } from "@mantine/core";
 
 import { IUser } from "@/types/user";

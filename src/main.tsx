@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { createTheme, MantineProvider } from "@mantine/core";
@@ -7,6 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
+import { WebSocketConnector } from "@/providers/WebSocketConnector";
 import { AppRoutes } from "@/routes";
 
 import "@mantine/core/styles.css";
@@ -56,7 +56,7 @@ const theme = createTheme({
 });
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  <QueryClientProvider client={queryClient}>
     <ToastContainer
       position="top-right"
       autoClose={5000}
@@ -69,12 +69,11 @@ createRoot(document.getElementById("root")!).render(
       pauseOnHover
       theme="light"
     />
-    <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme}>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </MantineProvider>
-    </QueryClientProvider>
-  </StrictMode>,
+    <MantineProvider theme={theme}>
+      <BrowserRouter>
+        <WebSocketConnector />
+        <AppRoutes />
+      </BrowserRouter>
+    </MantineProvider>
+  </QueryClientProvider>,
 );

@@ -1,20 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import axiosClient from "@/api/axiosClient";
 import { QueryKeys } from "@/constants/queryKeys";
-import { websocketService } from "@/services/websocket";
-import { useUser } from "@/stores/useUser";
 import { CreateChatDto, IChat, IMessage } from "@/types/chat";
 
 export const useGetChats = () => {
-  return useQuery({
+  return useQuery<IChat[]>({
     queryKey: [QueryKeys.GET_CHATS],
     queryFn: async () => {
-      const { data } = await axiosClient.get<IChat[]>("/chats");
+      const { data } = await axiosClient.get("/chats");
       return data;
     },
   });
@@ -32,15 +28,15 @@ export const useGetChat = (chatId: string) => {
 };
 
 export const useGetChatMessages = (chatId: string) => {
-  return useQuery({
-    queryKey: [QueryKeys.GET_CHAT_MESSAGES, chatId],
+  return useQuery<IMessage[]>({
+    queryKey: ["chat-messages", chatId],
     queryFn: async () => {
-      const { data } = await axiosClient.get<IMessage[]>(
-        `/chats/${chatId}/messages`,
-      );
+      const { data } = await axiosClient.get(`/chats/${chatId}/messages`);
       return data;
     },
     enabled: !!chatId,
+    gcTime: 0,
+    staleTime: 0,
   });
 };
 
@@ -96,110 +92,4 @@ export const useSendMessage = (chatId: string) => {
       }
     },
   });
-};
-
-export const useWebSocket = (chatId: string) => {
-  const queryClient = useQueryClient();
-  const [isConnected, setIsConnected] = useState(false);
-  const { accessToken } = useUser();
-
-  useEffect(() => {
-    if (!accessToken) {
-      console.error("❌ No hay token de acceso disponible");
-      return;
-    }
-
-    const handleConnect = () => {
-      setIsConnected(true);
-    };
-
-    const handleDisconnect = () => {
-      setIsConnected(false);
-    };
-
-    websocketService.on("connect", handleConnect);
-    websocketService.on("disconnect", handleDisconnect);
-
-    const checkConnection = () => {
-      const connected = websocketService.isConnected();
-      setIsConnected(connected);
-    };
-
-    checkConnection();
-
-    const interval = setInterval(checkConnection, 5000);
-
-    return () => {
-      websocketService.off("connect", handleConnect);
-      websocketService.off("disconnect", handleDisconnect);
-      clearInterval(interval);
-    };
-  }, [accessToken]);
-
-  const handleNewMessage = useCallback(
-    (message: IMessage) => {
-      if (message.chat.id === chatId) {
-        queryClient.setQueryData<IMessage[]>(
-          [QueryKeys.GET_CHAT_MESSAGES, chatId],
-          (old = []) => [...old, message],
-        );
-        queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CHATS] });
-      }
-    },
-    [chatId, queryClient],
-  );
-
-  const joinChat = useCallback(() => {
-    if (!chatId) {
-      return;
-    }
-
-    if (!isConnected) {
-      return;
-    }
-
-    websocketService.joinChat(chatId);
-  }, [chatId, isConnected]);
-
-  const leaveChat = useCallback(() => {
-    if (!chatId) {
-      return;
-    }
-
-    if (!isConnected) {
-      return;
-    }
-
-    websocketService.leaveChat(chatId);
-  }, [chatId, isConnected]);
-
-  const subscribeToMessages = useCallback(
-    (_handler: (message: IMessage) => void) => {
-      if (!isConnected) {
-        return () => {};
-      }
-
-      return websocketService.subscribeToMessages(handleNewMessage);
-    },
-    [isConnected, handleNewMessage],
-  );
-
-  const sendMessage = useCallback(
-    (content: string) => {
-      if (!isConnected) {
-        return;
-      }
-
-      websocketService.sendMessage(chatId, content);
-    },
-    [chatId, isConnected],
-  );
-
-  return {
-    joinChat,
-    leaveChat,
-    subscribeToMessages,
-    sendMessage,
-    isConnected,
-  };
 };

@@ -7,6 +7,8 @@ export interface IMessage {
   chat: IChat;
   createdAt: string;
   updatedAt: string;
+  isSystemMessage?: boolean;
+  isRead?: boolean;
 }
 
 export interface ILocation {

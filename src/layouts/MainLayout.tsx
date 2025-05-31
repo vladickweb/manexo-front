@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 
 import {
   FaCalendarAlt,
@@ -11,6 +11,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import Logo from "@/assets/manexo-logo.svg?react";
 import { useAuth } from "@/hooks/useAuth";
+import { useChatSocket } from "@/hooks/useChatSocket";
 
 interface NavItem {
   id: string;
@@ -56,16 +57,71 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-export const MainLayout = ({ children }: MainLayoutProps) => {
+export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isLoading } = useAuth();
+  const { notifications } = useChatSocket();
+  const unreadMessagesCount = notifications.filter((n) => !n.isRead).length;
 
   const handleNavigation = useCallback(
     (path: string) => {
       navigate(path);
     },
     [navigate],
+  );
+
+  const isActivePath = useCallback(
+    (path: string) => location.pathname === path,
+    [location.pathname],
+  );
+
+  const renderNavItems = useMemo(
+    () =>
+      navItems.map((item) => (
+        <button
+          key={item.id}
+          onClick={() => handleNavigation(item.path)}
+          className={`flex items-center space-x-2 relative ${
+            isActivePath(item.path)
+              ? "text-primary"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          {item.icon}
+          <span className="text-sm font-medium">{item.name}</span>
+          {item.id === "messages" && unreadMessagesCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-2 h-2" />
+          )}
+        </button>
+      )),
+    [handleNavigation, isActivePath, unreadMessagesCount],
+  );
+
+  const renderMobileNavItems = useMemo(
+    () =>
+      navItems.map((item) => (
+        <button
+          key={item.id}
+          onClick={() => handleNavigation(item.path)}
+          className={`flex flex-col items-center relative ${
+            isActivePath(item.path) ? "text-primary" : "text-gray-500"
+          }`}
+        >
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              isActivePath(item.path) ? "bg-primary/10" : ""
+            }`}
+          >
+            {item.icon}
+            {item.id === "messages" && unreadMessagesCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-2 h-2" />
+            )}
+          </div>
+          <span className="text-xs mt-1">{item.name}</span>
+        </button>
+      )),
+    [handleNavigation, isActivePath, unreadMessagesCount],
   );
 
   if (isLoading) {
@@ -90,22 +146,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           >
             <Logo className="h-12 w-auto" />
           </button>
-          <nav className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavigation(item.path)}
-                className={`flex items-center space-x-2 ${
-                  location.pathname === item.path
-                    ? "text-primary"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                {item.icon}
-                <span className="text-sm font-medium">{item.name}</span>
-              </button>
-            ))}
-          </nav>
+          <nav className="hidden md:flex space-x-8">{renderNavItems}</nav>
         </div>
       </header>
 
@@ -118,29 +159,12 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-3">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavigation(item.path)}
-                className={`flex flex-col items-center ${
-                  location.pathname === item.path
-                    ? "text-primary"
-                    : "text-gray-500"
-                }`}
-              >
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    location.pathname === item.path ? "bg-primary/10" : ""
-                  }`}
-                >
-                  {item.icon}
-                </div>
-                <span className="text-xs mt-1">{item.name}</span>
-              </button>
-            ))}
+            {renderMobileNavItems}
           </div>
         </div>
       </nav>
     </div>
   );
-};
+});
+
+MainLayout.displayName = "MainLayout";
