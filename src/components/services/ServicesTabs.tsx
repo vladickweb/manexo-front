@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
 import { Contract } from "@/hooks/api/useCreateContract";
-import { useDeleteServicesById } from "@/hooks/api/useDeleteServicesById";
 import { useGetMyContracts } from "@/hooks/api/useGetMyContracts";
 import { useGetServicesMePublished } from "@/hooks/api/useGetServicesMePublished";
 import { useUser } from "@/stores/useUser";
@@ -22,12 +21,8 @@ export const ServicesTabs = () => {
     useGetServicesMePublished();
   const { data: myContracts, isLoading: isLoadingContracted } =
     useGetMyContracts();
-  const { mutate: deleteService } = useDeleteServicesById();
   const { user } = useUser();
   const navigate = useNavigate();
-
-  const handleDelete = (id: string) => deleteService(id);
-  const handleEdit = (id: string) => navigate(`/services/${id}/edit`);
 
   const isLoading =
     activeTab === "offered" ? isLoadingOffered : isLoadingContracted;
@@ -36,7 +31,10 @@ export const ServicesTabs = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-4">
+        <div className="flex-1">
+          <ServicesTabNav activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
         <Button
           variant="primary"
           filled
@@ -47,14 +45,8 @@ export const ServicesTabs = () => {
         </Button>
       </div>
 
-      <ServicesTabNav activeTab={activeTab} onTabChange={setActiveTab} />
-
       {activeTab === "offered" ? (
-        <OfferedServicesTab
-          services={servicesMePublished}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <OfferedServicesTab services={servicesMePublished} />
       ) : (
         <ContractedServicesTab
           contracts={myContracts as Contract[]}

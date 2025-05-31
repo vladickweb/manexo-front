@@ -17,7 +17,7 @@ export const MessagesPage = () => {
   if (isLoadingChats) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center h-[60vh]">
+        <div className="flex items-center justify-center h-full">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       </MainLayout>
@@ -27,7 +27,7 @@ export const MessagesPage = () => {
   if (!chats || chats.length === 0) {
     return (
       <MainLayout>
-        <div className="flex flex-col items-center justify-center h-[60vh]">
+        <div className="flex flex-col items-center justify-center flex-1">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <FaCommentDots className="w-10 h-10 text-primary" />
           </div>
@@ -45,14 +45,12 @@ export const MessagesPage = () => {
   return (
     <MainLayout>
       <div className="container mx-auto">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-[calc(100vh-12rem)]">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 h-full">
           <div className="grid grid-cols-12 h-full">
-            {/* Chat List */}
             <div className="col-span-12 md:col-span-4 lg:col-span-3 border-r">
               <ChatList chats={chats} />
             </div>
 
-            {/* Chat Window */}
             <div className="col-span-12 md:col-span-8 lg:col-span-9">
               {chatId && chat ? (
                 <ChatWindow chat={chat} />

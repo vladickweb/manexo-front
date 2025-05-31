@@ -70,7 +70,7 @@ export const ProfilePage = () => {
 
   if (!profile) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center h-full">
         <p className="text-gray-600">No se pudo cargar el perfil</p>
       </div>
     );

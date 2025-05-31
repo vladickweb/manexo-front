@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { Button, Drawer } from "@mantine/core";
 import { motion } from "framer-motion";
@@ -17,20 +17,11 @@ import {
 } from "@/hooks/api/useUserLocation";
 import { useUser } from "@/stores/useUser";
 
-const initialFormValues = {
-  categoryId: undefined,
-  subcategoryIds: [] as string[],
-  minPrice: "",
-  maxPrice: "",
-  onlyActives: false,
-};
-
 const initialFilters = {
   categoryId: undefined,
   subcategoryIds: [] as string[],
   minPrice: undefined as number | undefined,
   maxPrice: undefined as number | undefined,
-  onlyActives: false,
   limit: 10,
 };
 
@@ -83,26 +74,23 @@ export const SearchPage: React.FC = () => {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleFilterChange = useCallback((formValues: any) => {
+  const handleFilterChange = React.useCallback((formValues: any) => {
     setFilters((prev) => ({
       ...prev,
       categoryId: formValues.categoryId,
       subcategoryIds: formValues.subcategoryIds,
       minPrice: formValues.minPrice ? +formValues.minPrice : undefined,
       maxPrice: formValues.maxPrice ? +formValues.maxPrice : undefined,
-      onlyActives: formValues.onlyActives,
     }));
   }, []);
 
   const activeFiltersCount = useMemo(() => {
-    let count = 0;
-    if (filters.categoryId) count++;
-    if (filters.subcategoryIds && filters.subcategoryIds.length > 0) count++;
-    if (typeof filters.minPrice === "number" && !isNaN(filters.minPrice))
-      count++;
-    if (typeof filters.maxPrice === "number" && !isNaN(filters.maxPrice))
-      count++;
-    if (filters.onlyActives) count++;
+    const count = [
+      filters.categoryId,
+      filters.subcategoryIds && filters.subcategoryIds.length > 0,
+      typeof filters.minPrice === "number" && !isNaN(filters.minPrice),
+      typeof filters.maxPrice === "number" && !isNaN(filters.maxPrice),
+    ].filter(Boolean).length;
     return count;
   }, [filters]);
 
@@ -135,7 +123,7 @@ export const SearchPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
+    <div className="h-full bg-gray-50 relative">
       <header className="container mx-auto px-4 py-8">
         <motion.p
           initial={{ opacity: 0 }}
@@ -193,7 +181,14 @@ export const SearchPage: React.FC = () => {
           key={resetKey}
           onFilterChange={handleFilterChange as any}
           resetKey={resetKey}
-          initialValues={initialFormValues}
+          initialValues={{
+            categoryId: filters.categoryId,
+            subcategoryIds: filters.subcategoryIds,
+            minPrice:
+              filters.minPrice !== undefined ? filters.minPrice.toString() : "",
+            maxPrice:
+              filters.maxPrice !== undefined ? filters.maxPrice.toString() : "",
+          }}
         />
       </Drawer>
 

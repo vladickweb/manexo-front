@@ -9,15 +9,9 @@ import { EmptyState } from "./EmptyState";
 
 type OfferedProps = {
   services?: Service[];
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
 };
 
-export const OfferedServicesTab: React.FC<OfferedProps> = ({
-  services,
-  onEdit,
-  onDelete,
-}) => {
+export const OfferedServicesTab: React.FC<OfferedProps> = ({ services }) => {
   if (!services || services.length === 0) {
     return (
       <EmptyState
@@ -34,8 +28,7 @@ export const OfferedServicesTab: React.FC<OfferedProps> = ({
         <ServiceCard
           key={service.id}
           service={service}
-          onEdit={() => onEdit(service.id.toString())}
-          onDelete={() => onDelete(service.id.toString())}
+          showHamburgerMenu={true}
         />
       ))}
     </div>

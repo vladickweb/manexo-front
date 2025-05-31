@@ -11,14 +11,14 @@ export const ContractSuccessPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <Loader />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="h-full flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full mx-auto p-8 bg-white rounded-2xl shadow-sm">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-6">

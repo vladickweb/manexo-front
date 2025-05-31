@@ -1,4 +1,5 @@
 import { FC, useEffect, useMemo, useRef, useState } from "react";
+import ReactDOM from "react-dom";
 
 import { Rating } from "@mantine/core";
 import { AnimatePresence, motion } from "framer-motion";
@@ -7,6 +8,8 @@ import { MapPin, MoreVertical, Navigation, Star } from "lucide-react";
 import { ReviewsModal } from "@/components/reviews/ReviewsModal";
 import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal/index";
 import { UserAvatar } from "@/components/UserAvatar";
+import { useDeleteServicesById } from "@/hooks/api/useDeleteServicesById";
+import { useEditService } from "@/hooks/api/useEditService";
 import {
   useCreateFavorite,
   useDeleteFavorite,
@@ -17,28 +20,34 @@ import { Service } from "@/types/service";
 
 interface ServiceCardProps {
   service: Service;
-  onEdit?: () => void;
-  onDelete?: () => void;
   showDistance?: boolean;
   showFavoriteButton?: boolean;
+  showHamburgerMenu?: boolean;
 }
 
 export const ServiceCard: FC<ServiceCardProps> = ({
   service,
-  onEdit,
-  onDelete,
   showDistance,
   showFavoriteButton,
+  showHamburgerMenu,
 }) => {
   const { user } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuPortalRef = useRef<HTMLDivElement>(null);
+  const [menuPosition, setMenuPosition] = useState<{
+    top: number;
+    left: number;
+  }>({ top: 0, left: 0 });
 
   const userId = useMemo(() => user?.id ?? 0, [user]);
 
   const { data: favorites, isLoading: favLoading } = useGetFavorites(userId);
+  const { mutate: editService, isPending: editServiceLoading } =
+    useEditService();
   const createFavorite = useCreateFavorite();
   const deleteFavorite = useDeleteFavorite();
 
@@ -53,9 +62,17 @@ export const ServiceCard: FC<ServiceCardProps> = ({
     }
   };
 
+  const { mutate: deleteService, isPending: deleteServiceLoading } =
+    useDeleteServicesById();
+
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const isInMenuButton =
+        menuRef.current && menuRef.current.contains(target);
+      const isInMenuPortal =
+        menuPortalRef.current && menuPortalRef.current.contains(target);
+      if (!isInMenuButton && !isInMenuPortal) {
         setMenuOpen(false);
       }
     }
@@ -77,17 +94,9 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   return (
     <>
       <div
-        className={`group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer ${!service.isActive ? "opacity-60 grayscale pointer-events-none" : ""}`}
-        onClick={() => service.isActive && setIsModalOpen(true)}
+        className={`group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer ${!service.isActive ? "opacity-60 grayscale scale-100" : ""}`}
+        onClick={() => setIsModalOpen(true)}
       >
-        {!service.isActive && (
-          <div className="absolute inset-0 bg-white/70 flex items-center justify-center z-30">
-            <span className="text-lg font-bold text-gray-500">
-              No disponible
-            </span>
-          </div>
-        )}
-        {/* Header Section */}
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -134,56 +143,91 @@ export const ServiceCard: FC<ServiceCardProps> = ({
               </button>
             )}
 
-            {(onEdit || onDelete) && (
+            {showHamburgerMenu && (
               <div ref={menuRef} className="relative">
                 <button
+                  ref={menuButtonRef}
                   onClick={(e) => {
                     e.stopPropagation();
                     setMenuOpen((o) => !o);
+                    if (menuButtonRef.current) {
+                      const rect =
+                        menuButtonRef.current.getBoundingClientRect();
+                      setMenuPosition({
+                        top: rect.bottom + window.scrollY + 8,
+                        left: rect.right + window.scrollX - 176, // 176px = w-44
+                      });
+                    }
                   }}
                   className="p-2 rounded-full hover:bg-gray-50 transition-colors"
-                  disabled={!service.isActive}
                 >
                   <MoreVertical className="h-5 w-5 text-gray-500" />
                 </button>
-                <AnimatePresence>
-                  {menuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-full mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-10"
-                    >
-                      {onEdit && (
+                {menuOpen &&
+                  ReactDOM.createPortal(
+                    <AnimatePresence>
+                      <motion.div
+                        ref={menuPortalRef}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        style={{
+                          position: "absolute",
+                          top: menuPosition.top,
+                          left: menuPosition.left,
+                          width: 176,
+                          zIndex: 9999,
+                        }}
+                        className="bg-white border border-gray-200 rounded-xl shadow-lg"
+                      >
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setMenuOpen(false);
-                            onEdit();
+                            editService({
+                              id: service.id.toString(),
+                              data: {
+                                isActive: !service.isActive,
+                              },
+                            });
                           }}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          disabled={!service.isActive}
+                          disabled={editServiceLoading}
                         >
                           Editar
                         </button>
-                      )}
-                      {onDelete && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setMenuOpen(false);
-                            onDelete();
+                            editService({
+                              id: service.id.toString(),
+                              data: {
+                                isActive: !service.isActive,
+                              },
+                            });
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          disabled={editServiceLoading}
+                        >
+                          {service.isActive ? "Desactivar" : "Activar"}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuOpen(false);
+                            deleteService({ id: service.id.toString() });
                           }}
                           className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors"
-                          disabled={!service.isActive}
+                          disabled={deleteServiceLoading}
                         >
                           Eliminar
                         </button>
-                      )}
-                    </motion.div>
+                      </motion.div>
+                    </AnimatePresence>,
+                    document.body,
                   )}
-                </AnimatePresence>
               </div>
             )}
           </div>

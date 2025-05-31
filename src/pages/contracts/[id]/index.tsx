@@ -12,7 +12,7 @@ export const ContractDetailsPage: FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center h-full">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -20,7 +20,7 @@ export const ContractDetailsPage: FC = () => {
 
   if (!contract) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center justify-center h-full">
         <h1 className="text-2xl font-bold text-gray-800 mb-4">
           Contrato no encontrado
         </h1>

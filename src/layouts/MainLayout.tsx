@@ -82,49 +82,40 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header
-        className={`bg-white shadow-sm fixed top-0 left-0 right-0`}
-        style={{ zIndex: 9999 }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center">
+      <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10 h-16 flex items-center">
+        <div className="container mx-auto px-4 flex justify-between items-center h-full">
+          <button
+            onClick={() => handleNavigation("/search")}
+            className="focus:outline-none"
+          >
+            <Logo className="h-12 w-auto" />
+          </button>
+          <nav className="hidden md:flex space-x-8">
+            {navItems.map((item) => (
               <button
-                onClick={() => handleNavigation("/search")}
-                className="focus:outline-none"
+                key={item.id}
+                onClick={() => handleNavigation(item.path)}
+                className={`flex items-center space-x-2 ${
+                  location.pathname === item.path
+                    ? "text-primary"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
               >
-                <Logo className="h-12 w-auto" />
+                {item.icon}
+                <span className="text-sm font-medium">{item.name}</span>
               </button>
-            </div>
-            <nav className="hidden md:block">
-              <div className="flex items-center space-x-8">
-                {navItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => handleNavigation(item.path)}
-                    className={`flex items-center space-x-2 ${
-                      location.pathname === item.path
-                        ? "text-primary"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
-                  >
-                    {item.icon}
-                    <span className="text-sm font-medium">{item.name}</span>
-                  </button>
-                ))}
-              </div>
-            </nav>
-          </div>
+            ))}
+          </nav>
         </div>
       </header>
 
-      <main className="flex-1 pt-16 pb-16 md:pb-0">
-        <div className="container mx-auto px-4 h-full">{children}</div>
+      <main className="flex-1 pt-16 pb-16 md:pb-0 flex flex-col overflow-hidden">
+        <div className="container mx-auto px-4 flex-1 flex flex-col overflow-y-auto">
+          {children}
+        </div>
       </main>
 
-      <nav
-        className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden transition-transform duration-300`}
-      >
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-3">
             {navItems.map((item) => (
