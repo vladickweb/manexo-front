@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { useQueryClient } from "@tanstack/react-query";
+
+import { QueryKeys } from "@/constants/queryKeys";
 import { websocketService } from "@/services/websocket";
 import { useUser } from "@/stores/useUser";
 import { IChat, IMessage } from "@/types/chat";
 
 export const useChatSocket = () => {
   const { accessToken, user } = useUser();
+  const queryClient = useQueryClient();
   const [lastMessages, setLastMessages] = useState<Record<string, IMessage>>(
     {},
   );
@@ -47,25 +51,29 @@ export const useChatSocket = () => {
       message: IMessage;
     }) => {
       setLastMessages((prev) => ({ ...prev, [chatId]: message }));
+      // Invalidar la lista de chats para que se actualice
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CHATS] });
     };
 
     const handleNotification = (notif: any) => {
       setNotifications((prev) => [notif, ...prev]);
+
+      // Si es una notificación de nuevo mensaje, actualizar la lista de chats y el contador
+      if (notif.type === "new_message") {
+        queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CHATS] });
+
+        // Incrementar el contador de mensajes no leídos
+        const data = JSON.parse(notif.data);
+        if (data.senderId !== user?.id) {
+          setUnreadCounts((prev) => ({
+            ...prev,
+            [data.chatId]: (prev[data.chatId] || 0) + 1,
+          }));
+        }
+      }
     };
 
     const handleNewMessage = (message: IMessage) => {
-      console.warn("[WebSocket] Nuevo mensaje recibido:", {
-        id: message.id,
-        content: message.content,
-        sender: {
-          id: message.sender.id,
-          firstName: message.sender.firstName,
-          lastName: message.sender.lastName,
-        },
-        chatId: message.chat.id,
-        createdAt: message.createdAt,
-      });
-
       setMessages((prev) => ({
         ...prev,
         [message.chat.id]: [...(prev[message.chat.id] || []), message],
@@ -74,18 +82,37 @@ export const useChatSocket = () => {
         ...prev,
         [message.chat.id]: message,
       }));
-
-      // Incrementar contador de no leídos si el mensaje no es del usuario actual
-      if (message.sender.id !== user?.id) {
-        setUnreadCounts((prev) => ({
-          ...prev,
-          [message.chat.id]: (prev[message.chat.id] || 0) + 1,
-        }));
-      }
     };
 
     const handleMessagesRead = (data: { chatId: string; userId: number }) => {
       if (data.userId === user?.id) {
+        // Actualizar el estado de lectura de los mensajes
+        setMessages((prev) => {
+          const updated = { ...prev };
+          if (updated[data.chatId]) {
+            updated[data.chatId] = updated[data.chatId].map((msg) => ({
+              ...msg,
+              isRead: true,
+            }));
+          }
+          return updated;
+        });
+
+        // Actualizar el último mensaje si existe
+        setLastMessages((prev) => {
+          if (prev[data.chatId]) {
+            return {
+              ...prev,
+              [data.chatId]: {
+                ...prev[data.chatId],
+                isRead: true,
+              },
+            };
+          }
+          return prev;
+        });
+
+        // Resetear el contador de no leídos
         setUnreadCounts((prev) => ({
           ...prev,
           [data.chatId]: 0,
@@ -106,7 +133,7 @@ export const useChatSocket = () => {
       websocketService.off("newMessage", handleNewMessage);
       websocketService.off("messagesRead", handleMessagesRead);
     };
-  }, [accessToken, user?.id]);
+  }, [accessToken, user?.id, queryClient]);
 
   // Métodos para enviar eventos
   const sendMessage = useCallback((chatId: string, content: string) => {

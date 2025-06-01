@@ -1,8 +1,9 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PublicRoute } from "@/components/PublicRoute";
 import { ServicesTabs } from "@/components/services/ServicesTabs";
+import { UnreadMessagesProvider } from "@/contexts/UnreadMessagesContext";
 import { MainLayout } from "@/layouts/MainLayout";
 import { CreateServicePage } from "@/modules/CreateServicePage";
 import { FavoritesPage } from "@/modules/FavoritesPage";
@@ -18,119 +19,51 @@ import "react-toastify/dist/ReactToastify.css";
 
 export const AppRoutes = () => {
   return (
-    <>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <PublicRoute>
-              <LandingPage />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/search"
-          element={
-            <ProtectedRoute>
+    <Routes>
+      {/* Rutas públicas */}
+      <Route
+        path="/"
+        element={
+          <PublicRoute>
+            <LandingPage />
+          </PublicRoute>
+        }
+      />
+
+      {/* Rutas protegidas envueltas con MainLayout y UnreadMessagesProvider */}
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <UnreadMessagesProvider>
               <MainLayout>
-                <SearchPage />
+                <Routes>
+                  <Route path="search" element={<SearchPage />} />
+                  <Route path="services" element={<ServicesTabs />} />
+                  <Route
+                    path="services/create"
+                    element={<CreateServicePage />}
+                  />
+                  <Route path="services/:id" element={<ServiceDetailPage />} />
+                  <Route
+                    path="contracts/:id"
+                    element={<ContractDetailsPage />}
+                  />
+                  <Route
+                    path="contracts/:id/success"
+                    element={<ContractSuccessPage />}
+                  />
+                  <Route path="favorites" element={<FavoritesPage />} />
+                  <Route path="messages" element={<MessagesPage />} />
+                  <Route path="messages/:chatId" element={<MessagesPage />} />
+                  <Route path="profile" element={<ProfilePage />} />
+                  <Route path="*" element={<Navigate to="/search" replace />} />
+                </Routes>
               </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/services"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <div className="container mx-auto px-4 py-8">
-                  <ServicesTabs />
-                </div>
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/services/create"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <CreateServicePage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/services/:id"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <ServiceDetailPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts/:id"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <ContractDetailsPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts/:id/success"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <ContractSuccessPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/favorites"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <FavoritesPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/messages"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <MessagesPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/messages/:chatId"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <MessagesPage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <ProfilePage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </>
+            </UnreadMessagesProvider>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 };

@@ -11,7 +11,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import Logo from "@/assets/manexo-logo.svg?react";
 import { useAuth } from "@/hooks/useAuth";
-import { useChatSocket } from "@/hooks/useChatSocket";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 interface NavItem {
   id: string;
@@ -61,8 +61,7 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isLoading } = useAuth();
-  const { notifications } = useChatSocket();
-  const unreadMessagesCount = notifications.filter((n) => !n.isRead).length;
+  const { hasUnreadMessages } = useUnreadMessages();
 
   const handleNavigation = useCallback(
     (path: string) => {
@@ -90,12 +89,12 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
         >
           {item.icon}
           <span className="text-sm font-medium">{item.name}</span>
-          {item.id === "messages" && unreadMessagesCount > 0 && (
+          {item.id === "messages" && hasUnreadMessages && (
             <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-2 h-2" />
           )}
         </button>
       )),
-    [handleNavigation, isActivePath, unreadMessagesCount],
+    [handleNavigation, isActivePath, hasUnreadMessages],
   );
 
   const renderMobileNavItems = useMemo(
@@ -114,14 +113,14 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
             }`}
           >
             {item.icon}
-            {item.id === "messages" && unreadMessagesCount > 0 && (
+            {item.id === "messages" && hasUnreadMessages && (
               <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-2 h-2" />
             )}
           </div>
           <span className="text-xs mt-1">{item.name}</span>
         </button>
       )),
-    [handleNavigation, isActivePath, unreadMessagesCount],
+    [handleNavigation, isActivePath, hasUnreadMessages],
   );
 
   if (isLoading) {
@@ -150,10 +149,8 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
         </div>
       </header>
 
-      <main className="flex-1 pt-16 pb-16 md:pb-0 flex flex-col overflow-hidden">
-        <div className="container mx-auto px-4 flex-1 flex flex-col overflow-y-auto">
-          {children}
-        </div>
+      <main className="flex-1 pt-16 pb-16 md:pb-0">
+        <div className="container mx-auto px-4 h-full">{children}</div>
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden">

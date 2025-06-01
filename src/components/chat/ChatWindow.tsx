@@ -2,7 +2,6 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { IoEyeOutline } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
 
 import { useGetChatMessages } from "@/hooks/api/useChats";
@@ -14,13 +13,36 @@ interface ChatWindowProps {
   chat: IChat;
 }
 
-const styles = `
-  @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-  @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .animate-slide-in-right { animation: slideInRight 0.3s ease-out forwards; }
-  .animate-slide-in-left { animation: slideInLeft 0.3s ease-out forwards; }
-  .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+const messageAnimationStyles = `
+  @keyframes slideInRight {
+    from {
+      transform: translateX(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out forwards;
+  }
+
+  .animate-slide-in-left {
+    animation: slideInLeft 0.3s ease-out forwards;
+  }
 `;
 
 export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
@@ -103,10 +125,10 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
 
   return (
     <>
-      <style>{styles}</style>
-      <div className="flex flex-col h-full max-h-[calc(100vh-12rem)] bg-white overflow-hidden">
+      <style>{messageAnimationStyles}</style>
+      <div className="flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center p-4 border-b border-gray-200 bg-white">
+        <div className="flex items-center p-4 border-b border-gray-200 bg-white flex-shrink-0">
           {otherParticipant.profileImageUrl ? (
             <img
               src={otherParticipant.profileImageUrl}
@@ -125,16 +147,13 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
             <h2 className="text-sm font-medium text-gray-900">
               {`${otherParticipant.firstName.charAt(0).toUpperCase() + otherParticipant.firstName.slice(1)} ${otherParticipant.lastName.charAt(0).toUpperCase() + otherParticipant.lastName.slice(1)}`}
             </h2>
-            <p className="text-xs text-gray-500">
-              {/* Aquí podrías mostrar el estado de conexión si lo tienes */}
-            </p>
           </div>
         </div>
 
         {/* Messages */}
         <div
           ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 scrollbar-thin"
+          className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0"
         >
           {messages.map((msg) =>
             msg.isSystemMessage ? (
@@ -146,14 +165,24 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
             ) : (
               <div
                 key={msg.id}
-                className={`flex ${msg.sender.id === user?.id ? "justify-end" : "justify-start"} animate-fade-in`}
+                className={`flex ${
+                  msg.sender.id === user?.id ? "justify-end" : "justify-start"
+                } ${msg.sender.id === user?.id ? "animate-slide-in-right" : "animate-slide-in-left"}`}
               >
                 <div
-                  className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm shadow-sm break-words animate-slide-in-${msg.sender.id === user?.id ? "right" : "left"} ${msg.sender.id === user?.id ? "bg-primary text-white" : "bg-white text-gray-900 border border-gray-200"}`}
+                  className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm shadow-sm break-words ${
+                    msg.sender.id === user?.id
+                      ? "bg-primary text-white"
+                      : "bg-white text-gray-900 border border-gray-200"
+                  }`}
                 >
                   <p>{msg.content}</p>
                   <span
-                    className={`flex justify-end gap-1 mt-1 text-xs ${msg.sender.id === user?.id ? "text-white/70" : "text-gray-500"}`}
+                    className={`flex justify-end gap-1 mt-1 text-xs ${
+                      msg.sender.id === user?.id
+                        ? "text-white/70"
+                        : "text-gray-500"
+                    }`}
                   >
                     {format(new Date(msg.createdAt), "HH:mm", { locale: es })}
                   </span>
@@ -161,38 +190,29 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
               </div>
             ),
           )}
-          {messages.length > 0 &&
-            messages[messages.length - 1].sender.id === user?.id && (
-              <div className="flex justify-end gap-1 text-xs text-gray-500 mt-1">
-                <IoEyeOutline className="w-3.5 h-3.5" />
-                <span>Visto</span>
-              </div>
-            )}
+
           <div ref={messagesEndRef} style={{ height: 16 }} />
         </div>
 
         {/* Input */}
-        <form
-          onSubmit={handleSendMessage}
-          className="p-4 border-t border-gray-200"
-        >
-          <div className="flex gap-2">
+        <div className="border-t p-4 bg-white flex-shrink-0">
+          <form onSubmit={handleSendMessage} className="flex gap-2">
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Escribe un mensaje..."
-              className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
             <button
               type="submit"
               disabled={!message.trim()}
-              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-primary text-white px-4 py-2 rounded-lg disabled:opacity-50"
             >
               Enviar
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </>
   );

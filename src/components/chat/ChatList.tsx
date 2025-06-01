@@ -2,6 +2,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { UserAvatar } from "@/components/UserAvatar";
 import { useChatSocket } from "@/hooks/useChatSocket";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { cn } from "@/lib/utils";
 import { useUser } from "@/stores/useUser";
 import { IChat, IMessage } from "@/types/chat";
 
@@ -22,7 +24,8 @@ export const ChatList = ({ chats }: ChatListProps) => {
   const { user } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
-  const { lastMessages, unreadCounts } = useChatSocket();
+  const { lastMessages } = useChatSocket();
+  const { unreadCounts } = useUnreadMessages();
 
   const getOtherParticipant = (chat: IChat) => {
     return chat.user.id === user?.id ? chat.serviceProvider : chat.user;
@@ -63,32 +66,49 @@ export const ChatList = ({ chats }: ChatListProps) => {
         return (
           <div
             key={chat.id}
-            className={`flex cursor-pointer items-center gap-4 rounded-lg p-4 hover:bg-gray-100 ${
-              isActive ? "bg-gray-100" : ""
-            }`}
+            className={cn(
+              "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+              isActive ? "bg-primary/20" : "hover:bg-gray-50",
+              unreadCount > 0 && "bg-primary/5 font-medium",
+            )}
             onClick={() => handleChatClick(chat.id)}
           >
-            <UserAvatar user={otherParticipant} size="lg" />
-            <div className="flex flex-1 flex-col min-w-0">
+            <div className="relative">
+              <UserAvatar user={otherParticipant} size="lg" />
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <h3 className="font-medium truncate">
+                <h3
+                  className={cn(
+                    "text-sm font-medium truncate",
+                    unreadCount > 0 && "text-primary",
+                  )}
+                >
                   {`${otherParticipant.firstName.charAt(0).toUpperCase() + otherParticipant.firstName.slice(1)} ${otherParticipant.lastName.charAt(0).toUpperCase() + otherParticipant.lastName.slice(1)}`}
                 </h3>
-                <div className="flex items-center gap-2">
-                  {lastMessage && lastMessage.createdAt && (
-                    <span className="text-sm text-gray-500 flex-shrink-0">
-                      {formatHour(lastMessage.createdAt)}
-                    </span>
-                  )}
-                  {unreadCount > 0 && (
-                    <span className="flex items-center justify-center min-w-[1.5rem] h-6 px-1.5 text-xs font-medium text-white bg-primary rounded-full">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                  )}
-                </div>
+                {lastMessage && (
+                  <span
+                    className={cn(
+                      "text-xs text-gray-500",
+                      unreadCount > 0 && "text-primary",
+                    )}
+                  >
+                    {formatHour(lastMessage.createdAt)}
+                  </span>
+                )}
               </div>
               {lastMessage && (
-                <p className="text-sm text-gray-600 truncate">
+                <p
+                  className={cn(
+                    "text-sm text-gray-500 truncate",
+                    unreadCount > 0 && "text-primary font-medium",
+                  )}
+                >
                   {getMessagePrefix(lastMessage)}
                   {lastMessage.content}
                 </p>
