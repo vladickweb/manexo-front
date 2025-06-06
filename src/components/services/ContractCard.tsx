@@ -154,9 +154,6 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
         serviceId={service.id.toString()}
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
-        onSuccess={() => {
-          // Aquí podrías actualizar la lista de contratos o mostrar un mensaje de éxito
-        }}
       />
     </>
   );

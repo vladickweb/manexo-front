@@ -86,14 +86,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
     setChatMessages,
   ]);
 
-  // Autoscroll al último mensaje
   useEffect(() => {
     if (!messagesContainerRef.current || !shouldAutoScroll) return;
     messagesContainerRef.current.scrollTop =
       messagesContainerRef.current.scrollHeight;
   }, [messages, shouldAutoScroll]);
 
-  // Detectar scroll manual
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
@@ -124,7 +122,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
     <>
       <style>{messageAnimationStyles}</style>
       <div className="flex flex-col h-full overflow-hidden">
-        {/* Header */}
         <div className="flex items-center p-4 border-b border-gray-200 bg-white flex-shrink-0">
           {otherParticipant.profileImageUrl ? (
             <img
@@ -147,7 +144,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
           </div>
         </div>
 
-        {/* Messages */}
         <div
           ref={messagesContainerRef}
           className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0"
@@ -191,7 +187,6 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
           <div ref={messagesEndRef} style={{ height: 16 }} />
         </div>
 
-        {/* Input */}
         <div className="border-t p-4 bg-white flex-shrink-0">
           <form onSubmit={handleSendMessage} className="flex gap-2">
             <input

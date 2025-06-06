@@ -45,11 +45,9 @@ export const ChatList = ({ chats }: ChatListProps) => {
   };
 
   const getLastMessage = (chat: IChat) => {
-    // Primero intentamos obtener el último mensaje del WebSocket
     const wsLastMessage = lastMessages[chat.id];
     if (wsLastMessage) return wsLastMessage;
 
-    // Si no hay mensaje en el WebSocket, usamos el último mensaje del chat
     if (chat.messages && chat.messages.length > 0) {
       return chat.messages[chat.messages.length - 1];
     }

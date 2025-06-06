@@ -13,7 +13,6 @@ interface CreateReviewModalProps {
   serviceId: string;
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
 }
 
 interface ReviewFormValues {
@@ -32,7 +31,6 @@ export const CreateReviewModal: FC<CreateReviewModalProps> = ({
   serviceId,
   isOpen,
   onClose,
-  onSuccess,
 }) => {
   const createReview = useCreateReview();
   const queryClient = useQueryClient();
@@ -59,7 +57,6 @@ export const CreateReviewModal: FC<CreateReviewModalProps> = ({
         comment: values.comment,
       });
 
-      // Invalidar queries relacionadas con servicios
       queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_SERVICES] });
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.GET_SERVICES_BY_ID],
@@ -72,7 +69,6 @@ export const CreateReviewModal: FC<CreateReviewModalProps> = ({
       queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CONTRACT] });
       queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_MY_CONTRACTS] });
 
-      onSuccess();
       onClose();
     } catch (error) {
       console.error("Error al crear la review:", error);

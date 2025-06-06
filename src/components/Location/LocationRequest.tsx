@@ -31,7 +31,6 @@ export const LocationRequest: React.FC<LocationRequestProps> = ({
   const manualInputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
-  // Cargamos el script de Google Maps
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY!,
     libraries: ["places"],

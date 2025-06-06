@@ -179,7 +179,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                         menuButtonRef.current.getBoundingClientRect();
                       setMenuPosition({
                         top: rect.bottom + window.scrollY + 8,
-                        left: rect.right + window.scrollX - 176, // 176px = w-44
+                        left: rect.right + window.scrollX - 176,
                       });
                     }
                   }}

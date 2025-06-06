@@ -22,12 +22,9 @@ export const useChatSocket = () => {
     const initialLastMessages: Record<string, IMessage> = {};
 
     chats.forEach((chat) => {
-      // Si ya tenemos un último mensaje en el WebSocketService, lo mantenemos
       if (currentLastMessages[chat.id]) {
         initialLastMessages[chat.id] = currentLastMessages[chat.id];
-      }
-      // Si no hay mensaje en el WebSocketService, usamos el del chat
-      else if (chat.messages && chat.messages.length > 0) {
+      } else if (chat.messages && chat.messages.length > 0) {
         initialLastMessages[chat.id] = chat.messages[chat.messages.length - 1];
       }
     });
@@ -39,7 +36,6 @@ export const useChatSocket = () => {
   useEffect(() => {
     if (!accessToken) return;
 
-    // Suscripción a eventos
     const handleLastMessages = (
       messages: { chatId: string; message: IMessage }[],
     ) => {
@@ -66,11 +62,9 @@ export const useChatSocket = () => {
     const handleNotification = (notif: any) => {
       setNotifications((prev) => [notif, ...prev]);
 
-      // Si es una notificación de nuevo mensaje, actualizar la lista de chats y el contador
       if (notif.type === "new_message") {
         queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CHATS] });
 
-        // Incrementar el contador de mensajes no leídos
         const data = JSON.parse(notif.data);
         if (data.senderId !== user?.id) {
           setUnreadCounts((prev) => ({
@@ -95,7 +89,6 @@ export const useChatSocket = () => {
 
     const handleMessagesRead = (data: { chatId: string; userId: number }) => {
       if (data.userId === user?.id) {
-        // Actualizar el estado de lectura de los mensajes
         setMessages((prev) => {
           const updated = { ...prev };
           if (updated[data.chatId]) {
@@ -107,7 +100,6 @@ export const useChatSocket = () => {
           return updated;
         });
 
-        // Actualizar el último mensaje si existe
         setLastMessages((prev) => {
           if (prev[data.chatId]) {
             return {
@@ -121,7 +113,6 @@ export const useChatSocket = () => {
           return prev;
         });
 
-        // Resetear el contador de no leídos
         setUnreadCounts((prev) => ({
           ...prev,
           [data.chatId]: 0,
@@ -144,7 +135,6 @@ export const useChatSocket = () => {
     };
   }, [accessToken, user?.id, queryClient]);
 
-  // Métodos para enviar eventos
   const sendMessage = useCallback((chatId: string, content: string) => {
     websocketService.sendMessage(chatId, content);
   }, []);
@@ -173,7 +163,7 @@ export const useChatSocket = () => {
       const tempId = `local-${Date.now()}`;
       const now = new Date().toISOString();
       const newMessage: IMessage = {
-        id: tempId as any, // id temporal
+        id: tempId as any,
         content,
         chat: { id: chatId } as any,
         sender: user,

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { LuCalendar, LuMail, LuMapPin, LuPencil, LuStar } from "react-icons/lu";
 import { toast } from "react-toastify";
 
@@ -18,6 +19,7 @@ const ALLOWED_FILE_TYPES = [
 
 export const ProfilePage = () => {
   const { user: profile, logout, setUser } = useUser();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isHovering, setIsHovering] = useState(false);
 
@@ -35,6 +37,11 @@ export const ProfilePage = () => {
         );
       },
     });
+
+  const handleLogout = () => {
+    queryClient.clear();
+    logout();
+  };
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -171,7 +178,7 @@ export const ProfilePage = () => {
               </div>
             </div>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
             >
               Cerrar sesión
@@ -179,9 +186,7 @@ export const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Grid de información adicional */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Disponibilidad */}
           <div className="md:col-span-2">
             <AvailabilityManager />
           </div>
@@ -215,7 +220,6 @@ export const ProfilePage = () => {
             )}
           </div>
 
-          {/* Contratos */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">Contratos Activos</h2>
             {profile.contracts && profile.contracts.length > 0 ? (
@@ -246,7 +250,6 @@ export const ProfilePage = () => {
             )}
           </div>
 
-          {/* Reseñas */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">Reseñas Recibidas</h2>
             {profile.reviews && profile.reviews.length > 0 ? (
@@ -274,7 +277,6 @@ export const ProfilePage = () => {
             )}
           </div>
 
-          {/* Favoritos */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">Servicios Favoritos</h2>
             {profile.favorites && profile.favorites.length > 0 ? (
