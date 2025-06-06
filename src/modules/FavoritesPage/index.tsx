@@ -1,5 +1,6 @@
 import { FaHeart } from "react-icons/fa";
 
+import { Loader } from "@/components/Loader/Loader";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { useGetFavorites } from "@/hooks/api/useFavorites";
 import { useGetUser } from "@/hooks/api/useGetUser";
@@ -12,11 +13,7 @@ export const FavoritesPage = () => {
   );
 
   if (userLoading || favLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
@@ -24,7 +21,13 @@ export const FavoritesPage = () => {
       {favorites && favorites.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((fav) => {
-            return <ServiceCard key={fav.service.id} service={fav.service} />;
+            return (
+              <ServiceCard
+                key={fav.service.id}
+                service={fav.service}
+                showFavoriteButton={true}
+              />
+            );
           })}
         </div>
       ) : (

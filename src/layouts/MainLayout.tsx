@@ -10,6 +10,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 
 import Logo from "@/assets/manexo-logo.svg?react";
+import { Loader } from "@/components/Loader/Loader";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
@@ -71,7 +72,9 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
   );
 
   const isActivePath = useCallback(
-    (path: string) => location.pathname === path,
+    (path: string) => {
+      return location.pathname.startsWith(path);
+    },
     [location.pathname],
   );
 
@@ -124,11 +127,7 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
   );
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!user) {

@@ -1,9 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
-import { LuLoader } from "react-icons/lu";
-
-import { useCreateContract } from "@/hooks/api/useCreateContract";
-import { useUser } from "@/stores/useUser";
 import { Service } from "@/types/service";
 
 interface TimeSlot {
@@ -36,10 +32,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   selectedSlots,
   availability,
 }) => {
-  const { user } = useUser();
-  const createContract = useCreateContract();
-  const [isProcessing, setIsProcessing] = useState(false);
-
   const totalAmount = useMemo(
     () => selectedSlots.length * Number(service?.price || 0),
     [selectedSlots, service?.price],
@@ -53,41 +45,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
       }).format(totalAmount),
     [totalAmount],
   );
-
-  const handleConfirmAndPay = async () => {
-    if (!user) return;
-
-    try {
-      setIsProcessing(true);
-      const timeSlots = selectedSlots.map((slot) => {
-        const day = availability.weekAvailability.find(
-          (d) => d.dayOfWeek === slot.day,
-        );
-        return {
-          date: day?.date || "",
-          startTime: slot.start,
-          endTime: slot.end,
-        };
-      });
-
-      const response = await createContract.mutateAsync({
-        serviceId: service.id,
-        amount: totalAmount,
-        clientEmail: user.email,
-        serviceName: service.subcategory.name,
-        clientId: user.id,
-        providerId: service.user.id,
-        agreedPrice: totalAmount,
-        timeSlots,
-      });
-
-      window.location.href = response.paymentUrl;
-    } catch (error) {
-      console.error("Error al crear el contrato:", error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -129,21 +86,6 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           </div>
         </div>
       </div>
-
-      <button
-        onClick={handleConfirmAndPay}
-        disabled={isProcessing}
-        className="w-full flex items-center justify-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isProcessing ? (
-          <>
-            <LuLoader className="w-5 h-5 mr-2 animate-spin" />
-            Procesando...
-          </>
-        ) : (
-          "Confirmar y pagar"
-        )}
-      </button>
     </div>
   );
 };

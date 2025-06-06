@@ -6,7 +6,7 @@ import { UpdateServiceDto } from "@/models/dto/CreateServiceDto";
 import { Service } from "@/types/service";
 
 interface EditServiceParams {
-  id: string;
+  id: number;
   data: Partial<UpdateServiceDto>;
 }
 

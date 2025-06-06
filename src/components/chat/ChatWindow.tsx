@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useLocation } from "react-router-dom";
 
+import { Loader } from "@/components/Loader/Loader";
 import { useGetChatMessages } from "@/hooks/api/useChats";
 import { useChatSocket } from "@/hooks/useChatSocket";
 import { useUser } from "@/stores/useUser";
@@ -116,11 +117,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
   );
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

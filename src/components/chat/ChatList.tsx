@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { UserAvatar } from "@/components/UserAvatar";
@@ -25,7 +27,14 @@ export const ChatList = ({ chats }: ChatListProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { lastMessages } = useChatSocket();
-  const { unreadCounts } = useUnreadMessages();
+  const { unreadCounts, markChatAsRead } = useUnreadMessages();
+
+  useEffect(() => {
+    const activeChatId = location.pathname.split("/").pop();
+    if (activeChatId && unreadCounts[activeChatId] > 0) {
+      markChatAsRead(activeChatId);
+    }
+  }, [location.pathname, unreadCounts, markChatAsRead]);
 
   const getOtherParticipant = (chat: IChat) => {
     return chat.user.id === user?.id ? chat.serviceProvider : chat.user;
@@ -57,66 +66,80 @@ export const ChatList = ({ chats }: ChatListProps) => {
 
   return (
     <div className="flex flex-col gap-2">
-      {chats.map((chat) => {
-        const otherParticipant = getOtherParticipant(chat);
-        const lastMessage = getLastMessage(chat);
-        const isActive = location.pathname === `/messages/${chat.id}`;
-        const unreadCount = unreadCounts[chat.id] || 0;
+      {chats
+        .sort((a, b) => {
+          const lastMessageA = getLastMessage(a);
+          const lastMessageB = getLastMessage(b);
 
-        return (
-          <div
-            key={chat.id}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
-              isActive ? "bg-primary/20" : "hover:bg-gray-50",
-              unreadCount > 0 && "bg-primary/5 font-medium",
-            )}
-            onClick={() => handleChatClick(chat.id)}
-          >
-            <div className="relative">
-              <UserAvatar user={otherParticipant} size="lg" />
-              {unreadCount > 0 && (
-                <div className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </div>
+          if (!lastMessageA && !lastMessageB) return 0;
+          if (!lastMessageA) return 1;
+          if (!lastMessageB) return -1;
+
+          return (
+            new Date(lastMessageB.createdAt).getTime() -
+            new Date(lastMessageA.createdAt).getTime()
+          );
+        })
+        .map((chat) => {
+          const otherParticipant = getOtherParticipant(chat);
+          const lastMessage = getLastMessage(chat);
+          const isActive = location.pathname === `/messages/${chat.id}`;
+          const unreadCount = isActive ? 0 : unreadCounts[chat.id] || 0;
+
+          return (
+            <div
+              key={chat.id}
+              className={cn(
+                "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+                isActive ? "bg-primary/20" : "hover:bg-gray-50",
+                unreadCount > 0 && "bg-primary/5 font-medium",
               )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <h3
-                  className={cn(
-                    "text-sm font-medium truncate",
-                    unreadCount > 0 && "text-primary",
-                  )}
-                >
-                  {`${otherParticipant.firstName.charAt(0).toUpperCase() + otherParticipant.firstName.slice(1)} ${otherParticipant.lastName.charAt(0).toUpperCase() + otherParticipant.lastName.slice(1)}`}
-                </h3>
-                {lastMessage && (
-                  <span
+              onClick={() => handleChatClick(chat.id)}
+            >
+              <div className="relative">
+                <UserAvatar user={otherParticipant} size="lg" />
+                {unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <h3
                     className={cn(
-                      "text-xs text-gray-500",
+                      "text-sm font-medium truncate",
                       unreadCount > 0 && "text-primary",
                     )}
                   >
-                    {formatHour(lastMessage.createdAt)}
-                  </span>
+                    {`${otherParticipant.firstName.charAt(0).toUpperCase() + otherParticipant.firstName.slice(1)} ${otherParticipant.lastName.charAt(0).toUpperCase() + otherParticipant.lastName.slice(1)}`}
+                  </h3>
+                  {lastMessage && (
+                    <span
+                      className={cn(
+                        "text-xs text-gray-500",
+                        unreadCount > 0 && "text-primary",
+                      )}
+                    >
+                      {formatHour(lastMessage.createdAt)}
+                    </span>
+                  )}
+                </div>
+                {lastMessage && (
+                  <p
+                    className={cn(
+                      "text-sm text-gray-500 truncate",
+                      unreadCount > 0 && "text-primary font-medium",
+                    )}
+                  >
+                    {getMessagePrefix(lastMessage)}
+                    {lastMessage.content}
+                  </p>
                 )}
               </div>
-              {lastMessage && (
-                <p
-                  className={cn(
-                    "text-sm text-gray-500 truncate",
-                    unreadCount > 0 && "text-primary font-medium",
-                  )}
-                >
-                  {getMessagePrefix(lastMessage)}
-                  {lastMessage.content}
-                </p>
-              )}
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
     </div>
   );
 };

@@ -11,6 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Contract } from "@/hooks/api/useCreateContract";
 
 import { CreateReviewModal } from "./CreateReviewModal";
@@ -47,8 +48,24 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
   );
 
   const firstBooking = useMemo(() => sortedBookings[0], [sortedBookings]);
-  const lastBooking = useMemo(
-    () => sortedBookings[sortedBookings.length - 1],
+
+  const earliestStartTime = useMemo(
+    () =>
+      sortedBookings.reduce(
+        (earliest, booking) =>
+          booking.startTime < earliest ? booking.startTime : earliest,
+        sortedBookings[0].startTime,
+      ),
+    [sortedBookings],
+  );
+
+  const latestEndTime = useMemo(
+    () =>
+      sortedBookings.reduce(
+        (latest, booking) =>
+          booking.endTime > latest ? booking.endTime : latest,
+        sortedBookings[0].endTime,
+      ),
     [sortedBookings],
   );
 
@@ -60,11 +77,7 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
       <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
-            <img
-              src={provider.profileImageUrl || "/default-avatar.png"}
-              alt={`${provider.firstName} ${provider.lastName}`}
-              className="w-10 h-10 rounded-full"
-            />
+            <UserAvatar user={provider} size="lg" />
             <div>
               <h3 className="font-semibold">
                 {provider.firstName} {provider.lastName}
@@ -83,7 +96,6 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
             <div className="flex items-center text-sm text-gray-500">
               <LuMapPin className="mr-1 h-4 w-4" />
               <span>{service.user.location.address}</span>
-              {/* TODO: ver como va esto */}
             </div>
           )}
 
@@ -94,9 +106,7 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
             </div>
             <div className="flex items-center text-gray-500">
               <LuClock className="mr-1 h-4 w-4" />
-              <span>
-                {firstBooking.startTime} - {lastBooking.endTime}
-              </span>
+              <span>{`${earliestStartTime} - ${latestEndTime}`}</span>
             </div>
           </div>
 

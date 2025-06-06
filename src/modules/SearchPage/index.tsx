@@ -28,14 +28,16 @@ const initialFilters = {
 export const SearchPage: React.FC = () => {
   const { user, setUser } = useUser();
   const { ref, inView } = useInView({
-    threshold: 0.1,
-    rootMargin: "200px",
-    delay: 100,
+    threshold: 1,
+    rootMargin: "50px",
+    delay: 300,
   });
 
   const [filters, setFilters] = useState(initialFilters);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
 
   const { mutateAsync: updateUserLocation } = useUpdateUserLocation({
     onSuccess: (data) => {
@@ -69,10 +71,42 @@ export const SearchPage: React.FC = () => {
   const services = pages?.pages.flatMap((p) => p.data) || [];
 
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+    const loadMore = async () => {
+      if (
+        inView &&
+        hasNextPage &&
+        !isFetchingNextPage &&
+        !isLoadingMore &&
+        !hasAttemptedLoad
+      ) {
+        setIsLoadingMore(true);
+        setHasAttemptedLoad(true);
+        try {
+          await fetchNextPage();
+          if (hasNextPage) {
+            setHasAttemptedLoad(false);
+          }
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoadingMore(false);
+        }
+      }
+    };
+
+    loadMore();
+  }, [
+    inView,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoadingMore,
+    hasAttemptedLoad,
+    fetchNextPage,
+  ]);
+
+  useEffect(() => {
+    setHasAttemptedLoad(false);
+  }, [filters]);
 
   const handleFilterChange = React.useCallback((formValues: any) => {
     setFilters((prev) => ({
@@ -101,14 +135,12 @@ export const SearchPage: React.FC = () => {
           onLocationSet={async (location) => {
             if (!user) return;
             if (!user.location || !(user.location as any).id) {
-              // No hay localización, hacemos POST
               const data = await createUserLocation({
                 ...location,
                 userId: user.id,
               });
               setUser({ ...user, location: data });
             } else {
-              // Ya hay localización, hacemos PATCH
               const locationId = (user.location as any).id;
               const data = await updateUserLocation({
                 id: locationId,
@@ -135,8 +167,7 @@ export const SearchPage: React.FC = () => {
         </motion.p>
       </header>
 
-      {/* Botón flotante de filtros con badge */}
-      <div className="fixed z-50 bottom-6 right-6">
+      <div className="fixed z-50 bottom-[100px] right-6 md:bottom-6">
         <div className="relative">
           <Button
             leftSection={<SlidersHorizontal size={20} />}
@@ -194,19 +225,16 @@ export const SearchPage: React.FC = () => {
 
       <main className="container mx-auto px-4 py-8">
         {loadingServices && !pages ? (
-          <div className="text-center py-20">
-            <Loader />
-            <p>Cargando servicios...</p>
-          </div>
+          <Loader />
         ) : services.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20">
+          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <FaMapMarkerAlt className="w-10 h-10 text-primary" />
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
               No se encontraron servicios
             </h2>
-            <p className="text-gray-600 text-center max-w-md">
+            <p className="text-gray-600 max-w-md">
               Prueba cambiando los filtros o ajustando tu ubicación para ver más
               resultados cerca de ti.
             </p>

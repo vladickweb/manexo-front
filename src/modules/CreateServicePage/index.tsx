@@ -5,6 +5,7 @@ import { Formik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
+import { Loader } from "@/components/Loader/Loader";
 import { AvailabilityManager } from "@/components/profile/AvailabilityManager";
 import { Button } from "@/components/ui/button";
 import { Category } from "@/constants/categories";
@@ -189,7 +190,7 @@ export const CreateServicePage = () => {
   );
 
   if (isLoading) {
-    return <div>Cargando...</div>;
+    return <Loader />;
   }
 
   if (!hasActiveAvailability) {

@@ -1,13 +1,20 @@
 import { FC } from "react";
 
-import { LuCalendar, LuClock, LuMapPin, LuUser } from "react-icons/lu";
-import { useParams } from "react-router-dom";
+import {
+  LuArrowLeft,
+  LuCalendar,
+  LuClock,
+  LuMapPin,
+  LuUser,
+} from "react-icons/lu";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { useGetContract } from "@/hooks/api/useGetContract";
 import { formatFullDate } from "@/utils/date";
 
 export const ContractDetailsPage: FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { data: contract, isLoading } = useGetContract(id || "");
 
   if (isLoading) {
@@ -62,6 +69,14 @@ export const ContractDetailsPage: FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center text-gray-600 hover:text-gray-900 mb-6"
+      >
+        <LuArrowLeft className="w-5 h-5 mr-2" />
+        Volver atrás
+      </button>
+
       <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
         <div className="flex justify-between items-start">
           <div>

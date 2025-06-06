@@ -11,20 +11,29 @@ export const useChatSocket = () => {
   const { accessToken, user } = useUser();
   const queryClient = useQueryClient();
   const [lastMessages, setLastMessages] = useState<Record<string, IMessage>>(
-    {},
+    websocketService.getLastMessages(),
   );
   const [notifications, setNotifications] = useState<any[]>([]);
   const [messages, setMessages] = useState<Record<string, IMessage[]>>({});
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
   const initializeLastMessages = useCallback((chats: IChat[]) => {
+    const currentLastMessages = websocketService.getLastMessages();
     const initialLastMessages: Record<string, IMessage> = {};
+
     chats.forEach((chat) => {
-      if (chat.messages && chat.messages.length > 0) {
+      // Si ya tenemos un último mensaje en el WebSocketService, lo mantenemos
+      if (currentLastMessages[chat.id]) {
+        initialLastMessages[chat.id] = currentLastMessages[chat.id];
+      }
+      // Si no hay mensaje en el WebSocketService, usamos el del chat
+      else if (chat.messages && chat.messages.length > 0) {
         initialLastMessages[chat.id] = chat.messages[chat.messages.length - 1];
       }
     });
-    setLastMessages((prev) => ({ ...prev, ...initialLastMessages }));
+
+    websocketService.setLastMessages(initialLastMessages);
+    setLastMessages(initialLastMessages);
   }, []);
 
   useEffect(() => {
@@ -34,13 +43,12 @@ export const useChatSocket = () => {
     const handleLastMessages = (
       messages: { chatId: string; message: IMessage }[],
     ) => {
-      setLastMessages((prev) => {
-        const updated = { ...prev };
-        for (const { chatId, message } of messages) {
-          updated[chatId] = message;
-        }
-        return updated;
-      });
+      const updated = { ...lastMessages };
+      for (const { chatId, message } of messages) {
+        updated[chatId] = message;
+        websocketService.setLastMessage(chatId, message);
+      }
+      setLastMessages(updated);
     };
 
     const handleLastMessageUpdate = ({
@@ -50,8 +58,8 @@ export const useChatSocket = () => {
       chatId: string;
       message: IMessage;
     }) => {
+      websocketService.setLastMessage(chatId, message);
       setLastMessages((prev) => ({ ...prev, [chatId]: message }));
-      // Invalidar la lista de chats para que se actualice
       queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CHATS] });
     };
 
@@ -78,6 +86,7 @@ export const useChatSocket = () => {
         ...prev,
         [message.chat.id]: [...(prev[message.chat.id] || []), message],
       }));
+      websocketService.setLastMessage(message.chat.id, message);
       setLastMessages((prev) => ({
         ...prev,
         [message.chat.id]: message,
@@ -177,6 +186,7 @@ export const useChatSocket = () => {
         ...prev,
         [chatId]: [...(prev[chatId] || []), newMessage],
       }));
+      websocketService.setLastMessage(chatId, newMessage);
       setLastMessages((prev) => ({
         ...prev,
         [chatId]: newMessage,

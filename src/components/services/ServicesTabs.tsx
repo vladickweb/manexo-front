@@ -1,9 +1,10 @@
 import { useState } from "react";
 
 import { Calendar } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
+import { Loader } from "@/components/Loader/Loader";
 import { Contract } from "@/hooks/api/useCreateContract";
 import { useGetMyContracts } from "@/hooks/api/useGetMyContracts";
 import { useGetServicesMePublished } from "@/hooks/api/useGetServicesMePublished";
@@ -14,26 +15,42 @@ import { OfferedServicesTab } from "./OfferedServicesTab";
 import { ServicesTabNav } from "./ServicesTabNav";
 
 export const ServicesTabs = () => {
-  const [activeTab, setActiveTab] = useState<"offered" | "contracted">(
-    "offered",
-  );
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [activeTab, setActiveTab] = useState<"offered" | "contracted">(() => {
+    if (location.state?.fromSuccess) {
+      return "contracted";
+    }
+    const tabFromUrl = searchParams.get("tab");
+    if (tabFromUrl === "offered" || tabFromUrl === "contracted") {
+      return tabFromUrl;
+    }
+    return "offered";
+  });
+
   const { data: servicesMePublished, isLoading: isLoadingOffered } =
     useGetServicesMePublished();
   const { data: myContracts, isLoading: isLoadingContracted } =
     useGetMyContracts();
   const { user } = useUser();
-  const navigate = useNavigate();
+
+  const handleTabChange = (tab: "offered" | "contracted") => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   const isLoading =
     activeTab === "offered" ? isLoadingOffered : isLoadingContracted;
 
-  if (isLoading) return <div>Cargando...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center gap-4">
         <div className="flex-1">
-          <ServicesTabNav activeTab={activeTab} onTabChange={setActiveTab} />
+          <ServicesTabNav activeTab={activeTab} onTabChange={handleTabChange} />
         </div>
         <Button
           variant="primary"

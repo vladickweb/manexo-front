@@ -1,6 +1,6 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 
-import { Divider, Group, Rating, Stack, Text } from "@mantine/core";
+import { Divider, Group, Loader, Rating, Stack, Text } from "@mantine/core";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { AnimatePresence, motion } from "framer-motion";
@@ -24,6 +24,15 @@ export const ReviewsModal: FC<ReviewsModalProps> = ({
     String(serviceId),
   );
 
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -32,6 +41,7 @@ export const ReviewsModal: FC<ReviewsModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={handleBackdropClick}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
@@ -67,9 +77,7 @@ export const ReviewsModal: FC<ReviewsModalProps> = ({
               </div>
 
               {isLoading ? (
-                <div className="flex justify-center items-center h-40">
-                  <Text>Cargando reseñas...</Text>
-                </div>
+                <Loader />
               ) : (
                 <Stack gap="lg">
                   {reviewsData?.reviews.map((review) => (

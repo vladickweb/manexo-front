@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { ChatList } from "@/components/chat/ChatList";
 import { ChatWindow } from "@/components/chat/ChatWindow";
+import { Loader } from "@/components/Loader/Loader";
 import { useGetChat, useGetChats } from "@/hooks/api/useChats";
 import { useChatSocket } from "@/hooks/useChatSocket";
 
@@ -21,11 +22,7 @@ export const MessagesPage = () => {
   }, [chats, initializeLastMessages]);
 
   if (isLoadingChats) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!chats || chats.length === 0) {

@@ -2,11 +2,14 @@ import React, { useCallback, useState } from "react";
 
 import { addWeeks, startOfWeek } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import { LuArrowLeft, LuArrowRight, LuX } from "react-icons/lu";
+import { LuArrowLeft, LuArrowRight, LuLoader, LuX } from "react-icons/lu";
 
+import { Loader } from "@/components/Loader/Loader";
 import { useCreateChat } from "@/hooks/api/useChats";
+import { useCreateContract } from "@/hooks/api/useCreateContract";
 import { useGetServiceAvailability } from "@/hooks/api/useGetServiceAvailability";
 import { useGetServicesById } from "@/hooks/api/useGetServicesById";
+import { useUser } from "@/stores/useUser";
 
 import { DetailsStep } from "./DetailsStep";
 import { ReviewStep } from "./ReviewStep";
@@ -35,6 +38,10 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
     serviceId,
     { enabled: Boolean(serviceId && isOpen) },
   );
+
+  const { user } = useUser();
+  const createContract = useCreateContract();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [selectedWeekStartDate, setSelectedWeekStartDate] = useState<Date>(
     () => {
@@ -110,6 +117,52 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
     createChat.mutate({ serviceId: service.id });
   }, [service, createChat]);
 
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
+
+  const handleConfirmAndPay = async () => {
+    if (!user || !service || !availability) return;
+
+    try {
+      setIsProcessing(true);
+      const timeSlots = selectedSlots.map((slot) => {
+        const day = availability.weekAvailability.find(
+          (d) => d.dayOfWeek === slot.day,
+        );
+        return {
+          date: day?.date || "",
+          startTime: slot.start,
+          endTime: slot.end,
+        };
+      });
+
+      const totalAmount = selectedSlots.length * Number(service.price);
+
+      const response = await createContract.mutateAsync({
+        serviceId: service.id,
+        amount: totalAmount,
+        clientEmail: user.email,
+        serviceName: service.subcategory.name,
+        clientId: user.id,
+        providerId: service.user.id,
+        agreedPrice: totalAmount,
+        timeSlots,
+      });
+
+      window.location.href = response.paymentUrl;
+    } catch (error) {
+      console.error("Error al crear el contrato:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const renderStep = useCallback(() => {
     if (!service) return null;
 
@@ -131,9 +184,6 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
             selectedSlots={selectedSlots}
             onWeekChange={handleWeekChange}
             onSlotSelect={handleSlotSelect}
-            onSlotRemove={(index) =>
-              setSelectedSlots((prev) => prev.filter((_, i) => i !== index))
-            }
           />
         );
 
@@ -155,7 +205,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
     isLoadingAvailability,
   ]);
 
-  if (isLoadingService) return <Skeleton />;
+  if (isLoadingService) return <Loader />;
 
   return (
     <AnimatePresence>
@@ -165,6 +215,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={handleBackdropClick}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
@@ -213,8 +264,19 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
                       <LuArrowRight className="w-4 h-4 ml-2" />
                     </button>
                   ) : (
-                    <button className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors ml-auto">
-                      Confirmar y pagar
+                    <button
+                      onClick={handleConfirmAndPay}
+                      disabled={isProcessing}
+                      className="flex items-center px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors ml-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isProcessing ? (
+                        <>
+                          <LuLoader className="w-5 h-5 mr-2 animate-spin" />
+                          Procesando...
+                        </>
+                      ) : (
+                        "Confirmar y pagar"
+                      )}
                     </button>
                   )}
                 </div>
@@ -224,19 +286,5 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
         </motion.div>
       )}
     </AnimatePresence>
-  );
-};
-
-const Skeleton = () => {
-  return (
-    <div className="animate-pulse space-y-4">
-      <div className="h-8 bg-gray-200 rounded w-3/4"></div>
-      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-      <div className="h-32 bg-gray-200 rounded"></div>
-      <div className="flex gap-4">
-        <div className="h-10 bg-gray-200 rounded w-1/3"></div>
-        <div className="h-10 bg-gray-200 rounded w-1/3"></div>
-      </div>
-    </div>
   );
 };

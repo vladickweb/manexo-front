@@ -5,6 +5,7 @@ import { FieldArray, Form, Formik } from "formik";
 import { LuPencil } from "react-icons/lu";
 import * as Yup from "yup";
 
+import { Loader } from "@/components/Loader/Loader";
 import { QueryKeys } from "@/constants/queryKeys";
 import {
   useBatchUpdateAvailabilities,
@@ -60,7 +61,7 @@ export const AvailabilityManager: FC = () => {
   };
 
   if (isLoading) {
-    return <div>Cargando disponibilidad...</div>;
+    return <Loader />;
   }
 
   const initialValues = {

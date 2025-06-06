@@ -17,7 +17,6 @@ interface ScheduleStepProps {
   selectedSlots: TimeSlot[];
   onWeekChange: (direction: "prev" | "next") => void;
   onSlotSelect: (day: number, start: string, end: string) => void;
-  onSlotRemove: (index: number) => void;
 }
 
 const formatFullDate = (date: string): string => {
@@ -37,7 +36,6 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
   selectedSlots,
   onWeekChange,
   onSlotSelect,
-  onSlotRemove,
 }) => {
   const today = startOfDay(new Date());
 
@@ -144,32 +142,6 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
                 )}
             </div>
           ))}
-        </div>
-      )}
-
-      {selectedSlots.length > 0 && (
-        <div className="space-y-2 mt-6">
-          <h3 className="font-semibold">Horarios seleccionados:</h3>
-          {selectedSlots.map((slot, index) => {
-            const day = allWeekDays.find((d) => d.dayOfWeek === slot.day);
-            return (
-              <div
-                key={index}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-              >
-                <span>
-                  {day ? formatFullDate(day.date) : ""} de {slot.start} a{" "}
-                  {slot.end}
-                </span>
-                <button
-                  onClick={() => onSlotRemove(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Eliminar
-                </button>
-              </div>
-            );
-          })}
         </div>
       )}
     </div>

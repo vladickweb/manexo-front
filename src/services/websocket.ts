@@ -27,6 +27,7 @@ export class WebSocketService {
   private eventHandlers: Map<string, Set<EventHandler>> = new Map();
   private lastMessageIds = new Set<string>();
   private connectionTimeout: NodeJS.Timeout | null = null;
+  private lastMessages: Record<string, IMessage> = {};
 
   private constructor() {}
 
@@ -63,11 +64,9 @@ export class WebSocketService {
 
     this.connectionTimeout = setTimeout(() => {
       if (this.socket && this.socket.connected) {
-        console.warn("[WebSocket] Ya conectado, no se reconecta.");
         return;
       }
       if (this.isConnecting) {
-        console.warn("[WebSocket] Ya está intentando conectar, espera.");
         return;
       }
 
@@ -82,7 +81,6 @@ export class WebSocketService {
             .replace("https://", "wss://");
         }
         const finalUrl = `${wsUrl}/chat`;
-        console.warn("[WebSocket] Intentando conectar a:", finalUrl);
 
         if (this.socket) {
           this.socket.disconnect();
@@ -105,25 +103,19 @@ export class WebSocketService {
           this.isConnecting = false;
           this.reconnectAttempts = 0;
           this.emitConnectionEvent("connect");
-          console.warn("[WebSocket] Conectado correctamente a:", finalUrl);
           this.activeChats.forEach((chatId) => {
             this.socket?.emit("joinChat", chatId);
           });
         });
 
         this.socket.on("connect_error", (error: Error) => {
-          console.error(
-            "[WebSocket] Error de conexión:",
-            error,
-            "URL:",
-            finalUrl,
-          );
+          console.error(error);
           this.isConnecting = false;
           this.emitConnectionEvent("error");
         });
 
         this.socket.on("disconnect", (reason: string) => {
-          console.error("[WebSocket] Desconectado:", reason, "URL:", finalUrl);
+          console.error(reason);
           this.isConnecting = false;
           this.emitConnectionEvent("disconnect");
           this.handleReconnect();
@@ -152,11 +144,9 @@ export class WebSocketService {
           this.emitEvent("lastMessages", data),
         );
 
-        // Añadir estos eventos después de la configuración del socket
         this.socket.on(
           "connected",
           (data: { userId: number; timestamp: string }) => {
-            console.warn("[WebSocket] Conexión autenticada:", data);
             this.emitEvent("connected", data);
           },
         );
@@ -164,7 +154,6 @@ export class WebSocketService {
         this.socket.on(
           "disconnected",
           (data: { reason: string; timestamp: string }) => {
-            console.warn("[WebSocket] Desconectado:", data);
             this.emitEvent("disconnected", data);
           },
         );
@@ -172,25 +161,19 @@ export class WebSocketService {
         this.socket.on(
           "reconnected",
           (data: { userId: number; timestamp: string }) => {
-            console.warn("[WebSocket] Reconectado:", data);
             this.emitEvent("reconnected", data);
           },
         );
 
         this.socket.on("error", (error: { message: string; code: string }) => {
-          console.error("[WebSocket] Error:", error);
           this.emitEvent("error", error);
 
-          // Manejar errores específicos
           switch (error.code) {
             case "AUTH_ERROR":
-              // Manejar error de autenticación
               break;
             case "LOAD_MESSAGES_ERROR":
-              // Manejar error al cargar mensajes
               break;
             case "RECONNECT_ERROR":
-              // Manejar error de reconexión
               break;
           }
         });
@@ -199,7 +182,7 @@ export class WebSocketService {
         this.isConnecting = false;
         this.emitConnectionEvent("error");
       }
-    }, 100); // Debounce de 100ms
+    }, 100);
   }
 
   disconnect() {
@@ -231,16 +214,11 @@ export class WebSocketService {
       this.reconnectAttempts >= this.maxReconnectAttempts ||
       !this.accessToken
     ) {
-      console.warn("[WebSocket] Máximo de intentos de reconexión alcanzado");
       return;
     }
 
     this.reconnectAttempts++;
     const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
-
-    console.warn(
-      `[WebSocket] Intentando reconectar en ${delay}ms (intento ${this.reconnectAttempts})`,
-    );
 
     this.reconnectTimeout = setTimeout(() => {
       if (this.socket) {
@@ -377,6 +355,18 @@ export class WebSocketService {
       }, 5000);
     }
     this.eventHandlers.get(event)?.forEach((handler) => handler(data));
+  }
+
+  getLastMessages(): Record<string, IMessage> {
+    return this.lastMessages;
+  }
+
+  setLastMessage(chatId: string, message: IMessage) {
+    this.lastMessages[chatId] = message;
+  }
+
+  setLastMessages(messages: Record<string, IMessage>) {
+    this.lastMessages = { ...this.lastMessages, ...messages };
   }
 }
 

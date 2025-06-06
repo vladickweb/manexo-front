@@ -1,24 +1,29 @@
+import { useEffect } from "react";
+
+import { useQueryClient } from "@tanstack/react-query";
 import { LuLoader } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Loader } from "@/components/Loader/Loader";
+import { QueryKeys } from "@/constants/queryKeys";
 import { useGetContract } from "@/hooks/api/useGetContract";
 
 export const ContractSuccessPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: contract, isLoading } = useGetContract(id || "");
 
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CONTRACT] });
+  }, [queryClient]);
+
   if (isLoading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <Loader />
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
-    <div className="h-full flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full mx-auto p-8 bg-white rounded-2xl shadow-sm">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-6">
@@ -57,7 +62,9 @@ export const ContractSuccessPage = () => {
             </div>
 
             <button
-              onClick={() => navigate("/services")}
+              onClick={() =>
+                navigate("/services", { state: { fromSuccess: true } })
+              }
               className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
             >
               Ir a mis servicios

@@ -2,12 +2,14 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 
 import { Rating } from "@mantine/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { MapPin, MoreVertical, Navigation, Star } from "lucide-react";
 
 import { ReviewsModal } from "@/components/reviews/ReviewsModal";
 import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal/index";
 import { UserAvatar } from "@/components/UserAvatar";
+import { QueryKeys } from "@/constants/queryKeys";
 import { useDeleteServicesById } from "@/hooks/api/useDeleteServicesById";
 import { useEditService } from "@/hooks/api/useEditService";
 import {
@@ -32,7 +34,9 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   showHamburgerMenu,
 }) => {
   const { user } = useUser();
+  const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
@@ -65,6 +69,22 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   const { mutate: deleteService, isPending: deleteServiceLoading } =
     useDeleteServicesById();
 
+  const handleDeleteService = () => {
+    deleteService(service.id, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_SERVICES] });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeys.GET_SERVICES_ME_PUBLISHED],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeys.GET_SERVICES_BY_ID],
+        });
+        setShowDeleteConfirm(false);
+        setMenuOpen(false);
+      },
+    });
+  };
+
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
       const target = e.target as Node;
@@ -94,8 +114,12 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   return (
     <>
       <div
-        className={`group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer ${!service.isActive ? "opacity-60 grayscale scale-100" : ""}`}
-        onClick={() => setIsModalOpen(true)}
+        className={`group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 ${user?.id === service.user.id ? "" : "cursor-pointer"} ${!service.isActive ? "opacity-60 grayscale scale-100" : ""}`}
+        onClick={() => {
+          if (user?.id !== service.user.id) {
+            setIsModalOpen(true);
+          }
+        }}
       >
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
@@ -186,23 +210,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                             e.stopPropagation();
                             setMenuOpen(false);
                             editService({
-                              id: service.id.toString(),
-                              data: {
-                                isActive: !service.isActive,
-                              },
-                            });
-                          }}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          disabled={editServiceLoading}
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMenuOpen(false);
-                            editService({
-                              id: service.id.toString(),
+                              id: service.id,
                               data: {
                                 isActive: !service.isActive,
                               },
@@ -217,7 +225,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                           onClick={(e) => {
                             e.stopPropagation();
                             setMenuOpen(false);
-                            deleteService({ id: service.id.toString() });
+                            setShowDeleteConfirm(true);
                           }}
                           className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors"
                           disabled={deleteServiceLoading}
@@ -318,6 +326,35 @@ export const ServiceCard: FC<ServiceCardProps> = ({
           onClose={() => setIsReviewsModalOpen(false)}
           serviceId={service.id}
         />
+      )}
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-semibold mb-4">
+              Confirmar eliminación
+            </h3>
+            <p className="text-gray-600 mb-6">
+              ¿Estás seguro de que quieres eliminar este servicio? Esta acción
+              no se puede deshacer.
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-900"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteService}
+                disabled={deleteServiceLoading}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleteServiceLoading ? "Eliminando..." : "Eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

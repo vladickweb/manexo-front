@@ -1,10 +1,12 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 
+import { Rating } from "@mantine/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { LuStar } from "react-icons/lu";
 import * as Yup from "yup";
 
 import { Button } from "@/components/Button/Button";
+import { QueryKeys } from "@/constants/queryKeys";
 import { useCreateReview } from "@/hooks/api/useCreateReview";
 
 interface CreateReviewModalProps {
@@ -23,9 +25,7 @@ const validationSchema = Yup.object().shape({
   rating: Yup.number()
     .min(1, "Debes seleccionar una puntuación")
     .required("La puntuación es requerida"),
-  comment: Yup.string()
-    .min(10, "El comentario debe tener al menos 10 caracteres")
-    .required("El comentario es requerido"),
+  comment: Yup.string().required("El comentario es requerido"),
 });
 
 export const CreateReviewModal: FC<CreateReviewModalProps> = ({
@@ -35,6 +35,16 @@ export const CreateReviewModal: FC<CreateReviewModalProps> = ({
   onSuccess,
 }) => {
   const createReview = useCreateReview();
+  const queryClient = useQueryClient();
+
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
 
   const initialValues: ReviewFormValues = {
     rating: 0,
@@ -48,6 +58,20 @@ export const CreateReviewModal: FC<CreateReviewModalProps> = ({
         rating: values.rating,
         comment: values.comment,
       });
+
+      // Invalidar queries relacionadas con servicios
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_SERVICES] });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.GET_SERVICES_BY_ID],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.GET_SERVICES_ME_PUBLISHED],
+      });
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_REVIEW] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_REVIEW_BY_ID] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CONTRACT] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_MY_CONTRACTS] });
+
       onSuccess();
       onClose();
     } catch (error) {
@@ -58,7 +82,10 @@ export const CreateReviewModal: FC<CreateReviewModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      onClick={handleBackdropClick}
+    >
       <div className="bg-white rounded-xl p-6 w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4">Deja tu opinión</h2>
 
@@ -73,24 +100,12 @@ export const CreateReviewModal: FC<CreateReviewModalProps> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Puntuación
                 </label>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setFieldValue("rating", star)}
-                      className="focus:outline-none"
-                    >
-                      <LuStar
-                        className={`w-8 h-8 ${
-                          star <= values.rating
-                            ? "text-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    </button>
-                  ))}
-                </div>
+                <Rating
+                  value={values.rating}
+                  onChange={(value) => setFieldValue("rating", value)}
+                  size="lg"
+                  color="primary"
+                />
                 {errors.rating && touched.rating && (
                   <div className="text-red-500 text-sm mt-1">
                     {errors.rating}
