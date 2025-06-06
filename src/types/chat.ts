@@ -11,7 +11,7 @@ export interface IMessage {
   isRead?: boolean;
 }
 
-export interface ILocation {
+interface ILocation {
   latitude: number;
   longitude: number;
   address: string;
@@ -23,7 +23,7 @@ export interface ILocation {
   country: string;
 }
 
-export interface IService {
+interface IService {
   id: number;
   description: string;
   radius: number;

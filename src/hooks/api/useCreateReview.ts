@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import axiosClient from "@/api/axiosClient";
 
-export interface Review {
+interface Review {
   id: string;
   rating: number;
   comment: string;

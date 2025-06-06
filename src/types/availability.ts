@@ -15,7 +15,3 @@ export interface CreateAvailabilityDto {
   endTime: string;
   isActive?: boolean;
 }
-
-export interface UpdateAvailabilityDto extends Partial<CreateAvailabilityDto> {
-  id: string;
-}

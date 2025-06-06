@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-export interface UnreadMessagesContextType {
+interface UnreadMessagesContextType {
   unreadCounts: Record<string, number>;
   hasUnreadMessages: boolean;
   markChatAsRead: (chatId: string) => void;

@@ -63,33 +63,3 @@ export const useCreateChat = () => {
     },
   });
 };
-
-export const useSendMessage = (chatId: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (content: string) => {
-      const { data } = await axiosClient.post<IMessage>(
-        `/chats/${chatId}/messages`,
-        {
-          content,
-        },
-      );
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [QueryKeys.GET_CHAT_MESSAGES, chatId],
-      });
-      queryClient.invalidateQueries({ queryKey: [QueryKeys.GET_CHATS] });
-    },
-    onError: (error: any) => {
-      const errorMessage = error.response?.data?.message;
-      if (Array.isArray(errorMessage)) {
-        errorMessage.forEach((msg) => toast.error(msg));
-      } else {
-        toast.error(errorMessage || "Error al enviar el mensaje");
-      }
-    },
-  });
-};

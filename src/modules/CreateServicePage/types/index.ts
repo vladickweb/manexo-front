@@ -6,7 +6,7 @@ export interface Step {
   placeholder?: string;
 }
 
-export interface AddressComponents {
+interface AddressComponents {
   streetName: string;
   streetNumber: string;
   city: string;

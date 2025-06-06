@@ -1,12 +1,6 @@
 import { IUser } from "@/types/user";
 
-export interface Location {
-  address: string;
-  latitude: number;
-  longitude: number;
-}
-
-export interface Subcategory {
+interface Subcategory {
   id: number;
   name: string;
   description: string;
@@ -19,7 +13,7 @@ export interface Subcategory {
   };
 }
 
-export interface ReviewStats {
+interface ReviewStats {
   totalReviews: number;
   averageRating: number;
 }
@@ -35,17 +29,7 @@ export interface Service {
   updatedAt: string;
   user: IUser;
   subcategory: Subcategory;
-  reviews: any[]; // TODO: Definir tipo de Review
+  reviews: any[];
   distance: number;
   reviewStats: ReviewStats;
-}
-
-export interface Category {
-  id: number;
-  name: string;
-  description: string;
-  icon: string;
-  createdAt: Date;
-  updatedAt: Date;
-  category?: Category;
 }

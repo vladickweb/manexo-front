@@ -45,17 +45,3 @@ export const useUploadProfileImage = (
     },
   });
 };
-
-export const useRemoveProfileImage = (
-  options?: UseMutationOptions<IUser, unknown, number>,
-) => {
-  return useMutation({
-    ...(options || {}),
-    mutationFn: async (id: number) => {
-      const { data } = await axiosClient.delete<IUser>(
-        `/users/${id}/profile-image`,
-      );
-      return data;
-    },
-  });
-};
