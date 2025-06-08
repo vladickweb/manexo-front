@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 
 import axiosClient from "@/api/axiosClient";
 import { useUser } from "@/stores/useUser";
+import { IUser } from "@/types/user";
 
 interface SignupData {
   firstName: string;
@@ -33,6 +34,7 @@ interface SignupResponse {
 
 export const useSignup = () => {
   const setUser = useUser((state) => state.setUser);
+  const setTokens = useUser((state) => state.setTokens);
   const navigate = useNavigate();
 
   return useMutation({
@@ -45,7 +47,8 @@ export const useSignup = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      setUser(data.user, data.accessToken, data.refreshToken);
+      setUser(data.user as unknown as IUser);
+      setTokens(data.accessToken, data.refreshToken);
       navigate("/search", { replace: true });
     },
     onError: (error: any) => {

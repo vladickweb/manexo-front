@@ -7,8 +7,8 @@ export const useDeleteServicesById = (
 ) => {
   return useMutation({
     ...(options || {}),
-    mutationFn: async (params: any) => {
-      const { data } = await axiosClient.delete<any>(`/services/{id}`, params);
+    mutationFn: async (id: number) => {
+      const { data } = await axiosClient.delete<any>(`/services/${id}`);
       return data;
     },
   });

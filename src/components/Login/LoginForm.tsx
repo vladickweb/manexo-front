@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { SlLogin } from "react-icons/sl";
 import * as Yup from "yup";
@@ -58,12 +59,26 @@ export const LoginForm = () => {
                 className="text-sm text-red-600 mt-1"
               />
             </div>
+            {loginMutation.isError && (
+              <div className="text-sm text-red-600 text-center">
+                {(loginMutation.error as AxiosError<{ message: string }>)
+                  ?.response?.data?.message ||
+                  "Error al iniciar sesión. Por favor, intenta de nuevo."}
+              </div>
+            )}
             <button
               type="submit"
-              className="mt-5 tracking-wide font-semibold bg-primary text-gray-100 w-full py-4 rounded-lg hover:bg-primary-dark transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+              disabled={loginMutation.isPending}
+              className="mt-5 tracking-wide font-semibold bg-primary text-gray-100 w-full py-4 rounded-lg hover:bg-primary-dark transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <SlLogin className="h-6 w-6" />
-              <span className="ml-3">Iniciar Sesión</span>
+              {loginMutation.isPending ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+              ) : (
+                <>
+                  <SlLogin className="h-6 w-6" />
+                  <span className="ml-3">Iniciar Sesión</span>
+                </>
+              )}
             </button>
           </Form>
         )}

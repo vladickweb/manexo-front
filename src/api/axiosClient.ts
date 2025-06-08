@@ -96,9 +96,7 @@ axiosClient.interceptors.response.use(
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
           response.data;
 
-        useUser
-          .getState()
-          .setUser(useUser.getState().user!, newAccessToken, newRefreshToken);
+        useUser.getState().setTokens(newAccessToken, newRefreshToken);
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 

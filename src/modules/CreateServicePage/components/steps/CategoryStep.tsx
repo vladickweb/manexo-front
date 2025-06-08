@@ -10,7 +10,7 @@ interface CategoryStepProps {
   onSelectSubcategory: (id: number) => void;
 }
 
-const CategoryStep = ({
+export const CategoryStep = ({
   onSelectCategory,
   onSelectSubcategory,
 }: CategoryStepProps) => {
@@ -117,5 +117,3 @@ const CategoryStep = ({
     </div>
   );
 };
-
-export default CategoryStep;

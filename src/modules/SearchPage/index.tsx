@@ -1,137 +1,262 @@
-import { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
+import { Button, Drawer } from "@mantine/core";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { SlidersHorizontal } from "lucide-react";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import { useInView } from "react-intersection-observer";
 
-import { CATEGORIES, Category } from "@/constants/categories";
+import { ServiceFilters } from "@/components/Filters/ServiceFilters";
+import { Loader } from "@/components/Loader/Loader";
+import { LocationRequest } from "@/components/Location/LocationRequest";
+import { ServiceCard } from "@/components/services/ServiceCard";
+import { useGetServicesInfinite } from "@/hooks/api/useGetServicesInfinite";
+import {
+  useCreateUserLocation,
+  useUpdateUserLocation,
+} from "@/hooks/api/useUserLocation";
+import { useUser } from "@/stores/useUser";
 
-export const SearchPage = () => {
-  const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
+const initialFilters = {
+  categoryId: undefined,
+  subcategoryIds: [] as string[],
+  minPrice: undefined as number | undefined,
+  maxPrice: undefined as number | undefined,
+  limit: 10,
+};
+
+export const SearchPage: React.FC = () => {
+  const { user, setUser } = useUser();
+  const { ref, inView } = useInView({
+    threshold: 1,
+    rootMargin: "50px",
+    delay: 300,
+  });
+
+  const [filters, setFilters] = useState(initialFilters);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
+
+  const { mutateAsync: updateUserLocation } = useUpdateUserLocation({
+    onSuccess: (data) => {
+      if (!user) return;
+      setUser({ ...user, location: data });
+    },
+  });
+
+  const { mutateAsync: createUserLocation } = useCreateUserLocation({
+    onSuccess: (data) => {
+      if (!user) return;
+      setUser({ ...user, location: data });
+    },
+  });
+
+  const {
+    data: pages,
+    isLoading: loadingServices,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetServicesInfinite(
+    {
+      ...filters,
+      latitude: user?.location?.latitude,
+      longitude: user?.location?.longitude,
+    },
+    { enabled: !!user?.location },
   );
 
-  const handleSelectCategory = (category: Category) => {
-    setSelectedCategory(category);
-  };
+  const services = pages?.pages.flatMap((p) => p.data) || [];
 
-  const handleCloseSubcategories = () => {
-    setSelectedCategory(null);
-  };
+  useEffect(() => {
+    const loadMore = async () => {
+      if (
+        inView &&
+        hasNextPage &&
+        !isFetchingNextPage &&
+        !isLoadingMore &&
+        !hasAttemptedLoad
+      ) {
+        setIsLoadingMore(true);
+        setHasAttemptedLoad(true);
+        try {
+          await fetchNextPage();
+          if (hasNextPage) {
+            setHasAttemptedLoad(false);
+          }
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoadingMore(false);
+        }
+      }
+    };
 
-  const handleSelectSubcategory = (
-    categoryId: string,
-    subcategoryId: string,
-  ) => {
-    navigate(`/services/${categoryId}/${subcategoryId}`);
-  };
+    loadMore();
+  }, [
+    inView,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoadingMore,
+    hasAttemptedLoad,
+    fetchNextPage,
+  ]);
+
+  useEffect(() => {
+    setHasAttemptedLoad(false);
+  }, [filters]);
+
+  const handleFilterChange = React.useCallback((formValues: any) => {
+    setFilters((prev) => ({
+      ...prev,
+      categoryId: formValues.categoryId,
+      subcategoryIds: formValues.subcategoryIds,
+      minPrice: formValues.minPrice ? +formValues.minPrice : undefined,
+      maxPrice: formValues.maxPrice ? +formValues.maxPrice : undefined,
+    }));
+  }, []);
+
+  const activeFiltersCount = useMemo(() => {
+    const count = [
+      filters.categoryId,
+      filters.subcategoryIds && filters.subcategoryIds.length > 0,
+      typeof filters.minPrice === "number" && !isNaN(filters.minPrice),
+      typeof filters.maxPrice === "number" && !isNaN(filters.maxPrice),
+    ].filter(Boolean).length;
+    return count;
+  }, [filters]);
+
+  if (!user?.location) {
+    return (
+      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-100px)]">
+        <LocationRequest
+          onLocationSet={async (location) => {
+            if (!user) return;
+            if (!user.location || !(user.location as any).id) {
+              const data = await createUserLocation({
+                ...location,
+                userId: user.id,
+              });
+              setUser({ ...user, location: data });
+            } else {
+              const locationId = (user.location as any).id;
+              const data = await updateUserLocation({
+                id: locationId,
+                data: { ...location, userId: user.id },
+              });
+              setUser({ ...user, location: data });
+            }
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col bg-gray-50 min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative"
+    <div className="h-full bg-gray-50 relative">
+      <header className="container mx-auto px-4 py-8">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mt-2 text-lg text-gray-600"
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-dark mb-2">
-            Explora el mundo de servicios
-          </h1>
-          <motion.p
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-lg md:text-xl text-gray-600"
-          >
-            Encuentra profesionales verificados para cada necesidad
-          </motion.p>
-        </motion.div>
-      </div>
+          Encuentra los mejores servicios en tu zona
+        </motion.p>
+      </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {selectedCategory ? (
-            <>
-              {selectedCategory.subcategories.map((subcategory, index) => (
-                <motion.div
-                  key={subcategory.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="relative group"
-                >
-                  <button
-                    onClick={() =>
-                      handleSelectSubcategory(
-                        selectedCategory.id.toString(),
-                        subcategory.id.toString(),
-                      )
-                    }
-                    className="w-full aspect-square bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-[1.02] border border-gray-100"
-                  >
-                    <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
-                      <img
-                        src={subcategory.icon}
-                        alt={subcategory.name}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-sm md:text-base font-medium text-gray-700 text-center">
-                      {subcategory.name}
-                    </span>
-                  </button>
-                </motion.div>
-              ))}
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                onClick={handleCloseSubcategories}
-                className="aspect-square bg-white rounded-2xl p-4 flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
-              >
-                <span className="text-sm md:text-base font-medium text-gray-700">
-                  Volver
-                </span>
-              </motion.button>
-            </>
-          ) : (
-            CATEGORIES.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="relative group"
-              >
-                <button
-                  onClick={() => handleSelectCategory(category)}
-                  className="w-full aspect-square bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-3 shadow-sm hover:shadow-md transition-all duration-300 group-hover:scale-[1.02] border border-gray-100"
-                >
-                  <div className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
-                    <img
-                      src={category.icon}
-                      alt={category.name}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <span className="text-sm md:text-base font-medium text-gray-700 text-center">
-                    {category.name}
-                  </span>
-                </button>
-              </motion.div>
-            ))
+      <div className="fixed z-50 bottom-[100px] right-6 md:bottom-6">
+        <div className="relative">
+          <Button
+            leftSection={<SlidersHorizontal size={20} />}
+            className="shadow-lg bg-primary hover:bg-primary-dark text-white rounded-full px-6 py-3 text-base font-semibold flex items-center gap-2"
+            style={{ boxShadow: "0 4px 24px 0 rgba(0,0,0,0.10)" }}
+            onClick={() => setDrawerOpen(true)}
+            size="lg"
+            radius="xl"
+          >
+            Filtrar
+          </Button>
+          {activeFiltersCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5 border-2 border-white shadow">
+              {activeFiltersCount}
+            </span>
           )}
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="space-y-6"
-        ></motion.div>
-      </div>
+      <Drawer
+        opened={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title={<span className="font-bold text-lg">Filtrar servicios</span>}
+        position="right"
+        size="md"
+        padding="xl"
+        overlayProps={{ opacity: 0.4, blur: 2 }}
+      >
+        <div className="flex justify-end mb-4">
+          <button
+            type="button"
+            className="text-xs text-gray-500 hover:text-red-500 transition-colors underline underline-offset-2"
+            onClick={() => {
+              setFilters(initialFilters);
+              setResetKey((k) => k + 1);
+            }}
+          >
+            Limpiar filtros
+          </button>
+        </div>
+        <ServiceFilters
+          key={resetKey}
+          onFilterChange={handleFilterChange as any}
+          resetKey={resetKey}
+          initialValues={{
+            categoryId: filters.categoryId,
+            subcategoryIds: filters.subcategoryIds,
+            minPrice:
+              filters.minPrice !== undefined ? filters.minPrice.toString() : "",
+            maxPrice:
+              filters.maxPrice !== undefined ? filters.maxPrice.toString() : "",
+          }}
+        />
+      </Drawer>
+
+      <main className="container mx-auto px-4 py-8">
+        {loadingServices && !pages ? (
+          <Loader />
+        ) : services.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <FaMapMarkerAlt className="w-10 h-10 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              No se encontraron servicios
+            </h2>
+            <p className="text-gray-600 max-w-md">
+              Prueba cambiando los filtros o ajustando tu ubicación para ver más
+              resultados cerca de ti.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              {services.map((svc) => {
+                return (
+                  <ServiceCard
+                    key={svc.id}
+                    service={svc}
+                    showDistance={true}
+                    showFavoriteButton={true}
+                  />
+                );
+              })}
+            </div>
+            <div ref={ref} className="h-1" />
+          </>
+        )}
+      </main>
     </div>
   );
 };

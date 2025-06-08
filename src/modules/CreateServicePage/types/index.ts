@@ -6,6 +6,15 @@ export interface Step {
   placeholder?: string;
 }
 
+interface AddressComponents {
+  streetName: string;
+  streetNumber: string;
+  city: string;
+  province: string;
+  postalCode: string;
+  country: string;
+}
+
 export interface FormValues {
   description: string;
   price: number;
@@ -14,6 +23,7 @@ export interface FormValues {
     latitude: number;
     longitude: number;
     address: string;
+    addressComponents: AddressComponents;
   };
   requiresAcceptance: boolean;
   radius: number;

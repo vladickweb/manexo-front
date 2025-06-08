@@ -1,4 +1,4 @@
-const About = () => (
+export const About = () => (
   <section id="about" className="bg-gray-100 py-16">
     <div className="container mx-auto px-4">
       <h3 className="text-3xl font-bold text-center mb-8">Acerca de Menexo</h3>
@@ -10,5 +10,3 @@ const About = () => (
     </div>
   </section>
 );
-
-export default About;

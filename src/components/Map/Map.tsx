@@ -6,6 +6,8 @@ import {
   Marker,
   useLoadScript,
 } from "@react-google-maps/api";
+import { useFormikContext } from "formik";
+import { FaLocationArrow } from "react-icons/fa6";
 import { toast } from "react-toastify";
 
 interface Location {
@@ -13,12 +15,24 @@ interface Location {
   lng: number;
 }
 
+interface AddressComponents {
+  streetName: string;
+  streetNumber: string;
+  city: string;
+  province: string;
+  postalCode: string;
+  country: string;
+}
+
 interface MapProps {
-  onLocationSelect: (lat: number, lng: number, address: string) => void;
+  onLocationSelect: (
+    lat: number,
+    lng: number,
+    address: AddressComponents,
+  ) => void;
   radius?: number;
-  initialLocation?: Location;
-  center: Location;
-  isInteractive?: boolean;
+  location: Location;
+  initialAddress?: AddressComponents;
 }
 
 const isValidLocation = (location: Location | null | undefined): boolean =>
@@ -40,29 +54,53 @@ const calculateZoomFromRadius = (radius: number): number => {
   return 7;
 };
 
+const extractAddressComponents = (
+  addressComponents: google.maps.GeocoderAddressComponent[],
+): AddressComponents => {
+  const components: AddressComponents = {
+    streetName: "",
+    streetNumber: "",
+    city: "",
+    province: "",
+    postalCode: "",
+    country: "",
+  };
+
+  addressComponents.forEach((component) => {
+    const types = component.types;
+    if (types.includes("route")) {
+      components.streetName = component.long_name;
+    } else if (types.includes("street_number")) {
+      components.streetNumber = component.long_name;
+    } else if (types.includes("locality")) {
+      components.city = component.long_name;
+    } else if (types.includes("administrative_area_level_2")) {
+      components.province = component.long_name;
+    } else if (types.includes("postal_code")) {
+      components.postalCode = component.long_name;
+    } else if (types.includes("country")) {
+      components.country = component.long_name;
+    }
+  });
+
+  return components;
+};
+
 export const Map = ({
   onLocationSelect,
   radius = 15000,
-  initialLocation,
-  center,
-  isInteractive = true,
+  location,
+  initialAddress,
 }: MapProps) => {
+  const { values, setFieldValue } = useFormikContext<any>();
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,
   });
 
-  const [position, setPosition] = useState<Location | null>(
-    initialLocation && isValidLocation(initialLocation)
-      ? initialLocation
-      : null,
-  );
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
-  const [street, setStreet] = useState("");
-  const [streetNumber, setStreetNumber] = useState("");
-  const [selectedPlace, setSelectedPlace] =
+  const [_isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [_selectedPlace, setSelectedPlace] =
     useState<google.maps.places.PlaceResult | null>(null);
-  const [showNumberInput, setShowNumberInput] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
 
@@ -70,7 +108,6 @@ export const Map = ({
   const geocoder = useRef<google.maps.Geocoder | null>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const streetInputRef = useRef<HTMLInputElement>(null);
-  const numberInputRef = useRef<HTMLInputElement>(null);
   const hasFetchedInitialAddress = useRef(false);
   const circleRef = useRef<google.maps.Circle | null>(null);
 
@@ -89,6 +126,52 @@ export const Map = ({
     };
   }, [isLoaded]);
 
+  const fetchAddress = async (
+    lat: number,
+    lng: number,
+  ): Promise<AddressComponents> => {
+    if (!geocoder.current) {
+      return {
+        streetName: "",
+        streetNumber: "",
+        city: "",
+        province: "",
+        postalCode: "",
+        country: "",
+      };
+    }
+
+    try {
+      const result = await geocoder.current.geocode({ location: { lat, lng } });
+      if (result?.results?.[0]?.address_components) {
+        return extractAddressComponents(result.results[0].address_components);
+      }
+      return {
+        streetName: "",
+        streetNumber: "",
+        city: "",
+        province: "",
+        postalCode: "",
+        country: "",
+      };
+    } catch {
+      return {
+        streetName: "",
+        streetNumber: "",
+        city: "",
+        province: "",
+        postalCode: "",
+        country: "",
+      };
+    }
+  };
+
+  useEffect(() => {
+    if (values.location.latitude && values.location.longitude) {
+      setShowMap(true);
+    }
+  }, [values.location.latitude, values.location.longitude]);
+
   useEffect(() => {
     if (isLoaded && streetInputRef.current && !autocompleteRef.current) {
       autocompleteRef.current = new google.maps.places.Autocomplete(
@@ -104,56 +187,24 @@ export const Map = ({
         const place = autocompleteRef.current?.getPlace();
         if (place?.geometry?.location) {
           setSelectedPlace(place);
-          setShowNumberInput(true);
-          const streetName = place.address_components?.find((c) =>
-            c.types.includes("route"),
-          )?.long_name;
-          setStreet(streetName || "");
+          const addressComponents = place.address_components || [];
+          const address = extractAddressComponents(addressComponents);
+
+          setFieldValue("location.latitude", place.geometry.location.lat());
+          setFieldValue("location.longitude", place.geometry.location.lng());
+          setFieldValue("location.address", place.formatted_address);
+          setFieldValue("location.addressComponents", address);
+
+          setShowMap(true);
+          onLocationSelect(
+            place.geometry.location.lat(),
+            place.geometry.location.lng(),
+            address,
+          );
         }
       });
     }
-  }, [isLoaded]);
-
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setStreetNumber(e.target.value);
-  };
-
-  const handleNumberConfirm = () => {
-    if (selectedPlace?.geometry?.location && streetNumber) {
-      const lat = selectedPlace.geometry.location.lat();
-      const lng = selectedPlace.geometry.location.lng();
-      const address = `${street} ${streetNumber}, ${selectedPlace.formatted_address?.split(",").slice(1).join(",").trim()}`;
-      setPosition({ lat, lng });
-      setShowMap(true);
-      onLocationSelect(lat, lng, address);
-    }
-  };
-
-  const fetchAddress = async (lat: number, lng: number) => {
-    if (isOffline || !geocoder.current) {
-      return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-    }
-
-    try {
-      const result = await geocoder.current.geocode({ location: { lat, lng } });
-      return (
-        result?.results?.[0]?.formatted_address ??
-        `${lat.toFixed(6)}, ${lng.toFixed(6)}`
-      );
-    } catch {
-      return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-    }
-  };
-
-  const handleMapClick = async (e: google.maps.MapMouseEvent) => {
-    if (e.latLng) {
-      const lat = e.latLng.lat();
-      const lng = e.latLng.lng();
-      setPosition({ lat, lng });
-      const address = await fetchAddress(lat, lng);
-      onLocationSelect(lat, lng, address);
-    }
-  };
+  }, [isLoaded, setFieldValue, onLocationSelect]);
 
   const handleCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -166,7 +217,9 @@ export const Map = ({
       async (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        setPosition({ lat, lng });
+
+        setFieldValue("location.latitude", lat);
+        setFieldValue("location.longitude", lng);
         setShowMap(true);
 
         if (geocoder.current) {
@@ -177,28 +230,25 @@ export const Map = ({
 
             if (result.results && result.results.length > 0) {
               const addressComponents = result.results[0].address_components;
-              const streetName = addressComponents.find((c) =>
-                c.types.includes("route"),
-              )?.long_name;
-              const streetNumber = addressComponents.find((c) =>
-                c.types.includes("street_number"),
-              )?.long_name;
+              const address = extractAddressComponents(addressComponents);
 
-              if (streetName) {
-                setStreet(streetName);
-                if (streetNumber) {
-                  setStreetNumber(streetNumber);
-                  setShowNumberInput(true);
-                }
-              }
+              setFieldValue(
+                "location.address",
+                result.results[0].formatted_address,
+              );
+              setFieldValue("location.addressComponents", address);
+              onLocationSelect(lat, lng, address);
             }
-
-            const address = result.results[0].formatted_address;
-            onLocationSelect(lat, lng, address);
           } catch (error) {
             console.error("Error al obtener la dirección:", error);
-            const address = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-            onLocationSelect(lat, lng, address);
+            onLocationSelect(lat, lng, {
+              streetName: "",
+              streetNumber: "",
+              city: "",
+              province: "",
+              postalCode: "",
+              country: "",
+            });
           }
         }
 
@@ -215,24 +265,33 @@ export const Map = ({
   useEffect(() => {
     if (
       isLoaded &&
-      isValidLocation(initialLocation) &&
+      isValidLocation(location) &&
       !hasFetchedInitialAddress.current
     ) {
-      if (initialLocation) {
-        setPosition(initialLocation);
+      if (location) {
+        setFieldValue("location.latitude", location.lat);
+        setFieldValue("location.longitude", location.lng);
         setShowMap(true);
         hasFetchedInitialAddress.current = true;
-        fetchAddress(initialLocation.lat, initialLocation.lng).then(
-          (address) => {
-            onLocationSelect(initialLocation.lat, initialLocation.lng, address);
-          },
-        );
+        fetchAddress(location.lat, location.lng).then((address) => {
+          setFieldValue("location.addressComponents", address);
+          onLocationSelect(location.lat, location.lng, address);
+        });
       }
     }
-  }, [isLoaded, initialLocation, onLocationSelect]);
+  }, [isLoaded, location, onLocationSelect, setFieldValue]);
 
   useEffect(() => {
-    if (position && mapRef.current) {
+    if (
+      values.location.latitude &&
+      values.location.longitude &&
+      mapRef.current
+    ) {
+      const position = {
+        lat: values.location.latitude,
+        lng: values.location.longitude,
+      };
+
       const newZoom = calculateZoomFromRadius(radius);
       mapRef.current.setZoom(newZoom);
       mapRef.current.setCenter(position);
@@ -253,7 +312,20 @@ export const Map = ({
 
       circleRef.current = newCircle;
     }
-  }, [position, radius]);
+  }, [values.location.latitude, values.location.longitude, radius]);
+
+  useEffect(() => {
+    if (initialAddress) {
+      setFieldValue(
+        "location.addressComponents.streetName",
+        initialAddress.streetName || "",
+      );
+      setFieldValue(
+        "location.addressComponents.streetNumber",
+        initialAddress.streetNumber || "",
+      );
+    }
+  }, [initialAddress, setFieldValue]);
 
   if (!isLoaded) {
     return (
@@ -263,8 +335,6 @@ export const Map = ({
     );
   }
 
-  const mapCenter = position || center;
-
   return (
     <div className="flex flex-col h-full max-h-[600px] bg-white rounded-lg">
       <div className="flex h-full">
@@ -273,7 +343,7 @@ export const Map = ({
             Ubicación del servicio
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Busca la calle y confirma el número para ubicarte en el mapa.
+            Busca la dirección donde prestarás el servicio.
           </p>
 
           <div className="space-y-4">
@@ -289,60 +359,27 @@ export const Map = ({
                 </>
               ) : (
                 <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>Usar mi ubicación actual</span>
+                  <FaLocationArrow className="h-4 w-4" />
+                  <span className="text-sm">Usar mi ubicación actual</span>
                 </>
               )}
             </button>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Calle
+                Dirección
               </label>
               <input
                 ref={streetInputRef}
                 type="text"
-                placeholder="Ej. Gran Vía"
+                placeholder="Ej. Calle Simancas 13"
                 className="w-full px-3 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-primary"
-                value={street}
-                onChange={(e) => setStreet(e.target.value)}
+                value={values.location.address}
+                onChange={(e) =>
+                  setFieldValue("location.address", e.target.value)
+                }
               />
             </div>
-
-            {showNumberInput && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Número
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    ref={numberInputRef}
-                    type="text"
-                    placeholder="Ej. 45"
-                    className="w-full px-3 py-2 rounded border border-gray-300 focus:ring-2 focus:ring-primary"
-                    value={streetNumber}
-                    onChange={handleNumberChange}
-                  />
-                  <button
-                    onClick={handleNumberConfirm}
-                    className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition"
-                  >
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -350,20 +387,39 @@ export const Map = ({
           {showMap ? (
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
-              center={mapCenter}
-              onClick={isInteractive ? handleMapClick : undefined}
+              center={{
+                lat: values.location.latitude || location.lat,
+                lng: values.location.longitude || location.lng,
+              }}
+              zoom={calculateZoomFromRadius(radius)}
               onLoad={(map) => {
                 mapRef.current = map;
-                return undefined;
+                if (values.location.latitude && values.location.longitude) {
+                  const position = {
+                    lat: values.location.latitude,
+                    lng: values.location.longitude,
+                  };
+                  map.setCenter(position);
+
+                  if (circleRef.current) {
+                    circleRef.current.setMap(null);
+                  }
+
+                  const newCircle = new google.maps.Circle({
+                    center: position,
+                    radius: radius,
+                    map: map,
+                    fillColor: "#3b82f6",
+                    fillOpacity: 0.2,
+                    strokeColor: "#3b82f6",
+                    strokeWeight: 2,
+                  });
+
+                  circleRef.current = newCircle;
+                }
               }}
               options={{
                 disableDefaultUI: true,
-                zoomControl: isInteractive,
-                streetViewControl: isInteractive,
-                mapTypeControl: isInteractive,
-                fullscreenControl: isInteractive,
-                draggable: isInteractive,
-                scrollwheel: isInteractive,
                 styles: [
                   {
                     featureType: "poi",
@@ -373,10 +429,14 @@ export const Map = ({
                 ],
               }}
             >
-              {position && (
-                <>
-                  <Marker position={position} title="Ubicación seleccionada" />
-                </>
+              {values.location.latitude && values.location.longitude && (
+                <Marker
+                  position={{
+                    lat: values.location.latitude,
+                    lng: values.location.longitude,
+                  }}
+                  title="Ubicación seleccionada"
+                />
               )}
             </GoogleMap>
           ) : (
