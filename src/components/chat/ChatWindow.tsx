@@ -2,7 +2,9 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { useLocation } from "react-router-dom";
+import { IoArrowBack } from "react-icons/io5";
+import { IoSend } from "react-icons/io5";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { Loader } from "@/components/Loader/Loader";
 import { useGetChatMessages } from "@/hooks/api/useChats";
@@ -48,6 +50,7 @@ const messageAnimationStyles = `
 
 export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
   const { user } = useUser();
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -123,6 +126,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
       <style>{messageAnimationStyles}</style>
       <div className="flex flex-col h-full overflow-hidden">
         <div className="flex items-center p-4 border-b border-gray-200 bg-white flex-shrink-0">
+          <button
+            onClick={() => navigate("/messages")}
+            className="md:hidden mr-2 p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <IoArrowBack className="w-5 h-5 text-gray-600" />
+          </button>
           {otherParticipant.profileImageUrl ? (
             <img
               src={otherParticipant.profileImageUrl}
@@ -187,7 +196,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
           <div ref={messagesEndRef} style={{ height: 16 }} />
         </div>
 
-        <div className="border-t p-4 bg-white flex-shrink-0">
+        <div className="border-t border-gray-200 p-4 bg-white flex-shrink-0">
           <form onSubmit={handleSendMessage} className="flex gap-2">
             <input
               type="text"
@@ -199,9 +208,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
             <button
               type="submit"
               disabled={!message.trim()}
-              className="bg-primary text-white px-4 py-2 rounded-lg disabled:opacity-50"
+              className="bg-primary text-white p-2 rounded-lg disabled:opacity-50 hover:bg-primary-dark transition-colors"
             >
-              Enviar
+              <IoSend className="w-5 h-5" />
             </button>
           </form>
         </div>

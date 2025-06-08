@@ -241,7 +241,6 @@ export const ServiceCard: FC<ServiceCardProps> = ({
           </div>
         </div>
 
-        {/* User Info Section */}
         <div className="flex items-center gap-3 mb-4">
           <UserAvatar user={service.user} size="md" />
 
@@ -265,12 +264,10 @@ export const ServiceCard: FC<ServiceCardProps> = ({
           </div>
         </div>
 
-        {/* Description */}
         <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-4">
           {service.description}
         </p>
 
-        {/* Footer Section */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <div
             className="flex items-center gap-4 cursor-pointer group/reviews hover:bg-gray-50 p-2 rounded-lg transition-colors"

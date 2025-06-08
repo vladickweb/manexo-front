@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import { Button, Drawer } from "@mantine/core";
+import { Badge } from "@mantine/core";
 import { motion } from "framer-motion";
 import { SlidersHorizontal } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
@@ -180,9 +181,14 @@ export const SearchPage: React.FC = () => {
             Filtrar
           </Button>
           {activeFiltersCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5 border-2 border-white shadow">
+            <Badge
+              color="red"
+              size="md"
+              radius="xl"
+              className="absolute -top-2 -right-3"
+            >
               {activeFiltersCount}
-            </span>
+            </Badge>
           )}
         </div>
       </div>

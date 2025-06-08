@@ -240,7 +240,6 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
                   <LuX className="w-5 h-5" />
                 </button>
               </div>
-
               {renderStep()}
 
               {currentStep !== "details" && (

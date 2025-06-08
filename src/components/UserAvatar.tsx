@@ -7,7 +7,7 @@ export const UserAvatar = ({
   size = "sm",
 }: {
   user: IUser;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
 }) => {
   if (user.profileImageUrl) {
     return <Avatar src={user.profileImageUrl} size={size} />;

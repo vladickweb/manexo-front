@@ -87,8 +87,8 @@ export const ProfilePage = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
               <div
                 className="relative w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer group overflow-hidden"
                 onClick={handleImageClick}
@@ -148,11 +148,11 @@ export const ProfilePage = () => {
                   disabled={isUploading}
                 />
               </div>
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold">
+              <div className="space-y-2 text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl font-bold">
                   {profile.firstName} {profile.lastName}
                 </h1>
-                <div className="flex items-center space-x-4 text-gray-600">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-gray-600">
                   <div className="flex items-center">
                     <LuMail className="w-4 h-4 mr-2" />
                     {profile.email}
@@ -164,7 +164,7 @@ export const ProfilePage = () => {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-sm text-gray-500">
                   <div className="flex items-center">
                     <LuCalendar className="w-4 h-4 mr-2" />
                     Miembro desde{" "}
@@ -179,7 +179,7 @@ export const ProfilePage = () => {
             </div>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+              className="w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
             >
               Cerrar sesión
             </button>
@@ -189,124 +189,6 @@ export const ProfilePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <AvailabilityManager />
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Mis Servicios</h2>
-            {profile.services && profile.services.length > 0 ? (
-              <div className="space-y-4">
-                {profile.services.map((service) => (
-                  <div
-                    key={service.id}
-                    className="p-4 border rounded-lg hover:border-primary transition-colors"
-                  >
-                    <h3 className="font-medium">{service.title}</h3>
-                    <p className="text-sm text-gray-600">
-                      {service.description}
-                    </p>
-                    <div className="mt-2 flex justify-between items-center">
-                      <span className="text-primary font-medium">
-                        {service.price}€/hora
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {service.isActive ? "Activo" : "Inactivo"}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-600">No tienes servicios publicados</p>
-            )}
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Contratos Activos</h2>
-            {profile.contracts && profile.contracts.length > 0 ? (
-              <div className="space-y-4">
-                {profile.contracts.map((contract) => (
-                  <div
-                    key={contract.id}
-                    className="p-4 border rounded-lg hover:border-primary transition-colors"
-                  >
-                    <h3 className="font-medium">{contract.service.title}</h3>
-                    <p className="text-sm text-gray-600">
-                      {new Date(contract.startDate).toLocaleDateString()} -{" "}
-                      {new Date(contract.endDate).toLocaleDateString()}
-                    </p>
-                    <div className="mt-2 flex justify-between items-center">
-                      <span className="text-primary font-medium">
-                        {contract.totalPrice}€
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {contract.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-600">No tienes contratos activos</p>
-            )}
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Reseñas Recibidas</h2>
-            {profile.reviews && profile.reviews.length > 0 ? (
-              <div className="space-y-4">
-                {profile.reviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className="p-4 border rounded-lg hover:border-primary transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center">
-                        <span className="text-2xl mr-2">⭐</span>
-                        <span className="font-medium">{review.rating}/5</span>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p className="text-gray-600">{review.comment}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-600">No tienes reseñas aún</p>
-            )}
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Servicios Favoritos</h2>
-            {profile.favorites && profile.favorites.length > 0 ? (
-              <div className="space-y-4">
-                {profile.favorites.map((favorite) => (
-                  <div
-                    key={favorite.id}
-                    className="p-4 border rounded-lg hover:border-primary transition-colors"
-                  >
-                    <h3 className="font-medium">
-                      {favorite.service.description}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {favorite.service.description}
-                    </p>
-                    <div className="mt-2 flex justify-between items-center">
-                      <span className="text-primary font-medium">
-                        {favorite.service.price}€/hora
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {favorite.service.user.firstName}{" "}
-                        {favorite.service.user.lastName}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-600">No tienes servicios favoritos</p>
-            )}
           </div>
         </div>
       </div>
