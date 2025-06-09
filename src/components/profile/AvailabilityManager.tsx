@@ -82,7 +82,6 @@ export const AvailabilityManager: FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex items-center gap-2">
         <CalendarDays className="w-7 h-7 text-primary" />
         <h2 className="text-3xl font-bold text-gray-900">
@@ -110,7 +109,7 @@ export const AvailabilityManager: FC = () => {
                         className={`bg-white rounded-2xl shadow-lg p-5 flex flex-col justify-between transform transition ${
                           isDisabled
                             ? "opacity-60 grayscale"
-                            : "hover:scale-105"
+                            : "hover:bg-gray-50"
                         }`}
                       >
                         <div className="flex items-center justify-between mb-4">

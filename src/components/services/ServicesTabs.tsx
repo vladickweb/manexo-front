@@ -112,7 +112,6 @@ export const ServicesTabs = () => {
           </p>
         </div>
         <div className="flex flex-col md:flex-row md:items-center gap-3 w-full md:w-auto">
-          {/* Dropdown en mobile */}
           <div className="md:hidden order-1">
             <Menu shadow="md" width={220} position="bottom-start">
               <Menu.Target>
@@ -134,7 +133,6 @@ export const ServicesTabs = () => {
             </Menu>
           </div>
 
-          {/* Tabs animadas en desktop */}
           <div className="hidden md:flex rounded-lg bg-gray-100 p-1 relative overflow-x-auto flex-nowrap scrollbar-hide max-w-full order-1 md:order-none">
             {Object.entries(VIEW_LABELS).map(([view, { title }]) => (
               <button
@@ -176,7 +174,6 @@ export const ServicesTabs = () => {
         </div>
       </div>
 
-      {/* Contenido de las tabs con animación de opacidad */}
       <motion.div
         key={activeView}
         variants={fadeVariants}
