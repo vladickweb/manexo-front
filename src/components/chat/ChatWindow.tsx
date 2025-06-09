@@ -6,7 +6,7 @@ import { IoArrowBack } from "react-icons/io5";
 import { IoSend } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { Loader } from "@/components/Loader/Loader";
+import { ChatWindowSkeleton } from "@/components/chat/ChatWindowSkeleton";
 import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal";
 import { useGetChatMessages } from "@/hooks/api/useChats";
 import { useChatSocket } from "@/hooks/useChatSocket";
@@ -120,7 +120,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
   );
 
   if (isLoading) {
-    return <Loader />;
+    return <ChatWindowSkeleton />;
   }
 
   return (

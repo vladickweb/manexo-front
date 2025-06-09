@@ -4,9 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { LuLoader } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Loader } from "@/components/Loader/Loader";
 import { QueryKeys } from "@/constants/queryKeys";
 import { useGetContract } from "@/hooks/api/useGetContract";
+import { ContractSuccessSkeleton } from "@/pages/contracts/[id]/ContractSuccessSkeleton";
 
 export const ContractSuccessPage = () => {
   const { id } = useParams();
@@ -19,7 +19,7 @@ export const ContractSuccessPage = () => {
   }, [queryClient]);
 
   if (isLoading) {
-    return <Loader />;
+    return <ContractSuccessSkeleton />;
   }
 
   return (

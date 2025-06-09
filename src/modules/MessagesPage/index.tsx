@@ -5,15 +5,15 @@ import { useParams } from "react-router-dom";
 
 import { ChatList } from "@/components/chat/ChatList";
 import { ChatWindow } from "@/components/chat/ChatWindow";
-import { Loader } from "@/components/Loader/Loader";
 import { useGetChat, useGetChats } from "@/hooks/api/useChats";
 import { useChatSocket } from "@/hooks/useChatSocket";
+import { MessagesSkeleton } from "@/modules/MessagesPage/MessagesSkeleton";
 
 export const MessagesPage = () => {
   const { chatId } = useParams();
   const [isMobileView, setIsMobileView] = useState(false);
   const { data: chats, isLoading: isLoadingChats } = useGetChats();
-  const { data: chat } = useGetChat(chatId || "");
+  const { data: chat, isLoading: isLoadingChat } = useGetChat(chatId || "");
   const { initializeLastMessages } = useChatSocket();
 
   useEffect(() => {
@@ -32,8 +32,8 @@ export const MessagesPage = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  if (isLoadingChats) {
-    return <Loader />;
+  if (isLoadingChats || isLoadingChat) {
+    return <MessagesSkeleton />;
   }
 
   if (!chats || chats.length === 0) {

@@ -10,7 +10,6 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 
 import Logo from "@/assets/manexo-logo.svg?react";
-import { Loader } from "@/components/Loader/Loader";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
@@ -61,7 +60,7 @@ interface MainLayoutProps {
 export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
   const { hasUnreadMessages } = useUnreadMessages();
 
   const handleNavigation = useCallback(
@@ -125,10 +124,6 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
       )),
     [handleNavigation, isActivePath, hasUnreadMessages],
   );
-
-  if (isLoading) {
-    return <Loader />;
-  }
 
   if (!user) {
     return null;

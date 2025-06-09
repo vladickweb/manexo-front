@@ -4,7 +4,7 @@ import { addWeeks, startOfWeek } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { LuArrowLeft, LuArrowRight, LuLoader, LuX } from "react-icons/lu";
 
-import { Loader } from "@/components/Loader/Loader";
+import { ServiceDetailsSkeleton } from "@/components/services/ServiceDetailsModal/ServiceDetailsSkeleton";
 import { useCreateChat } from "@/hooks/api/useChats";
 import { useCreateContract } from "@/hooks/api/useCreateContract";
 import { useGetServiceAvailability } from "@/hooks/api/useGetServiceAvailability";
@@ -208,8 +208,6 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
     isLoadingAvailability,
   ]);
 
-  if (isLoadingService) return <Loader />;
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -243,7 +241,8 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
                   <LuX className="w-5 h-5" />
                 </button>
               </div>
-              {renderStep()}
+
+              {isLoadingService ? <ServiceDetailsSkeleton /> : renderStep()}
 
               {currentStep !== "details" && (
                 <div className="mt-8 flex justify-between">

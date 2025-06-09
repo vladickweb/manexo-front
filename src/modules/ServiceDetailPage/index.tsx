@@ -1,14 +1,14 @@
 import { useParams } from "react-router-dom";
 
-import { Loader } from "@/components/Loader/Loader";
 import { useGetServicesById } from "@/hooks/api/useGetServicesById";
+import { ServiceDetailSkeleton } from "@/modules/ServiceDetailPage/ServiceDetailSkeleton";
 
 export const ServiceDetailPage = () => {
   const { id } = useParams();
   const { data: service, isLoading } = useGetServicesById(Number(id));
 
   if (isLoading) {
-    return <Loader />;
+    return <ServiceDetailSkeleton />;
   }
 
   if (!service) {
