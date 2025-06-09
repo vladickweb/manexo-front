@@ -1,11 +1,11 @@
 
 <div align="center">
-  <img src="public/manexo-logo.svg" alt="Menexo Logo" width="200"/>
+  <img src="public/manexo-logo.svg" alt="Manexo Logo" width="200"/>
   <br/>
   <p><i>Conectando personas con los mejores servicios profesionales</i></p>
 </div>
 
-# Menexo - Plataforma de Servicios Profesionales
+# Manexo - Plataforma de Servicios Profesionales
 
 
 ## 🚀 Características
@@ -36,8 +36,8 @@
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/menexo-front.git
-   cd menexo-front
+   git clone https://github.com/tu-usuario/manexo-front.git
+   cd manexo-front
    ```
 
 2. Instala las dependencias:
@@ -59,7 +59,7 @@
 ## 📁 Estructura del Proyecto
 
 ```
-menexo-front/
+manexo-front/
 ├── public/                  # Archivos estáticos
 ├── src/
 │   ├── api/                 # Cliente Axios y configuración

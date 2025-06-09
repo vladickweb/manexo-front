@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Logo from "@/assets/manexo-logo.svg?react";
 import { ActionButton } from "@/components/ActionButton/ActionButton";
@@ -8,20 +8,47 @@ import { LoginModal } from "@/components/Login/LoginModal";
 export const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
 
   return (
-    <header className="bg-white shadow">
-      <div className="container mx-auto px-4 py-6 flex items-center justify-between">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white/80 backdrop-blur-md shadow-md" : "bg-transparent"
+      }`}
+    >
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Logo className="h-16 w-auto" />
+          <div className="relative">
+            <div
+              className={`absolute inset-0 bg-white/20 blur-xl rounded-full transform scale-150 transition-opacity duration-300 ${
+                isScrolled ? "opacity-0" : "opacity-100"
+              }`}
+            />
+            <Logo
+              className={`w-auto transition-all duration-300 relative ${
+                isScrolled ? "h-12" : "h-24"
+              } ${isScrolled ? "text-gray-800" : "text-white"}`}
+            />
+          </div>
         </div>
 
         <div className="md:hidden">
           <button onClick={toggleMenu} className="focus:outline-none">
             <svg
-              className="h-8 w-8 text-gray-800"
+              className={`h-8 w-8 transition-colors duration-300 ${
+                isScrolled ? "text-gray-800" : "text-white"
+              }`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -47,14 +74,44 @@ export const Header = () => {
         </div>
 
         <nav className="hidden md:flex items-center space-x-6">
-          <ActionButton href="#features">Servicios</ActionButton>
-          <ActionButton href="#about">Acerca</ActionButton>
-          <ActionButton href="#contact">Contacto</ActionButton>
+          <ActionButton
+            href="#features"
+            className={`transition-colors duration-300 ${
+              isScrolled
+                ? "text-gray-800 hover:text-gray-600"
+                : "text-white hover:text-gray-200"
+            }`}
+          >
+            Servicios
+          </ActionButton>
+          <ActionButton
+            href="#about"
+            className={`transition-colors duration-300 ${
+              isScrolled
+                ? "text-gray-800 hover:text-gray-600"
+                : "text-white hover:text-gray-200"
+            }`}
+          >
+            Acerca
+          </ActionButton>
+          <ActionButton
+            href="#contact"
+            className={`transition-colors duration-300 ${
+              isScrolled
+                ? "text-gray-800 hover:text-gray-600"
+                : "text-white hover:text-gray-200"
+            }`}
+          >
+            Contacto
+          </ActionButton>
           <Button
             onClick={() => {
               setIsLoginModalOpen(true);
               setMenuOpen(false);
             }}
+            className={
+              isScrolled ? "" : "bg-white text-gray-800 hover:bg-gray-100"
+            }
           >
             Iniciar Sesión
           </Button>
@@ -62,18 +119,41 @@ export const Header = () => {
       </div>
 
       {menuOpen && (
-        <nav className="md:hidden bg-white shadow">
+        <nav
+          className={`md:hidden transition-colors duration-300 ${
+            isScrolled ? "bg-white/95" : "bg-black/95"
+          } backdrop-blur-md shadow-lg`}
+        >
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-            <ActionButton href="#features" onClick={() => setMenuOpen(false)}>
+            <ActionButton
+              href="#features"
+              onClick={() => setMenuOpen(false)}
+              className={isScrolled ? "text-gray-800" : "text-white"}
+            >
               Servicios
             </ActionButton>
-            <ActionButton href="#about" onClick={() => setMenuOpen(false)}>
+            <ActionButton
+              href="#about"
+              onClick={() => setMenuOpen(false)}
+              className={isScrolled ? "text-gray-800" : "text-white"}
+            >
               Acerca
             </ActionButton>
-            <ActionButton href="#contact" onClick={() => setMenuOpen(false)}>
+            <ActionButton
+              href="#contact"
+              onClick={() => setMenuOpen(false)}
+              className={isScrolled ? "text-gray-800" : "text-white"}
+            >
               Contacto
             </ActionButton>
-            <Button onClick={() => setMenuOpen(false)}>Iniciar Sesión</Button>
+            <Button
+              onClick={() => setMenuOpen(false)}
+              className={
+                isScrolled ? "" : "bg-white text-gray-800 hover:bg-gray-100"
+              }
+            >
+              Iniciar Sesión
+            </Button>
           </div>
         </nav>
       )}
