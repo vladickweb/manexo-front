@@ -49,7 +49,8 @@ export const Header = () => {
                   MozOsxFontSmoothing: "grayscale",
                   textRendering: "optimizeLegibility",
                   fontFamily:
-                    "Stheiti, 'STHeiti', 'Heiti TC', 'Heiti SC', 'Heiti', sans-serif",
+                    "STHeiti, 'STHeiti', 'Stheiti', 'Heiti TC', 'Heiti SC', 'Heiti', sans-serif",
+                  fontWeight: "normal",
                 }}
                 preserveAspectRatio="xMidYMid meet"
               />

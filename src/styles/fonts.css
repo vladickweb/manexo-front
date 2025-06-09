@@ -1,6 +1,8 @@
 @font-face {
   font-family: STHeiti;
   src: url('../assets/fonts/stheiti-regular.ttf') format('truetype'),
+       url('../assets/fonts/stheiti-regular.woff2') format('woff2'),
+       url('../assets/fonts/stheiti-regular.woff') format('woff'),
        local('STHeiti'),
        local('Stheiti'),
        local('Heiti TC'),
@@ -8,5 +10,5 @@
        local('Heiti');
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 } 
