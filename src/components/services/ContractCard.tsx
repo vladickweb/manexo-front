@@ -56,7 +56,7 @@ export const ContractCard = ({ contract, isProvider }: ContractCardProps) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-4">
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center space-x-3">
