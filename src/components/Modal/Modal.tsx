@@ -49,7 +49,7 @@ export const Modal = ({
           onClick={onClose}
           aria-label="Close modal"
         >
-          <X className="h-6 w-6" />
+          <X className="h-6 w-6 z-50" />
         </button>
         <div className="flex-none w-full">
           {title && (
