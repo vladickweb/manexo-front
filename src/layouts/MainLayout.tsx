@@ -64,16 +64,12 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
   const { hasUnreadMessages } = useUnreadMessages();
 
   const handleNavigation = useCallback(
-    (path: string) => {
-      navigate(path);
-    },
+    (path: string) => navigate(path),
     [navigate],
   );
 
   const isActivePath = useCallback(
-    (path: string) => {
-      return location.pathname.startsWith(path);
-    },
+    (path: string) => location.pathname.startsWith(path),
     [location.pathname],
   );
 
@@ -125,13 +121,11 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
     [handleNavigation, isActivePath, hasUnreadMessages],
   );
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10 h-16 flex items-center">
+      <header className="fixed top-0 left-0 right-0 z-10 h-16 pt-[env(safe-area-inset-top)] bg-white shadow-sm flex items-center">
         <div className="container mx-auto px-4 flex justify-between items-center h-full">
           <button
             onClick={() => handleNavigation("/search")}
@@ -147,7 +141,7 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
         <div className="container mx-auto px-4 h-full">{children}</div>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-10 pb-[env(safe-area-inset-bottom)]">
+      <nav className="fixed bottom-0 left-0 right-0 z-10 bg-white border-t border-gray-200 md:hidden pb-[env(safe-area-inset-bottom)]">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-3">
             {renderMobileNavItems}

@@ -337,8 +337,8 @@ export const Map = ({
 
   return (
     <div className="flex flex-col h-full max-h-[600px] bg-white rounded-lg">
-      <div className="flex h-full">
-        <div className="w-1/3 p-5 bg-white border-r border-gray-200">
+      <div className="flex flex-col md:flex-row h-full">
+        <div className="w-full md:w-1/3 p-4 md:p-5 bg-white md:border-r border-b md:border-b-0 border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 mb-2">
             Ubicación del servicio
           </h2>
@@ -383,10 +383,14 @@ export const Map = ({
           </div>
         </div>
 
-        <div className="w-2/3 relative">
+        <div className="w-full md:w-2/3 relative h-[300px] md:h-auto">
           {showMap ? (
             <GoogleMap
-              mapContainerStyle={mapContainerStyle}
+              mapContainerStyle={{
+                ...mapContainerStyle,
+                height: "100%",
+                minHeight: "300px",
+              }}
               center={{
                 lat: values.location.latitude || location.lat,
                 lng: values.location.longitude || location.lng,
