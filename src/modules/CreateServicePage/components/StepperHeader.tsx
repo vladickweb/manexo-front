@@ -19,7 +19,7 @@ export const StepperHeader = ({ currentStep }: StepperHeaderProps) => (
                   />
                 </div>
               )}
-              <div className="relative z-10 flex flex-col items-center">
+              <div className="relative flex flex-col items-center">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                     index < currentStep
