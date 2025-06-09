@@ -1,133 +1,138 @@
-import { FC, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import {
-  LuCalendar,
-  LuClock,
-  LuEuro,
-  LuMapPin,
-  LuMessageSquare,
-  LuStar,
-} from "react-icons/lu";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { Calendar, Clock, MapPin, Star, User } from "lucide-react";
+import { LuMessageSquare, LuStar } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
-import { UserAvatar } from "@/components/UserAvatar";
-import { Contract } from "@/hooks/api/useCreateContract";
+import { Contract } from "@/hooks/api/useGetMyContracts";
 
 import { CreateReviewModal } from "./CreateReviewModal";
 
 interface ContractCardProps {
   contract: Contract;
+  isProvider: boolean;
 }
 
-export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
+export const ContractCard = ({ contract, isProvider }: ContractCardProps) => {
   const navigate = useNavigate();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const otherUser = isProvider ? contract.client : contract.provider;
+  const booking = contract.bookings[0];
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+  const { service } = useMemo(() => contract, [contract]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
-  const { service, provider, bookings, amount } = useMemo(
-    () => contract,
-    [contract],
-  );
-
-  const sortedBookings = useMemo(
-    () =>
-      [...bookings].sort((a, b) => {
-        const dateA = new Date(`${a.date}T${a.startTime}`);
-        const dateB = new Date(`${b.date}T${b.startTime}`);
-        return dateA.getTime() - dateB.getTime();
-      }),
-    [bookings],
-  );
-
-  const firstBooking = useMemo(() => sortedBookings[0], [sortedBookings]);
-
-  const earliestStartTime = useMemo(
-    () =>
-      sortedBookings.reduce(
-        (earliest, booking) =>
-          booking.startTime < earliest ? booking.startTime : earliest,
-        sortedBookings[0].startTime,
-      ),
-    [sortedBookings],
-  );
-
-  const latestEndTime = useMemo(
-    () =>
-      sortedBookings.reduce(
-        (latest, booking) =>
-          booking.endTime > latest ? booking.endTime : latest,
-        sortedBookings[0].endTime,
-      ),
-    [sortedBookings],
-  );
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "Pagado";
+      case "pending":
+        return "Pendiente";
+      case "cancelled":
+        return "Cancelado";
+      default:
+        return status;
+    }
+  };
 
   if (!contract?.service || !contract?.bookings?.length) {
     return null;
   }
+
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <UserAvatar user={provider} size="lg" />
-            <div>
-              <h3 className="font-semibold">
-                {provider.firstName} {provider.lastName}
-              </h3>
-              <p className="text-sm text-gray-500">
-                {service.subcategory?.name || "Servicio"}
-              </p>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="p-4">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">
+                  {otherUser.firstName} {otherUser.lastName}
+                </h3>
+                <p className="text-sm text-gray-500">{otherUser.email}</p>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-gray-600">{service.description}</p>
-
-          {service.user.location && (
-            <div className="flex items-center text-sm text-gray-500">
-              <LuMapPin className="mr-1 h-4 w-4" />
-              <span>{service.user.location.address}</span>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center text-gray-500">
-              <LuCalendar className="mr-1 h-4 w-4" />
-              <span>{formatDate(firstBooking.date)}</span>
-            </div>
-            <div className="flex items-center text-gray-500">
-              <LuClock className="mr-1 h-4 w-4" />
-              <span>{`${earliestStartTime} - ${latestEndTime}`}</span>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center space-x-2">
-              <LuEuro className="h-4 w-4 text-gray-500" />
-              <span className="text-lg font-semibold">{amount}€</span>
-              <span className="text-sm text-gray-500">total</span>
-            </div>
-            <span className="text-sm text-gray-500">
-              {bookings.length} {bookings.length === 1 ? "sesión" : "sesiones"}
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                contract.status,
+              )}`}
+            >
+              {getStatusText(contract.status)}
             </span>
           </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center text-sm text-gray-600">
+              <Calendar className="w-4 h-4 mr-2" />
+              <span>
+                {format(new Date(booking.date), "EEEE d 'de' MMMM", {
+                  locale: es,
+                })}
+              </span>
+            </div>
+
+            <div className="flex items-center text-sm text-gray-600">
+              <Clock className="w-4 h-4 mr-2" />
+              <span>
+                {booking.startTime} - {booking.endTime}
+              </span>
+            </div>
+
+            <div className="flex items-center text-sm text-gray-600">
+              <MapPin className="w-4 h-4 mr-2" />
+              <span>{contract.service.subcategory.name}</span>
+            </div>
+
+            {contract.service.reviews.length > 0 && (
+              <div className="flex items-center text-sm text-gray-600">
+                <Star className="w-4 h-4 mr-2 text-yellow-400" />
+                <span>
+                  {(
+                    contract.service.reviews.reduce(
+                      (acc, review) => acc + review.rating,
+                      0,
+                    ) / contract.service.reviews.length
+                  ).toFixed(1)}{" "}
+                  ({contract.service.reviews.length} reseñas)
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Precio acordado</span>
+              <span className="font-medium text-gray-900">
+                {contract.agreedPrice}€
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t">
-          <div className="flex items-center gap-3 w-full justify-between">
+        <div className="bg-gray-50 px-4 py-3 border-t border-gray-100">
+          <div className="flex items-center justify-between gap-3">
             <Button
               variant="secondary"
               onClick={() => navigate(`/contracts/${contract.id}`)}
-              className="flex items-center"
+              className="flex-1 flex items-center justify-center"
             >
               <LuMessageSquare className="mr-2 h-4 w-4" />
               Ver contrato
@@ -136,13 +141,13 @@ export const ContractCard: FC<ContractCardProps> = ({ contract }) => {
               <Button
                 variant="primary"
                 onClick={() => setIsReviewModalOpen(true)}
-                className="flex items-center"
+                className="flex-1 flex items-center justify-center"
               >
                 <LuStar className="mr-2 h-4 w-4" />
                 Dejar review
               </Button>
             ) : (
-              <span className="text-sm text-gray-500 font-semibold bg-green-100 px-2 py-1 rounded-full">
+              <span className="flex-1 text-sm text-gray-500 font-semibold bg-green-100 px-4 py-2 rounded-lg text-center">
                 Evaluado
               </span>
             )}

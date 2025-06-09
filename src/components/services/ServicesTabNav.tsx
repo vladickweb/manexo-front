@@ -1,33 +1,36 @@
 import React from "react";
 
-type Props = {
-  activeTab: "offered" | "contracted";
-  onTabChange: (tab: "offered" | "contracted") => void;
-};
+interface Tab {
+  id: string;
+  label: string;
+}
 
-export const ServicesTabNav: React.FC<Props> = ({ activeTab, onTabChange }) => (
-  <div className="border-b border-gray-200">
-    <nav className="-mb-px flex space-x-8">
-      <button
-        onClick={() => onTabChange("offered")}
-        className={`${
-          activeTab === "offered"
-            ? "border-primary text-primary"
-            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-      >
-        Servicios Ofrecidos
-      </button>
-      <button
-        onClick={() => onTabChange("contracted")}
-        className={`${
-          activeTab === "contracted"
-            ? "border-primary text-primary"
-            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-      >
-        Contratos
-      </button>
-    </nav>
-  </div>
-);
+interface ServicesTabNavProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  tabs: Tab[];
+}
+
+export const ServicesTabNav = ({
+  activeTab,
+  onTabChange,
+  tabs,
+}: ServicesTabNavProps) => {
+  return (
+    <div className="flex space-x-4 border-b border-gray-200">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => onTabChange(tab.id)}
+          className={`px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === tab.id
+              ? "border-b-2 border-primary text-primary"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+};
