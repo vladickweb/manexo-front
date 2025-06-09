@@ -1,6 +1,18 @@
+import { useState } from "react";
+
+import { useNavigate } from "react-router-dom";
+
 import { Button } from "@/components/Button/Button";
+import { LoginModal } from "@/components/Login/LoginModal";
 
 export const Hero = () => {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleServicesClick = () => {
+    navigate("/#services");
+  };
+
   return (
     <section className="relative h-[100dvh] w-full overflow-hidden pt-24 md:pt-16">
       <div className="absolute inset-0">
@@ -28,12 +40,14 @@ export const Hero = () => {
                 variant="primary"
                 filled
                 className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
+                onClick={() => setIsLoginModalOpen(true)}
               >
                 Comienza ahora
               </Button>
               <Button
                 variant="secondary"
                 className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
+                onClick={handleServicesClick}
               >
                 Ver servicios
               </Button>
@@ -41,6 +55,8 @@ export const Hero = () => {
           </div>
         </div>
       </div>
+
+      <LoginModal isOpen={isLoginModalOpen} setIsOpen={setIsLoginModalOpen} />
     </section>
   );
 };

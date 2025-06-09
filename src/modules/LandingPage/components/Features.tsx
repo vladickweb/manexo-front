@@ -53,7 +53,7 @@ const features: Feature[] = [
 export const Features = () => {
   return (
     <section
-      id="features"
+      id="services"
       className="relative py-32 overflow-hidden mt-20 rounded-lg"
     >
       {/* Fondo decorativo */}

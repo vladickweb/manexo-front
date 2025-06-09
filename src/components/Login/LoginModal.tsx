@@ -31,41 +31,47 @@ export const LoginModal = ({ isOpen, setIsOpen }: LoginModalProps) => {
     };
   }, [isOpen]);
 
-  if (!mounted) return null;
+  if (!mounted || !isOpen) return null;
 
   const modalContent = (
-    <Modal
-      isOpen={isOpen}
-      onClose={() => setIsOpen(false)}
-      containerClassName="fixed inset-0 w-full h-full md:w-11/12 md:max-w-2xl md:h-auto md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 overflow-y-auto bg-white rounded-lg"
-    >
-      <div className="sticky top-0 bg-white z-10 mb-6 flex border-b">
-        <button
-          className={`flex-1 py-2 text-center font-semibold ${
-            activeTab === "login"
-              ? "border-b-2 border-primary text-primary"
-              : "text-gray-600"
-          }`}
-          onClick={() => setActiveTab("login")}
-        >
-          Iniciar Sesión
-        </button>
-        <button
-          className={`flex-1 py-2 text-center font-semibold ${
-            activeTab === "signup"
-              ? "border-b-2 border-primary text-primary"
-              : "text-gray-600"
-          }`}
-          onClick={() => setActiveTab("signup")}
-        >
-          Registrarse
-        </button>
-      </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="fixed inset-0 bg-black/50"
+        onClick={() => setIsOpen(false)}
+      />
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        containerClassName="relative w-11/12 max-w-2xl bg-white rounded-lg overflow-hidden mt-16 md:mt-0"
+      >
+        <div className="sticky top-0 bg-white z-10 mb-6 flex border-b">
+          <button
+            className={`flex-1 py-2 text-center font-semibold ${
+              activeTab === "login"
+                ? "border-b-2 border-primary text-primary"
+                : "text-gray-600"
+            }`}
+            onClick={() => setActiveTab("login")}
+          >
+            Iniciar Sesión
+          </button>
+          <button
+            className={`flex-1 py-2 text-center font-semibold ${
+              activeTab === "signup"
+                ? "border-b-2 border-primary text-primary"
+                : "text-gray-600"
+            }`}
+            onClick={() => setActiveTab("signup")}
+          >
+            Registrarse
+          </button>
+        </div>
 
-      <div className="overflow-y-auto">
-        {activeTab === "login" ? <LoginForm /> : <SignupForm />}
-      </div>
-    </Modal>
+        <div className="overflow-y-auto">
+          {activeTab === "login" ? <LoginForm /> : <SignupForm />}
+        </div>
+      </Modal>
+    </div>
   );
 
   return createPortal(modalContent, document.body);
