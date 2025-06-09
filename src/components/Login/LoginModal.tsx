@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { LoginForm } from "@/components/Login/LoginForm";
 import { SignupForm } from "@/components/Login/SignupForm";
@@ -12,13 +12,25 @@ interface LoginModalProps {
 export const LoginModal = ({ isOpen, setIsOpen }: LoginModalProps) => {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={() => setIsOpen(false)}
-      containerClassName="w-11/12 max-w-2xl"
+      containerClassName="w-11/12 max-w-2xl h-[90vh] md:h-auto overflow-y-auto"
     >
-      <div className="mb-6 flex border-b">
+      <div className="sticky top-0 bg-white z-10 mb-6 flex border-b">
         <button
           className={`flex-1 py-2 text-center font-semibold ${
             activeTab === "login"
@@ -41,7 +53,9 @@ export const LoginModal = ({ isOpen, setIsOpen }: LoginModalProps) => {
         </button>
       </div>
 
-      {activeTab === "login" ? <LoginForm /> : <SignupForm />}
+      <div className="overflow-y-auto">
+        {activeTab === "login" ? <LoginForm /> : <SignupForm />}
+      </div>
     </Modal>
   );
 };
