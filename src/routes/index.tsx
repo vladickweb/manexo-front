@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
+import { AuthSuccess } from "@/components/Login/AuthSuccess";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PublicRoute } from "@/components/PublicRoute";
 import { ServicesTabs } from "@/components/services/ServicesTabs";
@@ -20,7 +21,6 @@ import "react-toastify/dist/ReactToastify.css";
 export const AppRoutes = () => {
   return (
     <Routes>
-      {/* Rutas públicas */}
       <Route
         path="/"
         element={
@@ -30,7 +30,15 @@ export const AppRoutes = () => {
         }
       />
 
-      {/* Rutas protegidas envueltas con MainLayout y UnreadMessagesProvider */}
+      <Route
+        path="/auth/success"
+        element={
+          <PublicRoute>
+            <AuthSuccess />
+          </PublicRoute>
+        }
+      />
+
       <Route
         path="/*"
         element={

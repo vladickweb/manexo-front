@@ -240,7 +240,7 @@ export const Map = ({
               onLocationSelect(lat, lng, address);
             }
           } catch (error) {
-            console.error("Error al obtener la dirección:", error);
+            console.error("Error getting address:", error);
             onLocationSelect(lat, lng, {
               streetName: "",
               streetNumber: "",

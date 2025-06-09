@@ -178,7 +178,7 @@ export class WebSocketService {
           }
         });
       } catch (error) {
-        console.error("Error al conectar:", error);
+        console.error("Error connecting:", error);
         this.isConnecting = false;
         this.emitConnectionEvent("error");
       }

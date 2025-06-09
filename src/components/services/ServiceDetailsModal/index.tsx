@@ -157,7 +157,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
 
       window.location.href = response.paymentUrl;
     } catch (error) {
-      console.error("Error al crear el contrato:", error);
+      console.error("Error creating contract:", error);
     } finally {
       setIsProcessing(false);
     }

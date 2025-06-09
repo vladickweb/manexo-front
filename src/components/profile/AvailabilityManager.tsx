@@ -56,7 +56,7 @@ export const AvailabilityManager: FC = () => {
     try {
       await batchUpdate({ availabilities: values.availabilities });
     } catch (error) {
-      console.error("Error al guardar disponibilidades:", error);
+      console.error("Error saving availabilities:", error);
     }
   };
 
