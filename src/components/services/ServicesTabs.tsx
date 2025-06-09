@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
-import { Loader } from "@/components/Loader/Loader";
+import { ServicesSkeleton } from "@/components/services/ServicesSkeleton";
 import { Contract } from "@/hooks/api/useCreateContract";
 import { useGetMyContracts } from "@/hooks/api/useGetMyContracts";
 import { useGetServicesMePublished } from "@/hooks/api/useGetServicesMePublished";
@@ -98,7 +98,7 @@ export const ServicesTabs = () => {
   };
   const fadeTransition = { duration: 0.3 };
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <ServicesSkeleton />;
 
   return (
     <div className="space-y-6 pt-6">

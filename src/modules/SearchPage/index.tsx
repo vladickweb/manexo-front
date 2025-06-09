@@ -8,7 +8,6 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { useInView } from "react-intersection-observer";
 
 import { ServiceFilters } from "@/components/Filters/ServiceFilters";
-import { Loader } from "@/components/Loader/Loader";
 import { LocationRequest } from "@/components/Location/LocationRequest";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { useGetServicesInfinite } from "@/hooks/api/useGetServicesInfinite";
@@ -16,6 +15,7 @@ import {
   useCreateUserLocation,
   useUpdateUserLocation,
 } from "@/hooks/api/useUserLocation";
+import { ServiceCardSkeleton } from "@/modules/SearchPage/ServiceCardSkeleton";
 import { useUser } from "@/stores/useUser";
 
 const initialFilters = {
@@ -231,7 +231,11 @@ export const SearchPage: React.FC = () => {
 
       <main className="container mx-auto px-4 py-8">
         {loadingServices && !pages ? (
-          <Loader />
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <ServiceCardSkeleton key={idx} />
+            ))}
+          </div>
         ) : services.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -248,16 +252,21 @@ export const SearchPage: React.FC = () => {
         ) : (
           <>
             <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {services.map((svc) => {
-                return (
-                  <ServiceCard
-                    key={svc.id}
-                    service={svc}
-                    showDistance={true}
-                    showFavoriteButton={true}
-                  />
-                );
-              })}
+              {services.map((svc) => (
+                <ServiceCard
+                  key={svc.id}
+                  service={svc}
+                  showDistance={true}
+                  showFavoriteButton={true}
+                />
+              ))}
+              {isFetchingNextPage && (
+                <>
+                  <ServiceCardSkeleton key="skeleton-1" />
+                  <ServiceCardSkeleton key="skeleton-2" />
+                  <ServiceCardSkeleton key="skeleton-3" />
+                </>
+              )}
             </div>
             <div ref={ref} className="h-1" />
           </>

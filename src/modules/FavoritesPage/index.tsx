@@ -1,9 +1,9 @@
 import { FaHeart } from "react-icons/fa";
 
-import { Loader } from "@/components/Loader/Loader";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { useGetFavorites } from "@/hooks/api/useFavorites";
 import { useGetUser } from "@/hooks/api/useGetUser";
+import { FavoritesSkeleton } from "@/modules/FavoritesPage/FavoritesSkeleton";
 
 export const FavoritesPage = () => {
   const { data: user, isLoading: userLoading } = useGetUser();
@@ -13,7 +13,7 @@ export const FavoritesPage = () => {
   );
 
   if (userLoading || favLoading) {
-    return <Loader />;
+    return <FavoritesSkeleton />;
   }
 
   return (

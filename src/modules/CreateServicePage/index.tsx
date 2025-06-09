@@ -190,7 +190,11 @@ export const CreateServicePage = () => {
   );
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    );
   }
 
   if (!hasActiveAvailability) {
