@@ -32,7 +32,11 @@ export const ContractedServicesTab: React.FC<ContractedProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {userContracts.map((contract) => (
-        <ContractCard key={contract.id} contract={contract} />
+        <ContractCard
+          key={contract.id}
+          contract={contract}
+          isProvider={false}
+        />
       ))}
     </div>
   );

@@ -7,6 +7,7 @@ import { IoSend } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { Loader } from "@/components/Loader/Loader";
+import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal";
 import { useGetChatMessages } from "@/hooks/api/useChats";
 import { useChatSocket } from "@/hooks/useChatSocket";
 import { useUser } from "@/stores/useUser";
@@ -53,6 +54,7 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const [isServiceDetailsOpen, setIsServiceDetailsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -146,10 +148,16 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
               </span>
             </div>
           )}
-          <div className="ml-3">
+          <div className="ml-3 flex-1">
             <h2 className="text-sm font-medium text-gray-900">
               {`${otherParticipant.firstName.charAt(0).toUpperCase() + otherParticipant.firstName.slice(1)} ${otherParticipant.lastName.charAt(0).toUpperCase() + otherParticipant.lastName.slice(1)}`}
             </h2>
+            <button
+              onClick={() => setIsServiceDetailsOpen(true)}
+              className="text-xs text-primary hover:text-primary-dark transition-colors"
+            >
+              Ver detalles del servicio
+            </button>
           </div>
         </div>
 
@@ -215,6 +223,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
           </form>
         </div>
       </div>
+      <ServiceDetailsModal
+        isOpen={isServiceDetailsOpen}
+        onClose={() => setIsServiceDetailsOpen(false)}
+        serviceId={chat.service.id}
+        showSendMessageButton={false}
+      />
     </>
   );
 };

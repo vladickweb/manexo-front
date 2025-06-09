@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import axiosClient from "@/api/axiosClient";
 import { QueryKeys } from "@/constants/queryKeys";
+import { Contract } from "@/hooks/api/useCreateContract";
 
 export interface User {
   id: number;
@@ -66,24 +67,6 @@ export interface Booking {
   updatedAt: string;
 }
 
-export interface Contract {
-  id: number;
-  amount: string;
-  status: string;
-  notes: string | null;
-  agreedPrice: string;
-  stripePaymentIntentId: string | null;
-  createdAt: string;
-  updatedAt: string;
-  completedAt: string | null;
-  service: Service;
-  client: User;
-  provider: User;
-  bookings: Booking[];
-  timeSlots: TimeSlot[];
-  canReview: boolean;
-}
-
 export interface ContractsResponse {
   clientContracts: Contract[];
   providerContracts: Contract[];
@@ -93,7 +76,7 @@ export const useGetMyContracts = () => {
   return useQuery({
     queryKey: [QueryKeys.GET_MY_CONTRACTS],
     queryFn: async () => {
-      const { data } = await axiosClient.get<Contract[]>(
+      const { data } = await axiosClient.get<ContractsResponse>(
         "/contracts/my-contracts",
       );
       return data;

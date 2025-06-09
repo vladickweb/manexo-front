@@ -5,7 +5,7 @@ import { Service } from "@/types/service";
 import { IUser } from "@/types/user";
 
 export interface Contract {
-  id: string;
+  id: number;
   amount: string;
   status: "paid" | "pending" | "cancelled";
   notes: string | null;

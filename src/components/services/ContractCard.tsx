@@ -7,7 +7,7 @@ import { LuMessageSquare, LuStar } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
-import { Contract } from "@/hooks/api/useGetMyContracts";
+import { Contract } from "@/hooks/api/useCreateContract";
 
 import { CreateReviewModal } from "./CreateReviewModal";
 

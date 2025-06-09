@@ -10,12 +10,14 @@ interface DetailsStepProps {
   service: Service;
   onNext: () => void;
   onSendMessage: () => void;
+  showSendMessageButton?: boolean;
 }
 
 export const DetailsStep: React.FC<DetailsStepProps> = ({
   service,
   onNext,
   onSendMessage,
+  showSendMessageButton,
 }) => {
   return (
     <div className="space-y-6">
@@ -63,13 +65,15 @@ export const DetailsStep: React.FC<DetailsStepProps> = ({
         >
           Seleccionar horario
         </button>
-        <button
-          onClick={onSendMessage}
-          className="flex items-center justify-center px-6 py-3 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-colors font-medium"
-        >
-          <LuMessageSquare className="w-5 h-5 mr-2" />
-          Enviar mensaje
-        </button>
+        {showSendMessageButton && (
+          <button
+            onClick={onSendMessage}
+            className="flex items-center justify-center px-6 py-3 border-2 border-gray-200 rounded-lg hover:border-primary hover:bg-primary/5 transition-colors font-medium"
+          >
+            <LuMessageSquare className="w-5 h-5 mr-2" />
+            Enviar mensaje
+          </button>
+        )}
       </div>
     </div>
   );
