@@ -1,0 +1,12 @@
+@font-face {
+  font-family: STHeiti;
+  src: url('../assets/fonts/stheiti-regular.ttf') format('truetype'),
+       local('STHeiti'),
+       local('Stheiti'),
+       local('Heiti TC'),
+       local('Heiti SC'),
+       local('Heiti');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+} 

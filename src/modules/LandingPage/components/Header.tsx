@@ -35,11 +35,25 @@ export const Header = () => {
                 isScrolled ? "opacity-0" : "opacity-100"
               }`}
             />
-            <Logo
-              className={`w-auto transition-all duration-300 relative ${
+            <div
+              className={`relative transition-all duration-300 ${
                 isScrolled ? "h-12" : "h-24"
-              } ${isScrolled ? "text-gray-800" : "text-white"}`}
-            />
+              }`}
+            >
+              <Logo
+                className={`w-auto h-full transition-all duration-300 ${
+                  isScrolled ? "text-gray-800" : "text-white"
+                }`}
+                style={{
+                  WebkitFontSmoothing: "antialiased",
+                  MozOsxFontSmoothing: "grayscale",
+                  textRendering: "optimizeLegibility",
+                  fontFamily:
+                    "Stheiti, 'STHeiti', 'Heiti TC', 'Heiti SC', 'Heiti', sans-serif",
+                }}
+                preserveAspectRatio="xMidYMid meet"
+              />
+            </div>
           </div>
         </div>
 
@@ -121,7 +135,7 @@ export const Header = () => {
       {menuOpen && (
         <nav
           className={`md:hidden transition-colors duration-300 ${
-            isScrolled ? "bg-white/95" : "bg-black/95"
+            isScrolled ? "bg-white/95" : "bg-black/60"
           } backdrop-blur-md shadow-lg`}
         >
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
@@ -147,7 +161,10 @@ export const Header = () => {
               Contacto
             </ActionButton>
             <Button
-              onClick={() => setMenuOpen(false)}
+              onClick={() => {
+                setIsLoginModalOpen(true);
+                setMenuOpen(false);
+              }}
               className={
                 isScrolled ? "" : "bg-white text-gray-800 hover:bg-gray-100"
               }
