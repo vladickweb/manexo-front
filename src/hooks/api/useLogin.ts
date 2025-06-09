@@ -42,7 +42,7 @@ export const useLogin = () => {
       }, 100);
     },
     onError: (error) => {
-      console.error("useLogin - Error en login:", error);
+      console.error("useLogin: ", error);
     },
   });
 };

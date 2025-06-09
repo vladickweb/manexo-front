@@ -25,6 +25,7 @@ interface ServiceDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   serviceId: number;
+  showSendMessageButton?: boolean;
 }
 
 type Step = "details" | "schedule" | "review";
@@ -33,6 +34,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
   isOpen,
   onClose,
   serviceId,
+  showSendMessageButton = true,
 }) => {
   const { data: service, isLoading: isLoadingService } = useGetServicesById(
     serviceId,
@@ -157,7 +159,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
 
       window.location.href = response.paymentUrl;
     } catch (error) {
-      console.error("Error al crear el contrato:", error);
+      console.error("Error creating contract:", error);
     } finally {
       setIsProcessing(false);
     }
@@ -173,6 +175,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
             service={service}
             onNext={handleNext}
             onSendMessage={handleSendMessage}
+            showSendMessageButton={showSendMessageButton}
           />
         );
 
@@ -240,7 +243,6 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
                   <LuX className="w-5 h-5" />
                 </button>
               </div>
-
               {renderStep()}
 
               {currentStep !== "details" && (

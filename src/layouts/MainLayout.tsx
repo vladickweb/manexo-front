@@ -152,7 +152,7 @@ export const MainLayout = React.memo(({ children }: MainLayoutProps) => {
         <div className="container mx-auto px-4 h-full">{children}</div>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-10">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-3">
             {renderMobileNavItems}

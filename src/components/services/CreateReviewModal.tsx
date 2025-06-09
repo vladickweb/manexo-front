@@ -71,7 +71,7 @@ export const CreateReviewModal: FC<CreateReviewModalProps> = ({
 
       onClose();
     } catch (error) {
-      console.error("Error al crear la review:", error);
+      console.error("Error creating review:", error);
     }
   };
 
