@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { LoginForm } from "@/components/Login/LoginForm";
 import { SignupForm } from "@/components/Login/SignupForm";
@@ -11,31 +12,28 @@ interface LoginModalProps {
 
 export const LoginModal = ({ isOpen, setIsOpen }: LoginModalProps) => {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-      document.body.style.top = `-${window.scrollY}px`;
     } else {
-      const scrollY = document.body.style.top;
       document.body.style.overflow = "unset";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
-      window.scrollTo(0, parseInt(scrollY || "0") * -1);
     }
 
     return () => {
       document.body.style.overflow = "unset";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
     };
   }, [isOpen]);
 
-  return (
+  if (!mounted) return null;
+
+  const modalContent = (
     <Modal
       isOpen={isOpen}
       onClose={() => setIsOpen(false)}
@@ -69,4 +67,6 @@ export const LoginModal = ({ isOpen, setIsOpen }: LoginModalProps) => {
       </div>
     </Modal>
   );
+
+  return createPortal(modalContent, document.body);
 };
