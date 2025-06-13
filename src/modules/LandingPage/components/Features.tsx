@@ -53,10 +53,9 @@ const features: Feature[] = [
 export const Features = () => {
   return (
     <section
-      id="features"
+      id="services"
       className="relative py-32 overflow-hidden mt-20 rounded-lg"
     >
-      {/* Fondo decorativo */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,0.1),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(22,163,74,0.1),transparent_50%)]" />
