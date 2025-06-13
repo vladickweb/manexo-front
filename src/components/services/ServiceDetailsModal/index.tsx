@@ -26,6 +26,7 @@ interface ServiceDetailsModalProps {
   onClose: () => void;
   serviceId: number;
   showSendMessageButton?: boolean;
+  showNextButton?: boolean;
 }
 
 type Step = "details" | "schedule" | "review";
@@ -35,6 +36,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
   onClose,
   serviceId,
   showSendMessageButton = true,
+  showNextButton = true,
 }) => {
   const { data: service, isLoading: isLoadingService } = useGetServicesById(
     serviceId,
@@ -176,6 +178,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
             onNext={handleNext}
             onSendMessage={handleSendMessage}
             showSendMessageButton={showSendMessageButton}
+            showNextButton={showNextButton}
           />
         );
 

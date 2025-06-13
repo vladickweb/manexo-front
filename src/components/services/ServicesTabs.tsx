@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button as MantineButton, Menu } from "@mantine/core";
 import { motion } from "framer-motion";
@@ -68,28 +68,6 @@ export const ServicesTabs = () => {
     contracted: useRef<HTMLButtonElement>(null),
     provided: useRef<HTMLButtonElement>(null),
   };
-  const [indicatorStyle, setIndicatorStyle] = useState<{
-    left: number;
-    width: number;
-  }>({ left: 0, width: 0 });
-
-  const updateIndicator = () => {
-    const ref = tabRefs[activeView];
-    if (ref.current) {
-      const { offsetLeft, offsetWidth } = ref.current;
-      setIndicatorStyle({ left: offsetLeft, width: offsetWidth });
-    }
-  };
-
-  useLayoutEffect(() => {
-    updateIndicator();
-    const timeout = setTimeout(updateIndicator, 30);
-    window.addEventListener("resize", updateIndicator);
-    return () => {
-      clearTimeout(timeout);
-      window.removeEventListener("resize", updateIndicator);
-    };
-  }, [activeView, tabRefs.offered, tabRefs.contracted, tabRefs.provided]);
 
   const fadeVariants = {
     initial: { opacity: 0 },
@@ -105,10 +83,10 @@ export const ServicesTabs = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
-            {VIEW_LABELS[activeView].title}
+            {VIEW_LABELS[activeView as ViewType].title}
           </h2>
           <p className="text-gray-600 mt-1">
-            {VIEW_LABELS[activeView].description}
+            {VIEW_LABELS[activeView as ViewType].description}
           </p>
         </div>
         <div className="flex flex-col md:flex-row md:items-center gap-3 w-full md:w-auto">
@@ -116,7 +94,7 @@ export const ServicesTabs = () => {
             <Menu shadow="md" width={220} position="bottom-start">
               <Menu.Target>
                 <MantineButton variant="default" fullWidth>
-                  {VIEW_LABELS[activeView].title}
+                  {VIEW_LABELS[activeView as ViewType].title}
                 </MantineButton>
               </Menu.Target>
               <Menu.Dropdown>
@@ -148,19 +126,6 @@ export const ServicesTabs = () => {
                 {title}
               </button>
             ))}
-            <motion.div
-              className="absolute top-1 bottom-1 bg-white rounded-md shadow-sm z-0"
-              initial={false}
-              animate={{
-                left: indicatorStyle.left,
-                width: indicatorStyle.width,
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 30,
-              }}
-            />
           </div>
 
           <Button
@@ -201,6 +166,7 @@ export const ServicesTabs = () => {
                 key={contract.id}
                 contract={contract}
                 isProvider={true}
+                showAddToCalendar={true}
               />
             ))}
           </div>

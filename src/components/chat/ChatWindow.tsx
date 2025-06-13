@@ -2,19 +2,18 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { IoArrowBack } from "react-icons/io5";
-import { IoSend } from "react-icons/io5";
+import { IoArrowBack, IoCheckmarkDoneSharp, IoSend } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { ChatWindowSkeleton } from "@/components/chat/ChatWindowSkeleton";
 import { ServiceDetailsModal } from "@/components/services/ServiceDetailsModal";
+import { UserAvatar } from "@/components/UserAvatar";
 import { useGetChatMessages } from "@/hooks/api/useChats";
 import { useChatSocket } from "@/hooks/useChatSocket";
 import { useUser } from "@/stores/useUser";
 import { IChat } from "@/types/chat";
 
 interface ChatWindowProps {
-  chat: IChat;
+  chat?: IChat;
 }
 
 const messageAnimationStyles = `
@@ -58,9 +57,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const isChatActive = location.pathname === `/messages/${chat.id}`;
+  const isChatActive = location.pathname === `/messages/${chat?.id}`;
   const otherParticipant =
-    chat.user.id === user?.id ? chat.serviceProvider : chat.user;
+    chat?.user.id === user?.id ? chat?.serviceProvider : chat?.user;
   const {
     joinChat,
     leaveChat,
@@ -69,20 +68,20 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
     getMessages,
     setChatMessages,
   } = useChatSocket();
-  const { data: initialMessages, isLoading } = useGetChatMessages(chat.id);
-  const messages = getMessages(chat.id);
+  const { data: initialMessages } = useGetChatMessages(chat?.id);
+  const messages = getMessages(chat?.id || "");
 
   useEffect(() => {
-    joinChat(chat.id);
-    if (isChatActive) markMessagesAsRead(chat.id);
+    joinChat(chat?.id || "");
+    if (isChatActive) markMessagesAsRead(chat?.id || "");
     if (initialMessages) {
-      setChatMessages(chat.id, initialMessages);
+      setChatMessages(chat?.id || "", initialMessages);
     }
     return () => {
-      leaveChat(chat.id);
+      leaveChat(chat?.id || "");
     };
   }, [
-    chat.id,
+    chat?.id,
     isChatActive,
     joinChat,
     leaveChat,
@@ -112,17 +111,17 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
     (e: React.FormEvent) => {
       e.preventDefault();
       if (!message.trim()) return;
-      sendMessage(chat.id, message);
+      sendMessage(chat?.id || "", message);
       setMessage("");
       setShouldAutoScroll(true);
     },
-    [message, sendMessage, chat.id],
+    [message, sendMessage, chat?.id],
   );
 
-  if (isLoading) {
-    return <ChatWindowSkeleton />;
-  }
-
+  const lastOwnMsgIdx = messages
+    .map((m, i) => (m.sender.id === user?.id ? i : -1))
+    .filter((i) => i !== -1)
+    .pop();
   return (
     <>
       <style>{messageAnimationStyles}</style>
@@ -134,23 +133,12 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
           >
             <IoArrowBack className="w-5 h-5 text-gray-600" />
           </button>
-          {otherParticipant.profileImageUrl ? (
-            <img
-              src={otherParticipant.profileImageUrl}
-              alt={`${otherParticipant.firstName} ${otherParticipant.lastName}`}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-500">
-                {otherParticipant.firstName?.[0] || "U"}
-                {otherParticipant.lastName?.[0] || ""}
-              </span>
-            </div>
-          )}
+          <UserAvatar user={otherParticipant!} size="lg" />
           <div className="ml-3 flex-1">
             <h2 className="text-sm font-medium text-gray-900">
-              {`${otherParticipant.firstName.charAt(0).toUpperCase() + otherParticipant.firstName.slice(1)} ${otherParticipant.lastName.charAt(0).toUpperCase() + otherParticipant.lastName.slice(1)}`}
+              {otherParticipant
+                ? `${otherParticipant.firstName?.charAt(0).toUpperCase() + otherParticipant.firstName?.slice(1)} ${otherParticipant.lastName?.charAt(0).toUpperCase() + otherParticipant.lastName?.slice(1)}`
+                : ""}
             </h2>
             <button
               onClick={() => setIsServiceDetailsOpen(true)}
@@ -165,14 +153,18 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
           ref={messagesContainerRef}
           className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 min-h-0"
         >
-          {messages.map((msg) =>
-            msg.isSystemMessage ? (
-              <div key={msg.id} className="flex justify-center">
-                <div className="bg-gray-100 text-gray-500 text-xs px-4 py-2 rounded-lg max-w-[80%]">
-                  {msg.content}
+          {messages.map((msg, idx) => {
+            const isLastOwnMsg = idx === lastOwnMsgIdx;
+            if (msg.isSystemMessage) {
+              return (
+                <div key={msg.id} className="flex justify-center">
+                  <div className="bg-gray-100 text-gray-500 text-xs px-4 py-2 rounded-lg max-w-[80%]">
+                    {msg.content}
+                  </div>
                 </div>
-              </div>
-            ) : (
+              );
+            }
+            const messageBubble = (
               <div
                 key={msg.id}
                 className={`flex ${
@@ -198,8 +190,26 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
                   </span>
                 </div>
               </div>
-            ),
-          )}
+            );
+            if (isLastOwnMsg && msg.isRead) {
+              return (
+                <div key={msg.id}>
+                  {messageBubble}
+                  <div className="flex justify-end mt-1 pr-2">
+                    <span className="flex items-center gap-1 text-xs text-blue-300">
+                      <IoCheckmarkDoneSharp
+                        className="text-blue-300"
+                        size={16}
+                        title="Leído"
+                      />
+                      Leído
+                    </span>
+                  </div>
+                </div>
+              );
+            }
+            return messageBubble;
+          })}
 
           <div ref={messagesEndRef} style={{ height: 16 }} />
         </div>
@@ -226,8 +236,9 @@ export const ChatWindow: FC<ChatWindowProps> = ({ chat }) => {
       <ServiceDetailsModal
         isOpen={isServiceDetailsOpen}
         onClose={() => setIsServiceDetailsOpen(false)}
-        serviceId={chat.service.id}
+        serviceId={chat?.service.id || 0}
         showSendMessageButton={false}
+        showNextButton={user?.id !== chat?.serviceProvider.id || false}
       />
     </>
   );

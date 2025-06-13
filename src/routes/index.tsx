@@ -57,18 +57,6 @@ export const AppRoutes = () => {
       routeOrder[currentBasePath as keyof typeof routeOrder] ?? 0;
     const prevIndex = routeOrder[prevBasePath as keyof typeof routeOrder] ?? 0;
 
-    // eslint-disable-next-line no-console
-    console.log("Navigation Debug:", {
-      currentPath,
-      prevPath: prevPathRef.current,
-      currentBasePath,
-      prevBasePath,
-      currentIndex,
-      prevIndex,
-      direction: currentIndex > prevIndex ? "right-to-left" : "left-to-right",
-      isFirstRender,
-    });
-
     return currentIndex > prevIndex ? 1 : -1;
   };
 
@@ -268,18 +256,7 @@ export const AppRoutes = () => {
                       />
                       <Route
                         path="messages/:chatId"
-                        element={
-                          <motion.div
-                            custom={getDirection(location.pathname)}
-                            variants={pageVariants}
-                            initial="initial"
-                            animate="animate"
-                            exit="exit"
-                            transition={pageTransition}
-                          >
-                            <MessagesPage />
-                          </motion.div>
-                        }
+                        element={<MessagesPage />}
                       />
                       <Route
                         path="profile"

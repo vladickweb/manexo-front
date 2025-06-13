@@ -13,6 +13,9 @@ export const useGetChats = () => {
       const { data } = await axiosClient.get("/chats");
       return data;
     },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 };
 
@@ -27,7 +30,7 @@ export const useGetChat = (chatId: string) => {
   });
 };
 
-export const useGetChatMessages = (chatId: string) => {
+export const useGetChatMessages = (chatId?: string) => {
   return useQuery<IMessage[]>({
     queryKey: ["chat-messages", chatId],
     queryFn: async () => {

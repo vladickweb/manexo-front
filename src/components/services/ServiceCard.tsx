@@ -25,6 +25,8 @@ interface ServiceCardProps {
   showDistance?: boolean;
   showFavoriteButton?: boolean;
   showHamburgerMenu?: boolean;
+  onCategoryClick?: (categoryId: string) => void;
+  onSubcategoryClick?: (subcategoryId: string) => void;
 }
 
 export const ServiceCard: FC<ServiceCardProps> = ({
@@ -32,6 +34,8 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   showDistance,
   showFavoriteButton,
   showHamburgerMenu,
+  onCategoryClick,
+  onSubcategoryClick,
 }) => {
   const { user } = useUser();
   const queryClient = useQueryClient();
@@ -124,12 +128,28 @@ export const ServiceCard: FC<ServiceCardProps> = ({
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
+              <span
+                className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full cursor-pointer hover:bg-primary/20 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onCategoryClick && service.subcategory?.category?.id) {
+                    onCategoryClick(service.subcategory.category.id.toString());
+                  }
+                }}
+              >
                 {service.subcategory?.category?.name}
               </span>
               {service.subcategory?.name !==
                 service.subcategory?.description && (
-                <span className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
+                <span
+                  className="text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onSubcategoryClick && service.subcategory?.id) {
+                      onSubcategoryClick(service.subcategory.id.toString());
+                    }
+                  }}
+                >
                   {service.subcategory?.name}
                 </span>
               )}

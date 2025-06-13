@@ -3,11 +3,9 @@ import { useEffect, useState } from "react";
 import Logo from "@/assets/manexo-logo.svg?react";
 import { ActionButton } from "@/components/ActionButton/ActionButton";
 import { Button } from "@/components/Button/Button";
-import { LoginModal } from "@/components/Login/LoginModal";
 
-export const Header = () => {
+export const Header = ({ onLoginClick }: { onLoginClick: () => void }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -121,7 +119,7 @@ export const Header = () => {
           </ActionButton>
           <Button
             onClick={() => {
-              setIsLoginModalOpen(true);
+              onLoginClick();
               setMenuOpen(false);
             }}
             className={
@@ -163,7 +161,7 @@ export const Header = () => {
             </ActionButton>
             <Button
               onClick={() => {
-                setIsLoginModalOpen(true);
+                onLoginClick();
                 setMenuOpen(false);
               }}
               className={
@@ -175,7 +173,6 @@ export const Header = () => {
           </div>
         </nav>
       )}
-      <LoginModal isOpen={isLoginModalOpen} setIsOpen={setIsLoginModalOpen} />
     </header>
   );
 };
