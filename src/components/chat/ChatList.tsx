@@ -1,5 +1,10 @@
-import { useEffect } from "react";
+import React from "react";
 
+import {
+  IoArrowBackCircle,
+  IoArrowForwardCircle,
+  IoCheckmarkDoneSharp,
+} from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { UserAvatar } from "@/components/UserAvatar";
@@ -22,19 +27,12 @@ function formatHour(dateString: string) {
   });
 }
 
-export const ChatList = ({ chats }: ChatListProps) => {
+export const ChatList = React.memo(({ chats }: ChatListProps) => {
   const { user } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
   const { lastMessages } = useChatSocket();
-  const { unreadCounts, markChatAsRead } = useUnreadMessages();
-
-  useEffect(() => {
-    const activeChatId = location.pathname.split("/").pop();
-    if (activeChatId && unreadCounts[activeChatId] > 0) {
-      markChatAsRead(activeChatId);
-    }
-  }, [location.pathname, unreadCounts, markChatAsRead]);
+  const { unreadCounts } = useUnreadMessages();
 
   const getOtherParticipant = (chat: IChat) => {
     return chat.user.id === user?.id ? chat.serviceProvider : chat.user;
@@ -61,6 +59,8 @@ export const ChatList = ({ chats }: ChatListProps) => {
       ? "Usted: "
       : `${message.sender.firstName.charAt(0).toUpperCase() + message.sender.firstName.slice(1)}: `;
   };
+
+  const isInitiator = (chat: IChat) => chat.user.id === user?.id;
 
   return (
     <div className="flex flex-col gap-2">
@@ -111,6 +111,19 @@ export const ChatList = ({ chats }: ChatListProps) => {
                     )}
                   >
                     {`${otherParticipant.firstName.charAt(0).toUpperCase() + otherParticipant.firstName.slice(1)} ${otherParticipant.lastName.charAt(0).toUpperCase() + otherParticipant.lastName.slice(1)}`}
+                    {isInitiator(chat) ? (
+                      <IoArrowForwardCircle
+                        title="Tú iniciaste la conversación"
+                        className="inline ml-2 text-primary align-text-bottom"
+                        size={18}
+                      />
+                    ) : (
+                      <IoArrowBackCircle
+                        title="La otra persona inició la conversación"
+                        className="inline ml-2 text-gray-400 align-text-bottom"
+                        size={18}
+                      />
+                    )}
                   </h3>
                   {lastMessage && (
                     <span
@@ -132,6 +145,14 @@ export const ChatList = ({ chats }: ChatListProps) => {
                   >
                     {getMessagePrefix(lastMessage)}
                     {lastMessage.content}
+                    {lastMessage.sender.id === user?.id &&
+                      lastMessage.isRead && (
+                        <IoCheckmarkDoneSharp
+                          className="inline ml-1 text-blue-500 align-text-bottom"
+                          size={16}
+                          title="Leído"
+                        />
+                      )}
                   </p>
                 )}
               </div>
@@ -140,4 +161,4 @@ export const ChatList = ({ chats }: ChatListProps) => {
         })}
     </div>
   );
-};
+});

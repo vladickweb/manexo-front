@@ -10,7 +10,8 @@ interface DetailsStepProps {
   service: Service;
   onNext: () => void;
   onSendMessage: () => void;
-  showSendMessageButton?: boolean;
+  showSendMessageButton: boolean;
+  showNextButton: boolean;
 }
 
 export const DetailsStep: React.FC<DetailsStepProps> = ({
@@ -18,6 +19,7 @@ export const DetailsStep: React.FC<DetailsStepProps> = ({
   onNext,
   onSendMessage,
   showSendMessageButton,
+  showNextButton,
 }) => {
   return (
     <div className="space-y-6">
@@ -59,12 +61,15 @@ export const DetailsStep: React.FC<DetailsStepProps> = ({
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
-        <button
-          onClick={onNext}
-          className="flex-1 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
-        >
-          Seleccionar horario
-        </button>
+        {showNextButton && (
+          <button
+            onClick={onNext}
+            className="flex-1 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium"
+          >
+            Seleccionar horario
+          </button>
+        )}
+
         {showSendMessageButton && (
           <button
             onClick={onSendMessage}

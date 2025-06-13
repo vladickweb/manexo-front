@@ -14,9 +14,14 @@ import { CreateReviewModal } from "./CreateReviewModal";
 interface ContractCardProps {
   contract: Contract;
   isProvider: boolean;
+  showAddToCalendar?: boolean;
 }
 
-export const ContractCard = ({ contract, isProvider }: ContractCardProps) => {
+export const ContractCard = ({
+  contract,
+  isProvider,
+  showAddToCalendar = false,
+}: ContractCardProps) => {
   const navigate = useNavigate();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const otherUser = isProvider ? contract.client : contract.provider;
@@ -48,6 +53,45 @@ export const ContractCard = ({ contract, isProvider }: ContractCardProps) => {
       default:
         return status;
     }
+  };
+
+  const handleAddToCalendar = () => {
+    if (!booking?.date || !booking?.startTime || !booking?.endTime) {
+      alert("No se han encontrado eventos válidos que añadir a tu calendario.");
+      return;
+    }
+
+    const bookingDate = new Date(booking.date);
+
+    const [startHours, startMinutes] = booking.startTime.split(":").map(Number);
+    const [endHours, endMinutes] = booking.endTime.split(":").map(Number);
+
+    const startDate = new Date(bookingDate);
+    startDate.setHours(startHours, startMinutes, 0, 0);
+
+    const endDate = new Date(bookingDate);
+    endDate.setHours(endHours, endMinutes, 0, 0);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      alert("No se han encontrado eventos válidos que añadir a tu calendario.");
+      return;
+    }
+
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const formatICSDate = (date: Date) =>
+      `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}00Z`;
+
+    const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${contract.service.subcategory.name} con ${otherUser.firstName} ${otherUser.lastName}\nDESCRIPTION:Servicio contratado en Menexo\nDTSTART:${formatICSDate(startDate)}\nDTEND:${formatICSDate(endDate)}\nLOCATION:-\nEND:VEVENT\nEND:VCALENDAR`;
+
+    const blob = new Blob([icsContent], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `evento-menexo.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   if (!contract?.service || !contract?.bookings?.length) {
@@ -98,7 +142,7 @@ export const ContractCard = ({ contract, isProvider }: ContractCardProps) => {
 
             <div className="flex items-center text-sm text-gray-600">
               <MapPin className="w-4 h-4 mr-2" />
-              <span>{contract.service.subcategory.name}</span>
+              <span>{contract.service.user.location?.address}</span>
             </div>
 
             {contract.service.reviews.length > 0 && (
@@ -145,6 +189,15 @@ export const ContractCard = ({ contract, isProvider }: ContractCardProps) => {
               >
                 <LuStar className="mr-2 h-4 w-4" />
                 Dejar review
+              </Button>
+            ) : showAddToCalendar ? (
+              <Button
+                variant="primary"
+                onClick={handleAddToCalendar}
+                className="flex-1 flex items-center justify-center"
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                Añadir al calendario
               </Button>
             ) : (
               <span className="flex-1 text-sm text-gray-500 font-semibold bg-green-100 px-4 py-2 rounded-lg text-center">

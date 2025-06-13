@@ -19,7 +19,7 @@ import { ServiceCardSkeleton } from "@/modules/SearchPage/ServiceCardSkeleton";
 import { useUser } from "@/stores/useUser";
 
 const initialFilters = {
-  categoryId: undefined,
+  categoryId: undefined as string | undefined,
   subcategoryIds: [] as string[],
   minPrice: undefined as number | undefined,
   maxPrice: undefined as number | undefined,
@@ -258,6 +258,26 @@ export const SearchPage: React.FC = () => {
                   service={svc}
                   showDistance={true}
                   showFavoriteButton={true}
+                  onCategoryClick={(categoryId) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      categoryId,
+                      subcategoryIds: [],
+                    }));
+                    setResetKey((k) => k + 1);
+                  }}
+                  onSubcategoryClick={(subcategoryId) => {
+                    setFilters((prev) => ({
+                      ...prev,
+                      subcategoryIds: [subcategoryId],
+                      categoryId:
+                        services
+                          .find((s) => s.id === svc.id)
+                          ?.subcategory?.category?.id?.toString() ||
+                        prev.categoryId,
+                    }));
+                    setResetKey((k) => k + 1);
+                  }}
                 />
               ))}
               {isFetchingNextPage && (
