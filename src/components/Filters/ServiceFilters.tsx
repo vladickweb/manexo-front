@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef } from "react";
 
-import { Box, TextInput } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { useFormik } from "formik";
 
 import { CATEGORIES } from "@/constants/categories";
+
+import { PriceSlider } from "./PriceSlider";
 
 interface FilterValues {
   categoryId?: string;
@@ -26,8 +28,8 @@ interface Props {
 const DEFAULT_VALUES: FilterValues = {
   categoryId: undefined,
   subcategoryIds: [],
-  minPrice: "",
-  maxPrice: "",
+  minPrice: "0",
+  maxPrice: "1000",
 };
 
 export const ServiceFilters: React.FC<Props> = ({
@@ -137,19 +139,16 @@ export const ServiceFilters: React.FC<Props> = ({
         )}
 
         <div className="flex flex-wrap gap-4 items-end mb-2">
-          <TextInput
-            label="Precio mínimo"
-            type="number"
-            placeholder="0"
-            className="flex-1"
-            {...formik.getFieldProps("minPrice")}
-          />
-          <TextInput
-            label="Precio máximo"
-            type="number"
-            placeholder="0"
-            className="flex-1"
-            {...formik.getFieldProps("maxPrice")}
+          <PriceSlider
+            min={0}
+            value={[
+              Number(formik.values.minPrice),
+              Number(formik.values.maxPrice),
+            ]}
+            onChange={([min, max]) => {
+              formik.setFieldValue("minPrice", String(min));
+              formik.setFieldValue("maxPrice", String(max));
+            }}
           />
         </div>
       </form>
