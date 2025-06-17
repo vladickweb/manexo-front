@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { LuCalendar, LuMail, LuMapPin, LuPencil, LuStar } from "react-icons/lu";
+import { LuCalendar, LuMail, LuMapPin, LuPencil } from "react-icons/lu";
 import { toast } from "react-toastify";
 
 import { AvailabilityManager } from "@/components/profile/AvailabilityManager";
@@ -152,27 +152,25 @@ export const ProfilePage = () => {
                 <h1 className="text-2xl sm:text-3xl font-bold">
                   {profile.firstName} {profile.lastName}
                 </h1>
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-gray-600">
-                  <div className="flex items-center">
-                    <LuMail className="w-4 h-4 mr-2" />
-                    {profile.email}
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-6 text-gray-600">
+                  <div className="flex items-center w-full md:w-auto justify-center md:justify-start">
+                    <LuMail className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">{profile.email}</span>
                   </div>
                   {profile.location?.city && (
-                    <div className="flex items-center">
-                      <LuMapPin className="w-4 h-4 mr-2" />
-                      {profile.location.city}
+                    <div className="flex items-center w-full md:w-auto justify-center md:justify-start">
+                      <LuMapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">
+                        {profile.location.address} {profile.location.city}
+                      </span>
                     </div>
                   )}
                 </div>
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-sm text-gray-500">
-                  <div className="flex items-center">
+                  <div className="flex items-center w-full sm:w-auto justify-center sm:justify-start">
                     <LuCalendar className="w-4 h-4 mr-2" />
                     Miembro desde{" "}
                     {new Date(profile.createdAt).toLocaleDateString("es-ES")}
-                  </div>
-                  <div className="flex items-center">
-                    <LuStar className="w-4 h-4 mr-2" />
-                    {profile.reviews?.length || 0} reseñas
                   </div>
                 </div>
               </div>
