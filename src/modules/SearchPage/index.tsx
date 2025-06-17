@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 
-import { Button, Drawer } from "@mantine/core";
-import { Badge } from "@mantine/core";
+import { Badge, Button, Drawer } from "@mantine/core";
 import { motion } from "framer-motion";
+import _ from "lodash";
 import { SlidersHorizontal } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useInView } from "react-intersection-observer";
@@ -109,15 +109,26 @@ export const SearchPage: React.FC = () => {
     setHasAttemptedLoad(false);
   }, [filters]);
 
-  const handleFilterChange = React.useCallback((formValues: any) => {
-    setFilters((prev) => ({
-      ...prev,
-      categoryId: formValues.categoryId,
-      subcategoryIds: formValues.subcategoryIds,
-      minPrice: formValues.minPrice ? +formValues.minPrice : undefined,
-      maxPrice: formValues.maxPrice ? +formValues.maxPrice : undefined,
-    }));
-  }, []);
+  const debouncedSetFilters = React.useMemo(
+    () =>
+      _.debounce((formValues: any) => {
+        setFilters((prev) => ({
+          ...prev,
+          categoryId: formValues.categoryId,
+          subcategoryIds: formValues.subcategoryIds,
+          minPrice: formValues.minPrice ? +formValues.minPrice : undefined,
+          maxPrice: formValues.maxPrice ? +formValues.maxPrice : undefined,
+        }));
+      }, 400),
+    [],
+  );
+
+  const handleFilterChange = React.useCallback(
+    (formValues: any) => {
+      debouncedSetFilters(formValues);
+    },
+    [debouncedSetFilters],
+  );
 
   const activeFiltersCount = useMemo(() => {
     const count = [
@@ -222,9 +233,13 @@ export const SearchPage: React.FC = () => {
             categoryId: filters.categoryId,
             subcategoryIds: filters.subcategoryIds,
             minPrice:
-              filters.minPrice !== undefined ? filters.minPrice.toString() : "",
+              filters.minPrice !== undefined && filters.minPrice !== null
+                ? filters.minPrice.toString()
+                : "0",
             maxPrice:
-              filters.maxPrice !== undefined ? filters.maxPrice.toString() : "",
+              filters.maxPrice !== undefined && filters.maxPrice !== null
+                ? filters.maxPrice.toString()
+                : "1000",
           }}
         />
       </Drawer>

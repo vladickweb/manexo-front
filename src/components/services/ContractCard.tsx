@@ -25,8 +25,20 @@ export const ContractCard = ({
   const navigate = useNavigate();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const otherUser = isProvider ? contract.client : contract.provider;
-  const firstBooking = contract.bookings[0];
-  const lastBooking = contract.bookings[contract.bookings.length - 1];
+
+  const sortedBookings = [...contract.bookings].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    if (dateA.getTime() !== dateB.getTime()) {
+      return dateA.getTime() - dateB.getTime();
+    }
+    const [hA, mA] = a.startTime.split(":").map(Number);
+    const [hB, mB] = b.startTime.split(":").map(Number);
+    return hA !== hB ? hA - hB : mA - mB;
+  });
+
+  const firstBooking = sortedBookings[0];
+  const lastBooking = sortedBookings[sortedBookings.length - 1];
 
   const { service } = useMemo(() => contract, [contract]);
 
@@ -107,8 +119,8 @@ export const ContractCard = ({
 
   return (
     <>
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-4">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden flex flex-col min-h-[300px]">
+        <div className="p-4 flex-1 flex flex-col">
           <div className="flex justify-between items-start mb-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -180,7 +192,7 @@ export const ContractCard = ({
           </div>
         </div>
 
-        <div className="bg-gray-50 px-4 py-3 border-t border-gray-100">
+        <div className="bg-white px-4 py-3 border-t-2 border-gray-200 shadow-none">
           <div className="flex items-center justify-between gap-3">
             <Button
               variant="secondary"

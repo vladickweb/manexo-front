@@ -118,7 +118,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
   return (
     <>
       <div
-        className={`group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 ${user?.id === service.user.id ? "" : "cursor-pointer"} ${!service.isActive ? "opacity-60 grayscale scale-100" : ""}`}
+        className={`group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 ${user?.id === service.user.id ? "" : "cursor-pointer"} ${!service.isActive ? "opacity-60 grayscale scale-100" : ""} flex flex-col min-h-[300px]`}
         onClick={() => {
           if (user?.id !== service.user.id) {
             setIsModalOpen(true);
@@ -288,7 +288,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
           {service.description}
         </p>
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
           <div
             className="flex items-center gap-4 cursor-pointer group/reviews hover:bg-gray-50 p-2 rounded-lg transition-colors"
             onClick={(e) => {

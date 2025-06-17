@@ -47,7 +47,7 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
 
         return {
           date: date.toISOString(),
-          dayOfWeek: i + 1,
+          dayOfWeek: (i + new Date(availability.weekStart).getDay()) % 7,
           isActive: false,
           isPastDate,
           availableSlots: [],
