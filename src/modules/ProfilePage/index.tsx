@@ -161,7 +161,7 @@ export const ProfilePage = () => {
                     <div className="flex items-center w-full md:w-auto justify-center md:justify-start">
                       <LuMapPin className="w-4 h-4 mr-2 flex-shrink-0" />
                       <span className="truncate">
-                        {profile.location.address} {profile.location.city}
+                        {profile.location.address}
                       </span>
                     </div>
                   )}
