@@ -7,12 +7,12 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/Button/Button";
 import { ServicesSkeleton } from "@/components/services/ServicesSkeleton";
-import { Contract } from "@/hooks/api/useCreateContract";
 import { useGetMyContracts } from "@/hooks/api/useGetMyContracts";
 import { useGetServicesMePublished } from "@/hooks/api/useGetServicesMePublished";
 
-import { ContractCard } from "./ContractCard";
+import { ContractedServicesTab } from "./ContractedServicesTab";
 import { OfferedServicesTab } from "./OfferedServicesTab";
+import { ProvidedServicesTab } from "./ProvidedServicesTab";
 
 type ViewType = "offered" | "contracted" | "provided";
 
@@ -150,26 +150,9 @@ export const ServicesTabs = () => {
         {activeView === "offered" ? (
           <OfferedServicesTab services={servicesMePublished} />
         ) : activeView === "contracted" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {contracts?.clientContracts?.map((contract: Contract) => (
-              <ContractCard
-                key={contract.id}
-                contract={contract}
-                isProvider={false}
-              />
-            ))}
-          </div>
+          <ContractedServicesTab contracts={contracts} />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {contracts?.providerContracts?.map((contract: Contract) => (
-              <ContractCard
-                key={contract.id}
-                contract={contract}
-                isProvider={true}
-                showAddToCalendar={true}
-              />
-            ))}
-          </div>
+          <ProvidedServicesTab contracts={contracts} />
         )}
       </motion.div>
     </div>

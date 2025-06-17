@@ -25,7 +25,8 @@ export const ContractCard = ({
   const navigate = useNavigate();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const otherUser = isProvider ? contract.client : contract.provider;
-  const booking = contract.bookings[0];
+  const firstBooking = contract.bookings[0];
+  const lastBooking = contract.bookings[contract.bookings.length - 1];
 
   const { service } = useMemo(() => contract, [contract]);
 
@@ -56,15 +57,21 @@ export const ContractCard = ({
   };
 
   const handleAddToCalendar = () => {
-    if (!booking?.date || !booking?.startTime || !booking?.endTime) {
+    if (
+      !firstBooking?.date ||
+      !firstBooking?.startTime ||
+      !firstBooking?.endTime
+    ) {
       alert("No se han encontrado eventos válidos que añadir a tu calendario.");
       return;
     }
 
-    const bookingDate = new Date(booking.date);
+    const bookingDate = new Date(firstBooking.date);
 
-    const [startHours, startMinutes] = booking.startTime.split(":").map(Number);
-    const [endHours, endMinutes] = booking.endTime.split(":").map(Number);
+    const [startHours, startMinutes] = firstBooking.startTime
+      .split(":")
+      .map(Number);
+    const [endHours, endMinutes] = firstBooking.endTime.split(":").map(Number);
 
     const startDate = new Date(bookingDate);
     startDate.setHours(startHours, startMinutes, 0, 0);
@@ -127,7 +134,7 @@ export const ContractCard = ({
             <div className="flex items-center text-sm text-gray-600">
               <Calendar className="w-4 h-4 mr-2" />
               <span>
-                {format(new Date(booking.date), "EEEE d 'de' MMMM", {
+                {format(new Date(firstBooking.date), "EEEE d 'de' MMMM", {
                   locale: es,
                 })}
               </span>
@@ -136,7 +143,9 @@ export const ContractCard = ({
             <div className="flex items-center text-sm text-gray-600">
               <Clock className="w-4 h-4 mr-2" />
               <span>
-                {booking.startTime} - {booking.endTime}
+                {(() => {
+                  return `${firstBooking.startTime} - ${lastBooking.endTime}`;
+                })()}
               </span>
             </div>
 

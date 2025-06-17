@@ -1,7 +1,7 @@
 export const MessagesSkeleton = () => {
   return (
     <div className="flex-1 flex items-center justify-center p-4 md:p-8 overflow-hidden">
-      <div className="w-full h-[calc(100vh-6rem-84px)] md:h-[calc(100vh-8rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="w-full h-[calc(100dvh-6rem-84px)] md:h-[calc(100dvh-8rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-12 h-full">
           <div className="col-span-1 md:col-span-4 lg:col-span-3 border-r border-gray-200 h-full overflow-hidden">
             <div className="h-full overflow-y-auto p-4 space-y-4">
