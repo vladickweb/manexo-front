@@ -210,7 +210,7 @@ export const CreateServicePage = () => {
   }
 
   return (
-    <div className="w-full min-h-[calc(100vh-100px)] flex flex-col items-center">
+    <div className="w-full min-h-[calc(100dvh-100px)] flex flex-col items-center">
       <div className="w-full h-full max-w-4xl flex flex-col">
         <StepperHeader currentStep={currentStep} />
         <div className="w-full px-6 pt-10 pb-20 md:pb-10">

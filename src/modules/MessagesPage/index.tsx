@@ -46,7 +46,7 @@ const EmptyState = ({
   title: string;
   description: string;
 }) => (
-  <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem-84px)] md:h-[calc(100vh-8rem)]">
+  <div className="flex flex-col items-center justify-center h-[calc(100dvh-4rem-84px)] md:h-[calc(100dvh-8rem)]">
     <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
       <Icon className="w-10 h-10 text-primary" />
     </div>
@@ -99,7 +99,7 @@ export const MessagesPage = () => {
   return (
     <UnreadMessagesProvider chats={chats}>
       <div className="flex-1 flex items-center justify-center p-4 md:p-8 overflow-hidden">
-        <div className="w-full h-[calc(100vh-6rem-84px)] md:h-[calc(100vh-8rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="w-full h-[calc(100dvh-6rem-84px)] md:h-[calc(100dvh-8rem)] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-12 h-full">
             <div
               className={`${mobileViewClasses.chatList} col-span-1 md:col-span-4 lg:col-span-3 border-r border-gray-200 h-full overflow-hidden`}

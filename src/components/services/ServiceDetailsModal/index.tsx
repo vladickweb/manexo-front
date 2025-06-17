@@ -225,7 +225,7 @@ export const ServiceDetailsModal: React.FC<ServiceDetailsModalProps> = ({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-xl w-full max-w-2xl max-h-[90dvh] overflow-y-auto"
           >
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">

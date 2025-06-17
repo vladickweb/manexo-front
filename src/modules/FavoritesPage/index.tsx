@@ -31,7 +31,7 @@ export const FavoritesPage = () => {
           })}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
+        <div className="flex flex-col items-center justify-center h-[calc(100dvh-200px)]">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <FaHeart className="w-10 h-10 text-primary" />
           </div>

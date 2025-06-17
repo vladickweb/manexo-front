@@ -131,7 +131,7 @@ export const SearchPage: React.FC = () => {
 
   if (!user?.location) {
     return (
-      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-100px)]">
+      <div className="flex items-center justify-center p-4 min-h-[calc(100dvh-100px)]">
         <LocationRequest
           onLocationSet={async (location) => {
             if (!user) return;
