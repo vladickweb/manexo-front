@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from "react";
 
 import { addDays, isBefore, startOfDay } from "date-fns";
@@ -38,11 +39,17 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
   onSlotSelect,
 }) => {
   const today = startOfDay(new Date());
+  console.log("Fecha actual:", today.toISOString());
 
   const weekDays = availability?.weekStart
     ? Array.from({ length: 7 }, (_, i) => {
         const date = addDays(new Date(availability.weekStart), i);
         const isPastDate = isBefore(date, today);
+        console.log(`Día ${i + 1}:`, {
+          fecha: date.toISOString(),
+          esPasada: isPastDate,
+          weekStart: availability.weekStart,
+        });
         return {
           date: date.toISOString(),
           dayOfWeek: i + 1,
