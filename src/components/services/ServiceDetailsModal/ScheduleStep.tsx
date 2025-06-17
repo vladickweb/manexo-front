@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import React from "react";
 
-import { addDays, isBefore, startOfDay } from "date-fns";
+import { addDays, isBefore, parseISO, startOfDay } from "date-fns";
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 import { ServiceAvailabilityResponse } from "@/hooks/api/useGetServiceAvailability";
@@ -43,12 +43,15 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
 
   const weekDays = availability?.weekStart
     ? Array.from({ length: 7 }, (_, i) => {
-        const date = addDays(new Date(availability.weekStart), i);
-        const isPastDate = isBefore(date, today);
+        const weekStartDate = parseISO(availability.weekStart);
+        const date = addDays(weekStartDate, i);
+        const isPastDate = isBefore(startOfDay(date), startOfDay(today));
         console.log(`Día ${i + 1}:`, {
           fecha: date.toISOString(),
           esPasada: isPastDate,
           weekStart: availability.weekStart,
+          fechaLocal: date.toLocaleString(),
+          fechaActualLocal: today.toLocaleString(),
         });
         return {
           date: date.toISOString(),
