@@ -29,11 +29,6 @@ export const Header = ({ onLoginClick }: { onLoginClick: () => void }) => {
         <div className="flex items-center space-x-4">
           <div className="relative">
             <div
-              className={`absolute inset-0 bg-white/20 blur-xl rounded-full transform scale-150 transition-opacity duration-300 ${
-                isScrolled ? "opacity-0" : "opacity-100"
-              }`}
-            />
-            <div
               className={`relative transition-all duration-300 ${
                 isScrolled ? "h-12" : "h-24"
               }`}
@@ -88,7 +83,7 @@ export const Header = ({ onLoginClick }: { onLoginClick: () => void }) => {
 
         <nav className="hidden md:flex items-center space-x-6">
           <ActionButton
-            href="#features"
+            href="#services"
             className={`transition-colors duration-300 ${
               isScrolled
                 ? "text-gray-800 hover:text-gray-600"
@@ -108,23 +103,23 @@ export const Header = ({ onLoginClick }: { onLoginClick: () => void }) => {
             Acerca
           </ActionButton>
           <ActionButton
-            href="#contact"
+            href="#faq"
             className={`transition-colors duration-300 ${
               isScrolled
                 ? "text-gray-800 hover:text-gray-600"
                 : "text-white hover:text-gray-200"
             }`}
           >
-            Contacto
+            FAQ
           </ActionButton>
           <Button
             onClick={() => {
               onLoginClick();
               setMenuOpen(false);
             }}
-            className={
-              isScrolled ? "" : "bg-white text-gray-800 hover:bg-gray-100"
-            }
+            className={isScrolled ? "" : "text-gray-800 hover:bg-gray-100"}
+            variant="primary"
+            filled
           >
             Iniciar Sesión
           </Button>
@@ -139,7 +134,7 @@ export const Header = ({ onLoginClick }: { onLoginClick: () => void }) => {
         >
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
             <ActionButton
-              href="#features"
+              href="#services"
               onClick={() => setMenuOpen(false)}
               className={isScrolled ? "text-gray-800" : "text-white"}
             >
@@ -153,11 +148,11 @@ export const Header = ({ onLoginClick }: { onLoginClick: () => void }) => {
               Acerca
             </ActionButton>
             <ActionButton
-              href="#contact"
+              href="#faq"
               onClick={() => setMenuOpen(false)}
               className={isScrolled ? "text-gray-800" : "text-white"}
             >
-              Contacto
+              FAQ
             </ActionButton>
             <Button
               onClick={() => {

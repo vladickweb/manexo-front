@@ -2,8 +2,9 @@
 <svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 762.09 379.54">
   <defs>
     <style>
-      .cls-1, .cls-2 {
+      .cls-1 {
         font-family: STHeiti, STHeiti;
+        fill: currentColor;
       }
 
       .cls-3 {
@@ -11,6 +12,7 @@
       }
 
       .cls-2 {
+        font-family: STHeiti, STHeiti;
         fill: #00b38a;
         font-size: 332px;
       }
