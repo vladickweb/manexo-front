@@ -61,7 +61,7 @@ export const Features = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(22,163,74,0.1),transparent_50%)]" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative container mx-auto px-4 py-4">
         <div className="text-center mb-20">
           <span className="text-green-600 font-semibold tracking-wider uppercase text-sm mb-4 block">
             Nuestros Servicios
