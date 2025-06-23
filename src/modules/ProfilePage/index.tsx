@@ -155,14 +155,15 @@ export const ProfilePage = () => {
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-6 text-gray-600">
                   <div className="flex items-center w-full md:w-auto justify-center md:justify-start">
                     <LuMail className="w-4 h-4 mr-2 flex-shrink-0" />
-                    <span className="truncate">{profile.email}</span>
+                    <span className="truncate text-sm md:text-base">
+                      {profile.email}
+                    </span>
                   </div>
                   {profile.location?.city && (
                     <div className="flex items-center w-full md:w-auto justify-center md:justify-start">
                       <LuMapPin className="w-4 h-4 mr-2 flex-shrink-0" />
-                      <span className="truncate">
-                        {profile.location.streetName}{" "}
-                        {profile.location.streetNumber}, {profile.location.city}
+                      <span className="truncate text-sm md:text-base">
+                        {profile.location.city}
                       </span>
                     </div>
                   )}

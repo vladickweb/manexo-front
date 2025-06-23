@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import { Badge, Button, Drawer } from "@mantine/core";
-import { motion } from "framer-motion";
 import _ from "lodash";
 import { SlidersHorizontal } from "lucide-react";
 import { FaMapMarkerAlt } from "react-icons/fa";
@@ -168,16 +167,16 @@ export const SearchPage: React.FC = () => {
 
   return (
     <div className="h-full bg-gray-50 relative">
-      <header className="container mx-auto px-4 py-8">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="mt-2 text-lg text-gray-600"
-        >
-          Encuentra los mejores servicios en tu zona
-        </motion.p>
-      </header>
+      <div className="container mx-auto py-8 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Servicios</h2>
+            <p className="text-gray-600 mt-1">
+              Aquí puedes ver los servicios disponibles.
+            </p>
+          </div>
+        </div>
+      </div>
 
       <div className="fixed z-50 bottom-[100px] right-6 md:bottom-6">
         <div className="relative">
@@ -244,7 +243,7 @@ export const SearchPage: React.FC = () => {
         />
       </Drawer>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto  y-8">
         {loadingServices && !pages ? (
           <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, idx) => (
