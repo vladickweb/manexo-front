@@ -120,6 +120,7 @@ export const ServiceCard: FC<ServiceCardProps> = ({
       <div
         className={`group relative bg-white rounded-3xl p-6 overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 ${user?.id === service.user.id ? "" : "cursor-pointer"} ${!service.isActive ? "opacity-60 grayscale scale-100" : ""} flex flex-col min-h-[300px]`}
         onClick={() => {
+          if (!service.isActive) return;
           if (user?.id !== service.user.id) {
             setIsModalOpen(true);
           }
@@ -171,7 +172,6 @@ export const ServiceCard: FC<ServiceCardProps> = ({
                   isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"
                 }
                 disabled={
-                  !service.isActive ||
                   favLoading ||
                   createFavorite.isPending ||
                   deleteFavorite.isPending

@@ -17,7 +17,15 @@ export const FavoritesPage = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-8 space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Mis favoritos</h2>
+          <p className="text-gray-600 mt-1">
+            Aquí puedes ver tus servicios favoritos.
+          </p>
+        </div>
+      </div>
       {favorites && favorites.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((fav) => {

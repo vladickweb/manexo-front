@@ -31,7 +31,7 @@ interface AddressComponents {
 }
 
 const validationSchema = Yup.object<FormValues>({
-  title: Yup.string().required("El título es requerido"),
+  title: Yup.string().optional(),
   description: Yup.string().required("La descripción es requerida"),
   price: Yup.number()
     .required("El precio es requerido")
@@ -43,7 +43,7 @@ const validationSchema = Yup.object<FormValues>({
     address: Yup.string().required("La dirección es requerida"),
     addressComponents: Yup.object({
       streetName: Yup.string().required("La calle es requerida"),
-      streetNumber: Yup.string().required("El número es requerido"),
+      streetNumber: Yup.string().optional(),
       city: Yup.string().required("La ciudad es requerida"),
       province: Yup.string().required("La provincia es requerida"),
       postalCode: Yup.string().required("El código postal es requerido"),
@@ -116,7 +116,7 @@ export const CreateServicePage = () => {
           longitude: values.location.longitude,
           address: values.location.address,
           streetName: values.location.addressComponents.streetName,
-          streetNumber: values.location.addressComponents.streetNumber,
+          streetNumber: values.location.addressComponents.streetNumber || "N/A",
           city: values.location.addressComponents.city,
           province: values.location.addressComponents.province,
           postalCode: values.location.addressComponents.postalCode,
