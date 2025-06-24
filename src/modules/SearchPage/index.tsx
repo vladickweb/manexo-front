@@ -166,7 +166,7 @@ export const SearchPage: React.FC = () => {
   }
 
   return (
-    <div className="h-full bg-gray-50 relative">
+    <div className="h-full bg-gray-50 relative pb-24">
       <div className="container mx-auto py-8 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
